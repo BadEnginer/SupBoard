@@ -4,5 +4,6 @@ Makefile
 *.ld
 build
 .vscode
+.bak
 libmicroros
 custombuild
