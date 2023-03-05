@@ -1,6 +1,6 @@
 # SupBoard
 JetPro
-![SCH.png](shematic.png)
+![SCH.png](SCH.png)
 
 ## Info about us:  
 STM32F411 
