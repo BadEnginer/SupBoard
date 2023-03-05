@@ -1,3 +1,7 @@
+Core
+Drivers
+EWARM
+Middlewares
 .mxproject
 Makefile
 *.s
