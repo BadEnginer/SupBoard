@@ -1,7 +1,6 @@
 # SupBoard
 JetPro
 ![SCH.png](SCH.png)
-![SUP_sch.pdf](SUP_sch.pdf)
 
 
 ## Info about us:  
