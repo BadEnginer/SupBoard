@@ -23,7 +23,16 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "epd2in9b.h"
+#include "epdif.h"
+#include "epdpaint.h"
+#include "imagedata.h"
+#include <stdlib.h>
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#define COLORED      1
+#define UNCOLORED    0
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +54,9 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 
+TIM_HandleTypeDef htim2;
+DMA_HandleTypeDef hdma_tim2_ch2_ch4;
+
 /* Definitions for InitTask */
 osThreadId_t InitTaskHandle;
 const osThreadAttr_t InitTask_attributes = {
@@ -59,8 +71,10 @@ const osThreadAttr_t InitTask_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_TIM2_Init(void);
 void StartInitTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -79,7 +93,8 @@ void StartInitTask(void *argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	  unsigned char* frame_buffer_black = (unsigned char*)malloc(EPD_WIDTH * EPD_HEIGHT / 8);
+	  unsigned char* frame_buffer_red = (unsigned char*)malloc(EPD_WIDTH * EPD_HEIGHT / 8);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -100,10 +115,45 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  EPD epd;
+  if (EPD_Init(&epd) != 0) {
+    printf("e-Paper init failed\n");
+    return -1;
+  }
 
+  Paint paint_black;
+  Paint paint_red;
+  Paint_Init(&paint_black, frame_buffer_black, epd.width, epd.height);
+  Paint_Init(&paint_red, frame_buffer_red, epd.width, epd.height);
+  Paint_Clear(&paint_black, UNCOLORED);
+  Paint_Clear(&paint_red, UNCOLORED);
+
+  /* Draw something to the frame buffer */
+  /* For simplicity, the arguments are explicit numerical coordinates */
+  Paint_SetRotate(&paint_black, ROTATE_0);
+  Paint_SetRotate(&paint_red, ROTATE_0);
+  Paint_DrawRectangle(&paint_black, 10, 80, 50, 140, COLORED);
+  Paint_DrawLine(&paint_black, 10, 80, 50, 140, COLORED);
+  Paint_DrawLine(&paint_black, 50, 80, 10, 140, COLORED);
+  Paint_DrawCircle(&paint_black, 90, 110, 30, COLORED);
+  Paint_DrawFilledRectangle(&paint_red, 10, 180, 50, 240, COLORED);
+  Paint_DrawFilledRectangle(&paint_red, 0, 6, 128, 26, COLORED);
+  Paint_DrawFilledCircle(&paint_red, 90, 210, 30, COLORED);
+
+  /*Write strings to the buffer */
+  Paint_DrawStringAt(&paint_black, 4, 30, "e-Paper JetPro", &Font12, COLORED);
+  Paint_DrawStringAt(&paint_red, 6, 10, "Hello JetPro!", &Font12, UNCOLORED);
+
+  /* Display the frame_buffer */
+  EPD_DisplayFrame(&epd, frame_buffer_black, frame_buffer_red);
+
+  /* Display the image buffer */
+  EPD_DisplayFrame(&epd, IMAGE_BLACK, IMAGE_RED);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -139,7 +189,6 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -270,6 +319,81 @@ static void MX_SPI1_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 119;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -277,6 +401,8 @@ static void MX_SPI1_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -299,6 +425,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(EPD_Busy_GPIO_Port, &GPIO_InitStruct);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
