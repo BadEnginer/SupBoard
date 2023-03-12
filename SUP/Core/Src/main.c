@@ -23,16 +23,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "epd2in9b.h"
-#include "epdif.h"
-#include "epdpaint.h"
-#include "imagedata.h"
 #include <stdlib.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#define COLORED      1
-#define UNCOLORED    0
+#include "EPD_Test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,8 +88,7 @@ void StartInitTask(void *argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	  unsigned char* frame_buffer_black = (unsigned char*)malloc(EPD_WIDTH * EPD_HEIGHT / 8);
-	  unsigned char* frame_buffer_red = (unsigned char*)malloc(EPD_WIDTH * EPD_HEIGHT / 8);
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -120,40 +114,7 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  EPD epd;
-  if (EPD_Init(&epd) != 0) {
-    printf("e-Paper init failed\n");
-    return -1;
-  }
-
-  Paint paint_black;
-  Paint paint_red;
-  Paint_Init(&paint_black, frame_buffer_black, epd.width, epd.height);
-  Paint_Init(&paint_red, frame_buffer_red, epd.width, epd.height);
-  Paint_Clear(&paint_black, UNCOLORED);
-  Paint_Clear(&paint_red, UNCOLORED);
-
-  /* Draw something to the frame buffer */
-  /* For simplicity, the arguments are explicit numerical coordinates */
-  Paint_SetRotate(&paint_black, ROTATE_0);
-  Paint_SetRotate(&paint_red, ROTATE_0);
-  Paint_DrawRectangle(&paint_black, 10, 80, 50, 140, COLORED);
-  Paint_DrawLine(&paint_black, 10, 80, 50, 140, COLORED);
-  Paint_DrawLine(&paint_black, 50, 80, 10, 140, COLORED);
-  Paint_DrawCircle(&paint_black, 90, 110, 30, COLORED);
-  Paint_DrawFilledRectangle(&paint_red, 10, 180, 50, 240, COLORED);
-  Paint_DrawFilledRectangle(&paint_red, 0, 6, 128, 26, COLORED);
-  Paint_DrawFilledCircle(&paint_red, 90, 210, 30, COLORED);
-
-  /*Write strings to the buffer */
-  Paint_DrawStringAt(&paint_black, 4, 30, "e-Paper JetPro", &Font12, COLORED);
-  Paint_DrawStringAt(&paint_red, 6, 10, "Hello JetPro!", &Font12, UNCOLORED);
-
-  /* Display the frame_buffer */
-  EPD_DisplayFrame(&epd, frame_buffer_black, frame_buffer_red);
-
-  /* Display the image buffer */
-  EPD_DisplayFrame(&epd, IMAGE_BLACK, IMAGE_RED);
+  EPD_test();
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -298,12 +259,12 @@ static void MX_SPI1_Init(void)
   /* SPI1 parameter configuration*/
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_1LINE;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_128;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

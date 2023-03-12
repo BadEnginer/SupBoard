@@ -69,14 +69,16 @@ void Error_Handler(void);
 #define EPD_Busy_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define RST_Pin EPD_Reset_Pin
+
+#define RST_Pin GPIO_PIN_1
 #define RST_GPIO_Port GPIOB
-#define DC_Pin EPD_Data_Control_Pin
+#define DC_Pin GPIO_PIN_2
 #define DC_GPIO_Port GPIOB
-#define BUSY_Pin EPD_Busy_Pin
+#define BUSY_Pin GPIO_PIN_10
 #define BUSY_GPIO_Port GPIOB
-#define SPI_CS_Pin EPD_CS_Pin
+#define SPI_CS_Pin GPIO_PIN_0
 #define SPI_CS_GPIO_Port GPIOB
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
