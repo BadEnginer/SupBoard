@@ -34,6 +34,7 @@
 #include "GUI_Paint.h"
 #include "imagedata.h"
 #include "Debug.h"
+#include "EPD_2in9bc.h"
 #include <stdlib.h> // malloc() free()
 
 int EPD_test(void);
