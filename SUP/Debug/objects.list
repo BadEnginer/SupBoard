@@ -1,6 +1,6 @@
 "./Core/Src/DEV_Config.o"
-"./Core/Src/EPD_2in9bc.o"
-"./Core/Src/EPD_2in9bc_test.o"
+"./Core/Src/EPD_2in9b_V3.o"
+"./Core/Src/EPD_2in9b_V3_test.o"
 "./Core/Src/GUI_Paint.o"
 "./Core/Src/ImageData.o"
 "./Core/Src/ImageData2.o"

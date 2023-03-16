@@ -1,11 +1,11 @@
 /*****************************************************************************
-* | File      	:   EPD_2in9bc_test.c
+* | File      	:   EPD_2in9b_V3_test.c
 * | Author      :   Waveshare team
-* | Function    :   2.9inch B&C e-paper test demo
+* | Function    :   2.9inch B V3 e-paper test demo
 * | Info        :
 *----------------
-* |	This version:   V1.0
-* | Date        :   2019-06-12
+* |	This version:   V1.1
+* | Date        :   2020-12-03
 * | Info        :
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,21 +28,21 @@
 #
 ******************************************************************************/
 #include "EPD_Test.h"
-//#include "EPD_2IN9BC.h"
+#include "EPD_2IN9B_V3.h"
 
 int EPD_test(void)
 {
-    printf("EPD_2IN9BC_test Demo\r\n");
+    printf("EPD_2IN9B_V3_test Demo\r\n");
     DEV_Module_Init();
 
     printf("e-Paper Init and Clear...\r\n");
-    EPD_2IN9BC_Init();
-    EPD_2IN9BC_Clear();
+    EPD_2IN9B_V3_Init();
+    EPD_2IN9B_V3_Clear();
     DEV_Delay_ms(500);
 
     //Create a new image cache named IMAGE_BW and fill it with white
     UBYTE *BlackImage, *RYImage; // Red or Yellow
-    UWORD Imagesize = ((EPD_2IN9BC_WIDTH % 8 == 0)? (EPD_2IN9BC_WIDTH / 8 ): (EPD_2IN9BC_WIDTH / 8 + 1)) * EPD_2IN9BC_HEIGHT;
+    UWORD Imagesize = ((EPD_2IN9B_V3_WIDTH % 8 == 0)? (EPD_2IN9B_V3_WIDTH / 8 ): (EPD_2IN9B_V3_WIDTH / 8 + 1)) * EPD_2IN9B_V3_HEIGHT;
     if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to apply for black memory...\r\n");
         return -1;
@@ -52,8 +52,8 @@ int EPD_test(void)
         return -1;
     }
     printf("NewImage:BlackImage and RYImage\r\n");
-    Paint_NewImage(BlackImage, EPD_2IN9BC_WIDTH, EPD_2IN9BC_HEIGHT, 270, WHITE);
-    Paint_NewImage(RYImage, EPD_2IN9BC_WIDTH, EPD_2IN9BC_HEIGHT, 270, WHITE);
+    Paint_NewImage(BlackImage, EPD_2IN9B_V3_WIDTH, EPD_2IN9B_V3_HEIGHT, 270, WHITE);
+    Paint_NewImage(RYImage, EPD_2IN9B_V3_WIDTH, EPD_2IN9B_V3_HEIGHT, 270, WHITE);
 
     //Select Image
     Paint_SelectImage(BlackImage);
@@ -63,8 +63,8 @@ int EPD_test(void)
 
 #if 1   // show image for array    
     printf("show image for array\r\n");
-    EPD_2IN9BC_Display(gImage_2in9bc_b, gImage_2in9bc_ry);
-    DEV_Delay_ms(2000);
+    EPD_2IN9B_V3_Display(gImage_2in9bc_b, gImage_2in9bc_ry);
+    DEV_Delay_ms(5000);
 #endif
 
 #if 1   // Drawing on the image
@@ -80,8 +80,8 @@ int EPD_test(void)
     Paint_DrawLine(70, 70, 20, 120, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
     Paint_DrawRectangle(20, 70, 70, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
     Paint_DrawRectangle(80, 70, 130, 120, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawString_EN(10, 0, "waveshare", &Font16, BLACK, WHITE);
-    Paint_DrawString_CN(130, 20, "΢ѩ����", &Font24CN, WHITE, BLACK);
+    Paint_DrawString_EN(10, 0, "ebat", &Font16, BLACK, WHITE);
+    Paint_DrawString_CN(130, 20, "suka", &Font24CN, WHITE, BLACK);
     Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
 
     //2.Draw red image
@@ -91,20 +91,20 @@ int EPD_test(void)
     Paint_DrawCircle(210, 95, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     Paint_DrawLine(85, 95, 125, 95, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(105, 75, 105, 115, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawString_CN(130, 0,"���abc", &Font12CN, BLACK, WHITE);
-    Paint_DrawString_EN(10, 20, "hello world", &Font12, WHITE, BLACK);
+    Paint_DrawString_CN(130, 0,"Da", &Font12CN, BLACK, WHITE);
+    Paint_DrawString_EN(10, 20, "nihao", &Font12, WHITE, BLACK);
     Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
 
     printf("EPD_Display\r\n");
-    EPD_2IN9BC_Display(BlackImage, RYImage);
-    DEV_Delay_ms(2000);
+    EPD_2IN9B_V3_Display(BlackImage, RYImage);
+    DEV_Delay_ms(5000);
 #endif
-
+	// clear EPD
     printf("Clear...\r\n");
-    EPD_2IN9BC_Clear();
-
+    EPD_2IN9B_V3_Clear();
+	//deep sleep mode, free heap ram
     printf("Goto Sleep...\r\n");
-    EPD_2IN9BC_Sleep();
+    EPD_2IN9B_V3_Sleep();
     free(BlackImage);
     free(RYImage);
     BlackImage = NULL;

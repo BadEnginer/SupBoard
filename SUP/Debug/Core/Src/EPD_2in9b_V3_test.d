@@ -1,4 +1,4 @@
-Core/Src/EPD_2in9_test.o: ../Core/Src/EPD_2in9_test.c \
+Core/Src/EPD_2in9b_V3_test.o: ../Core/Src/EPD_2in9b_V3_test.c \
  ../Core/Inc/EPD_Test.h ../Core/Inc/DEV_Config.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
@@ -34,7 +34,8 @@ Core/Src/EPD_2in9_test.o: ../Core/Src/EPD_2in9_test.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
  ../Core/Inc/GUI_Paint.h ../Core/Inc/fonts.h ../Core/Inc/imagedata.h \
- ../Core/Inc/Debug.h ../Core/Inc/EPD_2in9.h
+ ../Core/Inc/Debug.h ../Core/Inc/EPD_2in9b_V3.h \
+ ../Core/Inc/EPD_2IN9B_V3.h
 ../Core/Inc/EPD_Test.h:
 ../Core/Inc/DEV_Config.h:
 ../Core/Inc/main.h:
@@ -75,4 +76,5 @@ Core/Src/EPD_2in9_test.o: ../Core/Src/EPD_2in9_test.c \
 ../Core/Inc/fonts.h:
 ../Core/Inc/imagedata.h:
 ../Core/Inc/Debug.h:
-../Core/Inc/EPD_2in9.h:
+../Core/Inc/EPD_2in9b_V3.h:
+../Core/Inc/EPD_2IN9B_V3.h:
