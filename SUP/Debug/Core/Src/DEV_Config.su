@@ -1,3 +1,0 @@
-../Core/Src/DEV_Config.c:36:6:DEV_SPI_WriteByte	16	static
-../Core/Src/DEV_Config.c:41:5:DEV_Module_Init	8	static
-../Core/Src/DEV_Config.c:49:6:DEV_Module_Exit	8	static

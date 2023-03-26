@@ -19,15 +19,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "Display/e-ink/picture.h"
 #include <stdlib.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "EPD_Test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,7 +96,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  MCP4725 myMCP4725;
+  MCP4725_setValue(&myMCP4725, 2048, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -114,7 +114,25 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  EPD_test();
+  	  ws2812_init();
+  	  ws2812_test01();
+  	  ws2812_light();
+  ssd1306_Init();
+  //extern  unsigned char *gImage_BW;
+  //extern  unsigned char *gImage_R;
+  ssd1306_Fill(Black);
+  ssd1306_SetCursor(5, 10);
+  ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
+  ssd1306_UpdateScreen();
+  EPD_HW_Init(); //Electronic paper initialization
+  EPD_WhiteScreen_ALL(gqImage_BW,gqImage_R); //Refresh the picture in full screen
+  EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
+  driver_delay_xms(5000);
+
+  //Clean
+  //EPD_HW_Init(); //Electronic paper initialization
+  //EPD_WhiteScreen_ALL_Clean();
+  //EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -383,7 +401,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : EPD_Busy_Pin */
   GPIO_InitStruct.Pin = EPD_Busy_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(EPD_Busy_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -403,8 +421,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE END Header_StartInitTask */
 void StartInitTask(void *argument)
 {
-  /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)

@@ -1,0 +1,13 @@
+ADS1115.c:18:19:ADS1115_init	1
+ADS1115.c:26:6:ADS1115_deinit	1
+ADS1115.c:30:6:ADS1115_updateConfig	1
+ADS1115.c:39:6:ADS1115_updateI2Chandler	1
+ADS1115.c:43:6:ADS1115_updateAddress	1
+ADS1115.c:47:9:ADS1115_oneShotMeasure	1
+ADS1115.c:59:9:ADS1115_getData	3
+ADS1115.c:75:6:ADS1115_setThresholds	1
+ADS1115.c:91:6:ADS1115_flushData	1
+ADS1115.c:95:6:ADS1115_setConversionReadyPin	1
+ADS1115.c:99:6:ADS1115_startContinousMode	1
+ADS1115.c:109:6:ADS1115_stopContinousMode	1
+ADS1115.c:118:13:prepareConfigFrame	1

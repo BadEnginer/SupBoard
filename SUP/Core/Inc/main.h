@@ -31,7 +31,11 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "Display/e-ink/epaper.h"
+#include "Display/ws2812/ws2812.h"
+#include "Display/ssd1306/ssd1306.h"
 
+#include "DAC_out/MCP4725.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -70,6 +74,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+/*
 #define RST_Pin GPIO_PIN_1
 #define RST_GPIO_Port GPIOB
 #define DC_Pin GPIO_PIN_2
@@ -78,6 +83,7 @@ void Error_Handler(void);
 #define BUSY_GPIO_Port GPIOB
 #define SPI_CS_Pin GPIO_PIN_0
 #define SPI_CS_GPIO_Port GPIOB
+*/
 
 /* USER CODE END Private defines */
 
