@@ -57,10 +57,9 @@
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 extern TIM_HandleTypeDef htim9;
-extern TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN EV */
-
+extern TIM_HandleTypeDef htim2;
 /* USER CODE END EV */
 
 /******************************************************************************/

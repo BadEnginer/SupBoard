@@ -114,17 +114,16 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t all_dev[200] = {0};
+  uint8_t num = 0;
   HAL_StatusTypeDef type;
-  for(uint8_t i = 1; i > 128 ; i++){
+  for(uint8_t i = 0; i > 127 ; i++){
 	  type = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
-	  if(type= HAL_OK){
-		  all_dev[i] = i;
+	  if(type == HAL_OK){
+		  num++;
 	  }
   }
   	  ws2812_init();
   	  ws2812_test01();
-  	  ws2812_light();
   ssd1306_Init();
   //extern  unsigned char *gImage_BW;
   //extern  unsigned char *gImage_R;
@@ -132,15 +131,11 @@ int main(void)
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_UpdateScreen();
-  HAL_Delay(1000);
-  ssd1306_Fill(Black);
-  ssd1306_DrawBitmap(0, 0, gqImage_BW, 128, 32, White);
-  ssd1306_UpdateScreen();
 
   EPD_HW_Init(); //Electronic paper initialization
-  EPD_WhiteScreen_ALL(gqImage_BW,gqImage_R); //Refresh the picture in full screen
+  //EPD_WhiteScreen_ALL(gqImage_BW,gqImage_R); //Refresh the picture in full screen
   EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
-  driver_delay_xms(5000);
+  //driver_delay_xms(5000);
 
   //Clean
   //EPD_HW_Init(); //Electronic paper initialization
