@@ -96,8 +96,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  MCP4725 myMCP4725;
-  MCP4725_setValue(&myMCP4725, 2048, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
+  //MCP4725 myMCP4725;
+  //MCP4725_setValue(&myMCP4725, 2048, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -114,6 +114,14 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  uint8_t all_dev[200] = {0};
+  HAL_StatusTypeDef type;
+  for(uint8_t i = 1; i > 128 ; i++){
+	  type = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
+	  if(type= HAL_OK){
+		  all_dev[i] = i;
+	  }
+  }
   	  ws2812_init();
   	  ws2812_test01();
   	  ws2812_light();
@@ -124,6 +132,11 @@ int main(void)
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_UpdateScreen();
+  HAL_Delay(1000);
+  ssd1306_Fill(Black);
+  ssd1306_DrawBitmap(0, 0, gqImage_BW, 128, 32, White);
+  ssd1306_UpdateScreen();
+
   EPD_HW_Init(); //Electronic paper initialization
   EPD_WhiteScreen_ALL(gqImage_BW,gqImage_R); //Refresh the picture in full screen
   EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
