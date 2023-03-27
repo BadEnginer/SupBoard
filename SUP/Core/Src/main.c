@@ -77,7 +77,7 @@ void StartInitTask(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern uint16_t BUF_DMA [ARRAY_LEN];
 /* USER CODE END 0 */
 
 /**
@@ -123,20 +123,48 @@ int main(void)
 	  }
   }
   	  ws2812_init();
-  	  ws2812_test01();
-  ssd1306_Init();
+  	  //ws2812_test01();
+
+
+  	ws2812_pixel_rgb_to_buf_dma(0, 128, 0, 0);
+  	HAL_TIM_PWM_Start_DMA(&htim2,TIM_CHANNEL_2,(uint32_t*)&BUF_DMA,ARRAY_LEN);
   //extern  unsigned char *gImage_BW;
   //extern  unsigned char *gImage_R;
+  ssd1306_Init();
   ssd1306_Fill(Black);
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_UpdateScreen();
+  HAL_Delay(1000);
+  ssd1306_Fill(Black);
+  ssd1306_DrawBitmap(0, 0, default_dis, 128, 32, White);
+  ssd1306_UpdateScreen();
+  ssd1306_SetCursor(5, 15);
+    ssd1306_WriteString("7A", Font_11x18, White);
+    ssd1306_UpdateScreen();
 
   EPD_HW_Init(); //Electronic paper initialization
   //EPD_WhiteScreen_ALL(gqImage_BW,gqImage_R); //Refresh the picture in full screen
+  EPD_WhiteScreen_ALL(default_dis,gqImage_R);
   EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
   //driver_delay_xms(5000);
+  ADS1115_Config_t configReg;
+  ADS1115_Handle_t *pADS;
 
+
+  #define ADS1115_ADR 0x60
+  configReg.channel = CHANNEL_AIN0_GND;
+  configReg.pgaConfig = PGA_6_144;
+  configReg.operatingMode = MODE_SINGLE_SHOT;
+  configReg.dataRate = DRATE_475;
+  configReg.compareMode = COMP_HYSTERESIS;
+  configReg.polarityMode = POLARITY_ACTIVE_LOW;
+  configReg.latchingMode = LATCHING_NONE;
+  configReg.queueComparator = QUEUE_ONE;
+  pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configReg);
+  ADS1115_updateConfig(pADS, configReg);
+  ADS1115_setConversionReadyPin(pADS);
+  ADS1115_startContinousMode(pADS);
   //Clean
   //EPD_HW_Init(); //Electronic paper initialization
   //EPD_WhiteScreen_ALL_Clean();

@@ -34,7 +34,7 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
  ../Core/Inc/Display/ssd1306/ssd1306.h \
  ../Core/Inc/Display/ssd1306/ssd1306_conf.h \
  ../Core/Inc/Display/ssd1306/ssd1306_fonts.h \
- ../Core/Inc/DAC_out/MCP4725.h
+ ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h
 ../Core/Inc/DAC_out/MCP4725.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -72,4 +72,5 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
 ../Core/Inc/Display/ssd1306/ssd1306.h:
 ../Core/Inc/Display/ssd1306/ssd1306_conf.h:
 ../Core/Inc/Display/ssd1306/ssd1306_fonts.h:
+../Core/Inc/ADC_out/ADS1115.h:
 ../Core/Inc/DAC_out/MCP4725.h:
