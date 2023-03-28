@@ -77,7 +77,7 @@ void StartInitTask(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern uint16_t BUF_DMA [ARRAY_LEN];
+
 /* USER CODE END 0 */
 
 /**
@@ -122,12 +122,26 @@ int main(void)
 		  num++;
 	  }
   }
-  	  ws2812_init();
-  	  //ws2812_test01();
+  ARGB_Init();  // Initialization
 
+  ARGB_Clear(); // Clear stirp
+  while (ARGB_Show() != ARGB_OK); // Update - Option 1
 
-  	ws2812_pixel_rgb_to_buf_dma(0, 128, 0, 0);
-  	HAL_TIM_PWM_Start_DMA(&htim2,TIM_CHANNEL_2,(uint32_t*)&BUF_DMA,ARRAY_LEN);
+  ARGB_SetBrightness(100);  // Set global brightness to 40%
+
+  ARGB_SetRGB(2, 0, 255, 0); // Set LED №3 with 255 Green
+  while (!ARGB_Show());  // Update - Option 2
+
+  ARGB_SetHSV(0, 0, 255, 255); // Set LED №1 with Red
+  while (!ARGB_Ready()); // Update - Option 3
+  ARGB_Show();
+
+  ARGB_FillWhite(230); // Fill all white component with 230
+  while (ARGB_Ready() == ARGB_BUSY); // Update - Option 4
+  ARGB_Show();
+
+  ARGB_FillRGB(200, 0, 0); // Fill all the strip with Red
+  while (!ARGB_Show());
   //extern  unsigned char *gImage_BW;
   //extern  unsigned char *gImage_R;
   ssd1306_Init();
@@ -238,7 +252,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 25;
-  RCC_OscInitStruct.PLL.PLLN = 192;
+  RCC_OscInitStruct.PLL.PLLN = 144;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -255,7 +269,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -355,7 +369,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 119;
+  htim2.Init.Period = 89;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)

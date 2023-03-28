@@ -32,7 +32,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Display/e-ink/epaper.h"
-#include "Display/ws2812/ws2812.h"
+#include "Display/ws2812/ARGB.h"
 #include "Display/ssd1306/ssd1306.h"
 #include "ADC_out/ADS1115.h"
 #include "DAC_out/MCP4725.h"
