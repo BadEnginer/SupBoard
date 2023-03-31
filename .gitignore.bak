@@ -1,8 +1,2 @@
-Makefile
-*.s
-*.ld
-build
-.vscode
-.bak
-libmicroros
-custombuild
+*.o
+/Debug

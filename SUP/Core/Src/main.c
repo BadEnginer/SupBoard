@@ -55,7 +55,7 @@ DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 osThreadId_t InitTaskHandle;
 const osThreadAttr_t InitTask_attributes = {
   .name = "InitTask",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* USER CODE BEGIN PV */
@@ -123,25 +123,13 @@ int main(void)
 	  }
   }
   ARGB_Init();  // Initialization
+  //ARGB_STATE ARGB_GetState;
+  ARGB_Clear();
+  while (ARGB_Show() != ARGB_OK);
+  ARGB_SetBrightness(80);
+ // ARGB_SetRGB(0, 255, 0, 128);
 
-  ARGB_Clear(); // Clear stirp
-  while (ARGB_Show() != ARGB_OK); // Update - Option 1
-
-  ARGB_SetBrightness(100);  // Set global brightness to 40%
-
-  ARGB_SetRGB(2, 0, 255, 0); // Set LED №3 with 255 Green
-  while (!ARGB_Show());  // Update - Option 2
-
-  ARGB_SetHSV(0, 0, 255, 255); // Set LED №1 with Red
-  while (!ARGB_Ready()); // Update - Option 3
-  ARGB_Show();
-
-  ARGB_FillWhite(230); // Fill all white component with 230
-  while (ARGB_Ready() == ARGB_BUSY); // Update - Option 4
-  ARGB_Show();
-
-  ARGB_FillRGB(200, 0, 0); // Fill all the strip with Red
-  while (!ARGB_Show());
+  // Update - Option 1
   //extern  unsigned char *gImage_BW;
   //extern  unsigned char *gImage_R;
   ssd1306_Init();
@@ -151,26 +139,66 @@ int main(void)
   ssd1306_UpdateScreen();
   HAL_Delay(1000);
   ssd1306_Fill(Black);
-  ssd1306_DrawBitmap(0, 0, default_dis, 128, 32, White);
   ssd1306_UpdateScreen();
-  ssd1306_SetCursor(5, 15);
-    ssd1306_WriteString("7A", Font_11x18, White);
-    ssd1306_UpdateScreen();
 
-  EPD_HW_Init(); //Electronic paper initialization
-  //EPD_WhiteScreen_ALL(gqImage_BW,gqImage_R); //Refresh the picture in full screen
-  EPD_WhiteScreen_ALL(default_dis,gqImage_R);
-  EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
+  ssd1306_SetCursor(0, 0);
+    ssd1306_WriteString("TOK - ", Font_11x18, White);
+    ssd1306_SetCursor(100, 0);
+                   ssd1306_WriteString("A", Font_11x18, White);
+    ssd1306_SetCursor(0, 19);
+      ssd1306_WriteString("BAT - ", Font_11x18, White);
+      ssd1306_SetCursor(100, 19);
+            ssd1306_WriteString("%", Font_11x18, White);
+
+
+
+
+
+
+  //EPD_HW_Init(); //Electronic paper initialization
+  //EPD_WhiteScreen_ALL(gqImage_R,gqImage_R); //Refresh the picture in full screen
+  //EPD_WhiteScreen_ALL(default_dis,gqImage_R);
+  //EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
   //driver_delay_xms(5000);
   ADS1115_Config_t configReg;
   ADS1115_Handle_t *pADS;
+  uint8_t color = 0;
+while(1){
+	for(uint8_t i = 0 ; i < 11; i++){
+		  char sym[3];
+		  char car[3];
+		  itoa(i,sym,10);
+		  itoa(i*10,car,10);
+		  	  ssd1306_SetCursor(67, 0);
+		      ssd1306_WriteString(sym, Font_11x18, White);
+		      ssd1306_SetCursor(67, 19);
+		      ssd1306_WriteString(car, Font_11x18, White);
+		      ssd1306_UpdateScreen();
+		      HAL_Delay(200);
+			  ARGB_SetHSV(i, color, 250	, 250);
+			  color+=10;
+			  while (ARGB_Show() != ARGB_OK);
+	 }
 
+	 for(uint8_t i = 10 ; i < 1; i--){
+		  char sym[3];
+		  char car[3];
+		  itoa(i,sym,10);
+		  itoa(i*10,car,10);
+		  	  ssd1306_SetCursor(67, 0);
+		      ssd1306_WriteString(sym, Font_11x18, White);
+		      ssd1306_SetCursor(67, 19);
+		      ssd1306_WriteString(car, Font_11x18, White);
+		      ssd1306_UpdateScreen();
+		      HAL_Delay(200);
+	 }
+}
 
   #define ADS1115_ADR 0x60
   configReg.channel = CHANNEL_AIN0_GND;
-  configReg.pgaConfig = PGA_6_144;
-  configReg.operatingMode = MODE_SINGLE_SHOT;
-  configReg.dataRate = DRATE_475;
+  configReg.pgaConfig = PGA_4_096;
+  configReg.operatingMode = MODE_CONTINOUS;
+  configReg.dataRate = DRATE_250;
   configReg.compareMode = COMP_HYSTERESIS;
   configReg.polarityMode = POLARITY_ACTIVE_LOW;
   configReg.latchingMode = LATCHING_NONE;
