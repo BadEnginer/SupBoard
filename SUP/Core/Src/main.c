@@ -114,12 +114,13 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t num = 0;
+  uint8_t num[10] ={0};
+  uint8_t coutn = 0;
   HAL_StatusTypeDef type;
-  for(uint8_t i = 0; i > 127 ; i++){
+  for(uint8_t i = 1; i < 127 ; i++){
 	  type = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
 	  if(type == HAL_OK){
-		  num++;
+		  num[coutn++] = i;
 	  }
   }
   ARGB_Init();  // Initialization
@@ -149,12 +150,6 @@ int main(void)
       ssd1306_WriteString("BAT - ", Font_11x18, White);
       ssd1306_SetCursor(100, 19);
             ssd1306_WriteString("%", Font_11x18, White);
-
-
-
-
-
-
   //EPD_HW_Init(); //Electronic paper initialization
   //EPD_WhiteScreen_ALL(gqImage_R,gqImage_R); //Refresh the picture in full screen
   //EPD_WhiteScreen_ALL(default_dis,gqImage_R);
@@ -162,6 +157,32 @@ int main(void)
   //driver_delay_xms(5000);
   ADS1115_Config_t configReg;
   ADS1115_Handle_t *pADS;
+	#define ADS1115_ADR 72
+  configReg.channel = CHANNEL_AIN0_GND;
+  configReg.pgaConfig = PGA_6_144;
+  configReg.operatingMode = MODE_CONTINOUS;
+  configReg.dataRate = DRATE_250;
+  configReg.compareMode = COMP_WINDOW;
+  configReg.polarityMode = POLARITY_ACTIVE_LOW;
+  configReg.latchingMode = LATCHING_NONE;
+  configReg.queueComparator = QUEUE_ONE;
+  pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configReg);
+  ADS1115_updateConfig(pADS, configReg);
+  ADS1115_startContinousMode(pADS);
+  //ADS1115_setConversionReadyPin(pADS);
+  float data_from_adc_0 = 0;
+  for(uint8_t temp = 0; temp < 80; temp++){
+	  HAL_Delay(50);
+	  data_from_adc_0 = (ADS1115_getData(pADS)/2666.7);
+	  temp++;
+  }
+  configReg.channel = CHANNEL_AIN1_GND;
+  ADS1115_updateConfig(pADS, configReg);
+  for(uint8_t temp = 0; temp < 80; temp++){
+	  HAL_Delay(50);
+	  data_from_adc_0 = (ADS1115_getData(pADS)/2666.7);
+	  temp++;
+  }
   uint8_t color = 0;
 while(1){
 	for(uint8_t i = 0 ; i < 11; i++){
@@ -194,19 +215,7 @@ while(1){
 	 }
 }
 
-  #define ADS1115_ADR 0x60
-  configReg.channel = CHANNEL_AIN0_GND;
-  configReg.pgaConfig = PGA_4_096;
-  configReg.operatingMode = MODE_CONTINOUS;
-  configReg.dataRate = DRATE_250;
-  configReg.compareMode = COMP_HYSTERESIS;
-  configReg.polarityMode = POLARITY_ACTIVE_LOW;
-  configReg.latchingMode = LATCHING_NONE;
-  configReg.queueComparator = QUEUE_ONE;
-  pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configReg);
-  ADS1115_updateConfig(pADS, configReg);
-  ADS1115_setConversionReadyPin(pADS);
-  ADS1115_startContinousMode(pADS);
+
   //Clean
   //EPD_HW_Init(); //Electronic paper initialization
   //EPD_WhiteScreen_ALL_Clean();

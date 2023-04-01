@@ -66,7 +66,7 @@ int16_t ADS1115_getData(ADS1115_Handle_t *pConfig){
 
 	int16_t readValue = ((bytes[0] << 8) | bytes[1]);
 	if(readValue < 0)
-		readValue = 0;
+		readValue *=-1;
 
 	return readValue;
 }
