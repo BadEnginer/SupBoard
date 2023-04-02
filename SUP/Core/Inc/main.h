@@ -36,6 +36,7 @@ extern "C" {
 #include "Display/ssd1306/ssd1306.h"
 #include "ADC_out/ADS1115.h"
 #include "DAC_out/MCP4725.h"
+#include "Encoder/as5600.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
