@@ -117,6 +117,7 @@ int main(void)
   uint8_t num[10] ={0};
   uint8_t coutn = 0;
   HAL_StatusTypeDef type;
+  // Подсчёт устройств в сети I2C 60-display, 72-ацп, 54-encoder, 96 -dac/
   for(uint8_t i = 1; i < 127 ; i++){
 	  type = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
 	  if(type == HAL_OK){
@@ -162,26 +163,59 @@ int main(void)
   configReg.pgaConfig = PGA_6_144;
   configReg.operatingMode = MODE_CONTINOUS;
   configReg.dataRate = DRATE_250;
-  configReg.compareMode = COMP_WINDOW;
+  configReg.compareMode = COMP_HYSTERESIS;
   configReg.polarityMode = POLARITY_ACTIVE_LOW;
   configReg.latchingMode = LATCHING_NONE;
   configReg.queueComparator = QUEUE_ONE;
+	uint8_t bytes[3] = {0};
+
+	prepareConfigFrame(bytes, configReg);
+	configReg.channel = CHANNEL_AIN1_GND;
+	prepareConfigFrame(bytes, configReg);
+	configReg.channel = CHANNEL_AIN2_GND;
+	prepareConfigFrame(bytes, configReg);
+	configReg.channel = CHANNEL_AIN3_GND;
+
+
   pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configReg);
   ADS1115_updateConfig(pADS, configReg);
   ADS1115_startContinousMode(pADS);
   //ADS1115_setConversionReadyPin(pADS);
   float data_from_adc_0 = 0;
+  MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.30);
+	// Check the connection:
+	uint8_t state_dac = MCP4725_isConnected(&myMCP4725);
+	MCP4725_setValue(&myMCP4725, 2048, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
   for(uint8_t temp = 0; temp < 80; temp++){
 	  HAL_Delay(50);
-	  data_from_adc_0 = (ADS1115_getData(pADS)/2666.7);
+	  data_from_adc_0 = (ADS1115_getData(pADS));
 	  temp++;
   }
   configReg.channel = CHANNEL_AIN1_GND;
   ADS1115_updateConfig(pADS, configReg);
   for(uint8_t temp = 0; temp < 80; temp++){
 	  HAL_Delay(50);
-	  data_from_adc_0 = (ADS1115_getData(pADS)/2666.7);
+	  data_from_adc_0 = (ADS1115_getData(pADS));
 	  temp++;
+  }
+
+  configReg.channel = CHANNEL_AIN2_GND;
+  ADS1115_updateConfig(pADS, configReg);
+  for(uint8_t temp = 0; temp < 80; temp++){
+	  HAL_Delay(50);
+	  data_from_adc_0 = (ADS1115_getData(pADS));
+	  temp++;
+  }
+
+
+  uint16_t angle = 0;
+  uint16_t raw_angle = 0;
+  uint16_t staty_encoder = 0;
+  for(uint8_t test = 0; test < 50; test++){
+	  angle = AS5600_GetAngle();
+	  raw_angle = AS5600_GetRawAngle();
+	  staty_encoder = AS5600_GetStatus();
+	  HAL_Delay(10);
   }
   uint8_t color = 0;
 while(1){

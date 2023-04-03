@@ -27,6 +27,7 @@ Core/Src/DAC_out \
 Core/Src/Display/e-ink \
 Core/Src/Display/ssd1306 \
 Core/Src/Display/ws2812 \
+Core/Src/Encoder \
 Core/Src \
 Core/Startup \
 Drivers/STM32F4xx_HAL_Driver/Src \

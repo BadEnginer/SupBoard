@@ -34,6 +34,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/Display/ssd1306/ssd1306_conf.h \
  ../Core/Inc/Display/ssd1306/ssd1306_fonts.h \
  ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h \
+ ../Core/Inc/Encoder/as5600.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \
@@ -85,6 +86,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/Display/ssd1306/ssd1306_fonts.h:
 ../Core/Inc/ADC_out/ADS1115.h:
 ../Core/Inc/DAC_out/MCP4725.h:
+../Core/Inc/Encoder/as5600.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:

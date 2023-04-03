@@ -97,7 +97,7 @@ typedef struct{
 }ADS1115_ConfigReg_t;
 
 typedef struct ADS1115_Config_Tag ADS1115_Handle_t;
-
+void prepareConfigFrame(uint8_t *pOutFrame, ADS1115_Config_t config);
 ADS1115_Handle_t* ADS1115_init(I2C_HandleTypeDef *hi2c, uint16_t Addr, ADS1115_Config_t config);
 
 void ADS1115_deinit();

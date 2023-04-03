@@ -1,13 +1,5 @@
-/*
-
-
-	AS5600.C - описание функций для работы с датчиком AS5600
-
-
-*/
-
-#include "stm32f1xx_hal.h"
-#include "as5600.h"
+#include "stm32f4xx_hal.h"
+#include "Encoder/as5600.h"
 
 extern I2C_HandleTypeDef hi2c1;
 

@@ -33,7 +33,8 @@ Core/Src/stm32f4xx_hal_msp.o: ../Core/Src/stm32f4xx_hal_msp.c \
  ../Core/Inc/Display/ws2812/libs.h ../Core/Inc/Display/ssd1306/ssd1306.h \
  ../Core/Inc/Display/ssd1306/ssd1306_conf.h \
  ../Core/Inc/Display/ssd1306/ssd1306_fonts.h \
- ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h
+ ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h \
+ ../Core/Inc/Encoder/as5600.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -73,3 +74,4 @@ Core/Src/stm32f4xx_hal_msp.o: ../Core/Src/stm32f4xx_hal_msp.c \
 ../Core/Inc/Display/ssd1306/ssd1306_fonts.h:
 ../Core/Inc/ADC_out/ADS1115.h:
 ../Core/Inc/DAC_out/MCP4725.h:
+../Core/Inc/Encoder/as5600.h:

@@ -13,7 +13,7 @@ struct ADS1115_Config_Tag{
 	ADS1115_Config_t 	config;
 };
 
-static void prepareConfigFrame(uint8_t *pOutFrame, ADS1115_Config_t config);
+//static void prepareConfigFrame(uint8_t *pOutFrame, ADS1115_Config_t config);
 
 ADS1115_Handle_t* ADS1115_init(I2C_HandleTypeDef *hi2c, uint16_t Addr, ADS1115_Config_t config){
 	ADS1115_Handle_t *pConfig = malloc(sizeof(ADS1115_Handle_t));
@@ -65,8 +65,6 @@ int16_t ADS1115_getData(ADS1115_Handle_t *pConfig){
 		return 0;
 
 	int16_t readValue = ((bytes[0] << 8) | bytes[1]);
-	if(readValue < 0)
-		readValue *=-1;
 
 	return readValue;
 }
@@ -115,11 +113,15 @@ void ADS1115_stopContinousMode(ADS1115_Handle_t* pConfig){
 	HAL_I2C_Master_Transmit(pConfig->hi2c, (pConfig->address << 1), bytes, 3, 100);
 }
 
-static void prepareConfigFrame(uint8_t *pOutFrame, ADS1115_Config_t config){
+void prepareConfigFrame(uint8_t *pOutFrame, ADS1115_Config_t config){
+	uint8_t temp[3] = {0};
 	pOutFrame[0] = 0x01;
 	pOutFrame[1] |= (config.channel << 4) | (config.pgaConfig << 1)
 					| (config.operatingMode << 0);
 	pOutFrame[2] |= (config.dataRate << 5) | (config.compareMode << 4) | (config.polarityMode << 3)
 					| (config.latchingMode << 2) | (config.queueComparator << 1);
+	temp[0] = pOutFrame[0];
+	temp[1] = pOutFrame[1];
+	temp[2] = pOutFrame[2];
 }
 
