@@ -77,7 +77,7 @@ void StartInitTask(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint16_t raw_angle = 0;
 /* USER CODE END 0 */
 
 /**
@@ -144,9 +144,9 @@ int main(void)
   ssd1306_UpdateScreen();
 
   ssd1306_SetCursor(0, 0);
-    ssd1306_WriteString("TOK - ", Font_11x18, White);
+    ssd1306_WriteString("ANG - ", Font_11x18, White);
     ssd1306_SetCursor(100, 0);
-                   ssd1306_WriteString("A", Font_11x18, White);
+                   ssd1306_WriteString("°", Font_11x18, White);
     ssd1306_SetCursor(0, 19);
       ssd1306_WriteString("BAT - ", Font_11x18, White);
       ssd1306_SetCursor(100, 19);
@@ -159,8 +159,8 @@ int main(void)
   ADS1115_Config_t configReg;
   ADS1115_Handle_t *pADS;
 	#define ADS1115_ADR 72
-  configReg.channel = CHANNEL_AIN0_GND;
-  configReg.pgaConfig = PGA_6_144;
+  configReg.channel = CHANNEL_AIN1_GND;
+  configReg.pgaConfig = PGA_4_096;
   configReg.operatingMode = MODE_CONTINOUS;
   configReg.dataRate = DRATE_250;
   configReg.compareMode = COMP_HYSTERESIS;
@@ -168,15 +168,6 @@ int main(void)
   configReg.latchingMode = LATCHING_NONE;
   configReg.queueComparator = QUEUE_ONE;
 	uint8_t bytes[3] = {0};
-
-	prepareConfigFrame(bytes, configReg);
-	configReg.channel = CHANNEL_AIN1_GND;
-	prepareConfigFrame(bytes, configReg);
-	configReg.channel = CHANNEL_AIN2_GND;
-	prepareConfigFrame(bytes, configReg);
-	configReg.channel = CHANNEL_AIN3_GND;
-
-
   pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configReg);
   ADS1115_updateConfig(pADS, configReg);
   ADS1115_startContinousMode(pADS);
@@ -185,31 +176,20 @@ int main(void)
   MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.30);
 	// Check the connection:
 	uint8_t state_dac = MCP4725_isConnected(&myMCP4725);
-	MCP4725_setValue(&myMCP4725, 2048, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
+	uint16_t v_out = 0;
   for(uint8_t temp = 0; temp < 80; temp++){
+	  MCP4725_setValue(&myMCP4725, v_out, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
 	  HAL_Delay(50);
 	  data_from_adc_0 = (ADS1115_getData(pADS));
 	  temp++;
-  }
-  configReg.channel = CHANNEL_AIN1_GND;
-  ADS1115_updateConfig(pADS, configReg);
-  for(uint8_t temp = 0; temp < 80; temp++){
-	  HAL_Delay(50);
-	  data_from_adc_0 = (ADS1115_getData(pADS));
-	  temp++;
+	  v_out+= 100;
+	  if(v_out > 4060)
+		  v_out = 0;
   }
 
-  configReg.channel = CHANNEL_AIN2_GND;
-  ADS1115_updateConfig(pADS, configReg);
-  for(uint8_t temp = 0; temp < 80; temp++){
-	  HAL_Delay(50);
-	  data_from_adc_0 = (ADS1115_getData(pADS));
-	  temp++;
-  }
 
 
   uint16_t angle = 0;
-  uint16_t raw_angle = 0;
   uint16_t staty_encoder = 0;
   for(uint8_t test = 0; test < 50; test++){
 	  angle = AS5600_GetAngle();
@@ -218,35 +198,15 @@ int main(void)
 	  HAL_Delay(10);
   }
   uint8_t color = 0;
-while(1){
-	for(uint8_t i = 0 ; i < 11; i++){
+  	  while(1){
+  		  raw_angle = AS5600_GetAngle();
 		  char sym[3];
-		  char car[3];
-		  itoa(i,sym,10);
-		  itoa(i*10,car,10);
+		  itoa(raw_angle,sym,10);
 		  	  ssd1306_SetCursor(67, 0);
 		      ssd1306_WriteString(sym, Font_11x18, White);
 		      ssd1306_SetCursor(67, 19);
-		      ssd1306_WriteString(car, Font_11x18, White);
 		      ssd1306_UpdateScreen();
-		      HAL_Delay(200);
-			  ARGB_SetHSV(i, color, 250	, 250);
-			  color+=10;
-			  while (ARGB_Show() != ARGB_OK);
-	 }
-
-	 for(uint8_t i = 10 ; i < 1; i--){
-		  char sym[3];
-		  char car[3];
-		  itoa(i,sym,10);
-		  itoa(i*10,car,10);
-		  	  ssd1306_SetCursor(67, 0);
-		      ssd1306_WriteString(sym, Font_11x18, White);
-		      ssd1306_SetCursor(67, 19);
-		      ssd1306_WriteString(car, Font_11x18, White);
-		      ssd1306_UpdateScreen();
-		      HAL_Delay(200);
-	 }
+		      HAL_Delay(40);
 }
 
 
