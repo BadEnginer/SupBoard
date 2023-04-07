@@ -8,18 +8,25 @@
 #ifndef INC_APP_MENU_H_
 #define INC_APP_MENU_H_
 
-#define MENU_ITEMS_COUNT 7 // Количество пунктов меню
-#define MENU_ITEM_HEIGHT 11 // Высота пункта меню
-#define MENU_ITEM_MAIN_HEIGHT 16 // Высота основного пункта меню
+#include "Display/ssd1306/ssd1306.h"
 
+#define MENU_ITEMS_COUNT 7 	// Количество пунктов меню
+#define MENU_ITEM_HEIGHT 18 // Высота пункта меню
+#define MENU_ITEM_MAIN_HEIGHT 24 // Высота основного пункта меню
+
+#define ON 1
+#define OFF 0
 
 void drawMainMenu();
-void drawSubMenu(uint8_t i);
+void drawSubMenu(uint8_t);
 
-uint8_t iterButton();
-uint8_t enterButton();
-uint8_t encoderUp();
-uint8_t encoderDown();
+void buttonUpSet(uint8_t);
+void buttonEnSet(uint8_t);
+void encoderSet(int8_t);
+
+uint8_t buttonUp();
+uint8_t buttonEn();
+int8_t  encoder();
 
 void drawItemNum00();
 void drawItemNum01();

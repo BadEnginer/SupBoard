@@ -1,21 +1,19 @@
-/*
- * app_menu.c
- *
- *  Created on: Apr 7, 2023
- *      Author: BadEnginer
- */
-
+#include "app_menu/app_menu.h"
 
 int currentMenuItem = 0;
+static uint8_t buttonUpper = 0;
+static uint8_t buttonEnable = 0;
+static int8_t  encoderr = 0;
+
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT] = {
-    "00: Motor",
-    "01: LED",
-    "02: E-ink",
-	"03: ADC",
-	"04: Enc",
-	"05: DAC",
-	"06: Exit"
+    "00:Motor",
+    "01:LED  ",
+    "02:E-ink",
+	"03:ADC  ",
+	"04:Encod",
+	"05:DAC  ",
+	"06:Exit "
 };
 
 void drawSubMenu(uint8_t i){
@@ -23,6 +21,28 @@ void drawSubMenu(uint8_t i){
 	ssd1306_WriteString(menuItems[i], Font_7x10, White);
 };
 
+
+void buttonUpSet(uint8_t i){
+	buttonUpper = i;
+}
+void buttonEnSet(uint8_t i){
+	buttonEnable = i;
+}
+void encoderSet(int8_t i){
+	encoderr = i;
+}
+
+uint8_t buttonUp(){
+	return buttonUpper;
+}
+uint8_t buttonEn(){
+	return buttonEnable;
+}
+int8_t encoder(){
+	return encoderr;
+}
+
+/*
 void drawItemNum00(){
 	int8_t current_speed; // текущая скорость
 	int8_t exit = 1;	 // флаг выхода
@@ -70,17 +90,39 @@ void drawItemNum05(){
 void drawItemNum06(){
 
 }
+*/
 
 void drawMainMenu() {
     ssd1306_Fill(Black);
-    ssd1306_SetCursor(0, 0);
-    ssd1306_SetCursor(0, MENU_ITEM_HEIGHT);
-    for (int i = 0; i < MENU_ITEMS_COUNT; i++) {
-        if (i == currentMenuItem) {
-            ssd1306_WriteString("> ", Font_7x10, White);
-        }
-        ssd1306_WriteString(menuItems[i], Font_7x10, White);
-        ssd1306_SetCursor(0, (i + 2) * MENU_ITEM_HEIGHT);
+    uint8_t exit = 1;
+    uint8_t current_item_menu = 0;
+    uint8_t next_item_menu = current_item_menu + 1;
+    uint8_t prev_item_menu = MENU_ITEMS_COUNT - 1;
+    while( exit ){
+         next_item_menu = current_item_menu + 1;
+         prev_item_menu = current_item_menu - 1;
+    	if(current_item_menu == (MENU_ITEMS_COUNT-1))
+    		next_item_menu = 0;
+    	if(current_item_menu == 0) // Для нулевого элемента предыдущий символ будет последним
+    		prev_item_menu = MENU_ITEMS_COUNT - 1;
+
+    	ssd1306_SetCursor(0, 0);
+    	ssd1306_WriteString(menuItems[prev_item_menu], Font_11x18, White);
+
+    	ssd1306_SetCursor(0, MENU_ITEM_HEIGHT);
+    	ssd1306_WriteString("> ", Font_16x24, White);
+    	ssd1306_SetCursor(17, MENU_ITEM_HEIGHT);
+    		ssd1306_WriteString(menuItems[current_item_menu], Font_16x24, White);
+
+    	ssd1306_SetCursor(0, MENU_ITEM_MAIN_HEIGHT+MENU_ITEM_HEIGHT);
+    	ssd1306_WriteString(menuItems[next_item_menu], Font_11x18, White);
+
+    	ssd1306_UpdateScreen();
+    	buttonEnSet(OFF);
+    	while(buttonEn() != ON){}
+    		current_item_menu++;
+    		if(current_item_menu >= MENU_ITEMS_COUNT )
+    			current_item_menu = 0;
     }
-    ssd1306_UpdateScreen();
+
 }

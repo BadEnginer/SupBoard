@@ -3,6 +3,7 @@
 void StartSensOutTask(void *argument){
 	  for(;;)
 	  {
-	    osDelay(1);
+	    osDelay(1000);
+	    buttonEnSet(ON);
 	  }
 }

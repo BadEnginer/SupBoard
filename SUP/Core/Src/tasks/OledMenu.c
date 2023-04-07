@@ -4,6 +4,10 @@
 void StartOledMenuTask(void *argument){
 	  for(;;)
 	  {
-	    osDelay(1);
+		if(buttonEn() == ON){
+			drawMainMenu();
+			buttonEnSet(OFF);
+		}
+	    osDelay(100);
 	  }
 }

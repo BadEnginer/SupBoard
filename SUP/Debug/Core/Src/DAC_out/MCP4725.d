@@ -47,7 +47,8 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/tasks/OledMenu.h ../Core/Inc/tasks/SensOut.h \
+ ../Core/Inc/tasks/OledMenu.h ../Core/Inc/app_menu/app_menu.h \
+ ../Core/Inc/Display/ssd1306/ssd1306.h ../Core/Inc/tasks/SensOut.h \
  ../Core/Inc/tasks/OledOut.h
 ../Core/Inc/DAC_out/MCP4725.h:
 ../Core/Inc/main.h:
@@ -103,5 +104,7 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/tasks/OledMenu.h:
+../Core/Inc/app_menu/app_menu.h:
+../Core/Inc/Display/ssd1306/ssd1306.h:
 ../Core/Inc/tasks/SensOut.h:
 ../Core/Inc/tasks/OledOut.h:

@@ -28,6 +28,7 @@ Core/Src/Display/e-ink \
 Core/Src/Display/ssd1306 \
 Core/Src/Display/ws2812 \
 Core/Src/Encoder \
+Core/Src/app_menu \
 Core/Src \
 Core/Src/tasks \
 Core/Startup \

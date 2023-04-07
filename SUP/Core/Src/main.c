@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Display/e-ink/picture.h"
+#include "app_menu/app_menu.h"
 #include <stdlib.h>
 
 /* Private includes ----------------------------------------------------------*/
@@ -513,9 +514,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint8_t X3 = 0;
+uint8_t ButtonUp = 0;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	X3++;
+	if(GPIO_Pin == EXT_button_on_Pin){
+		buttonEnSet(ON);
+	}
 }
 /* USER CODE END 4 */
 
