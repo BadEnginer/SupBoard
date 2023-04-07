@@ -35,7 +35,20 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
  ../Core/Inc/Display/ssd1306/ssd1306_conf.h \
  ../Core/Inc/Display/ssd1306/ssd1306_fonts.h \
  ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h \
- ../Core/Inc/Encoder/as5600.h
+ ../Core/Inc/Encoder/as5600.h ../Core/Inc/tasks/UserTasks.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
+ ../Core/Inc/FreeRTOSConfig.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../Core/Inc/tasks/OledMenu.h ../Core/Inc/tasks/SensOut.h \
+ ../Core/Inc/tasks/OledOut.h
 ../Core/Inc/DAC_out/MCP4725.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -77,3 +90,18 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
 ../Core/Inc/ADC_out/ADS1115.h:
 ../Core/Inc/DAC_out/MCP4725.h:
 ../Core/Inc/Encoder/as5600.h:
+../Core/Inc/tasks/UserTasks.h:
+../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
+../Core/Inc/FreeRTOSConfig.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
+../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
+../Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
+../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+../Core/Inc/tasks/OledMenu.h:
+../Core/Inc/tasks/SensOut.h:
+../Core/Inc/tasks/OledOut.h:

@@ -51,12 +51,12 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 
-/* Definitions for InitTask */
-osThreadId_t InitTaskHandle;
-const osThreadAttr_t InitTask_attributes = {
-  .name = "InitTask",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+/* Definitions for EmptyTask */
+osThreadId_t EmptyTaskHandle;
+const osThreadAttr_t EmptyTask_attributes = {
+  .name = "EmptyTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityLow1,
 };
 /* USER CODE BEGIN PV */
 
@@ -69,7 +69,7 @@ static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM2_Init(void);
-void StartInitTask(void *argument);
+void StartEmptyTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -78,6 +78,18 @@ void StartInitTask(void *argument);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint16_t raw_angle = 0;
+uint16_t old_raw_angle = 0;
+typedef struct {
+	  uint8_t num:2;
+	  uint8_t MD:1;
+	  uint8_t ML:1;
+	  uint8_t MH:1;
+	  uint8_t dum:3
+}s_magnit;
+union{
+	  s_magnit state_magnit;
+	  uint8_t data;
+} magnituda;
 /* USER CODE END 0 */
 
 /**
@@ -181,25 +193,26 @@ int main(void)
 	  MCP4725_setValue(&myMCP4725, v_out, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
 	  HAL_Delay(50);
 	  data_from_adc_0 = (ADS1115_getData(pADS));
-	  temp++;
-	  v_out+= 100;
+	  v_out+= 150;
 	  if(v_out > 4060)
 		  v_out = 0;
   }
 
-
-
   uint16_t angle = 0;
-  uint16_t staty_encoder = 0;
+  uint8_t staty_encoder = 0;
   for(uint8_t test = 0; test < 50; test++){
 	  angle = AS5600_GetAngle();
 	  raw_angle = AS5600_GetRawAngle();
-	  staty_encoder = AS5600_GetStatus();
+
 	  HAL_Delay(10);
   }
   uint8_t color = 0;
-  	  while(1){
+  		  magnituda.data = AS5600_GetStatus();
   		  raw_angle = AS5600_GetAngle();
+  		  if(magnituda.state_magnit.MD != 1){
+  			  raw_angle = 0;
+  		  }
+
 		  char sym[3];
 		  itoa(raw_angle,sym,10);
 		  	  ssd1306_SetCursor(67, 0);
@@ -207,7 +220,6 @@ int main(void)
 		      ssd1306_SetCursor(67, 19);
 		      ssd1306_UpdateScreen();
 		      HAL_Delay(40);
-}
 
 
   //Clean
@@ -236,11 +248,12 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of InitTask */
-  InitTaskHandle = osThreadNew(StartInitTask, NULL, &InitTask_attributes);
+  /* creation of EmptyTask */
+  EmptyTaskHandle = osThreadNew(StartEmptyTask, NULL, &EmptyTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  initUserTasks();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -322,7 +335,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.ClockSpeed = 400000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -485,29 +498,42 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(EPD_Busy_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : EXT_button_on_Pin */
+  GPIO_InitStruct.Pin = EXT_button_on_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(EXT_button_on_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-
+uint8_t X3 = 0;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	X3++;
+}
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartInitTask */
+/* USER CODE BEGIN Header_StartEmptyTask */
 /**
-  * @brief  Function implementing the InitTask thread.
+  * @brief  Function implementing the EmptyTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartInitTask */
-void StartInitTask(void *argument)
+/* USER CODE END Header_StartEmptyTask */
+void StartEmptyTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	  for(;;)
+	  {
+	    osDelay(1);
+	  }
   /* USER CODE END 5 */
 }
 

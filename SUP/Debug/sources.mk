@@ -29,6 +29,7 @@ Core/Src/Display/ssd1306 \
 Core/Src/Display/ws2812 \
 Core/Src/Encoder \
 Core/Src \
+Core/Src/tasks \
 Core/Startup \
 Drivers/STM32F4xx_HAL_Driver/Src \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \

@@ -43,7 +43,11 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/Display/ssd1306/ssd1306_conf.h \
  ../Core/Inc/Display/ssd1306/ssd1306_fonts.h \
  ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h \
- ../Core/Inc/Encoder/as5600.h
+ ../Core/Inc/Encoder/as5600.h ../Core/Inc/tasks/UserTasks.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
+ ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
+ ../Core/Inc/tasks/OledMenu.h ../Core/Inc/tasks/SensOut.h \
+ ../Core/Inc/tasks/OledOut.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -93,3 +97,9 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Core/Inc/ADC_out/ADS1115.h:
 ../Core/Inc/DAC_out/MCP4725.h:
 ../Core/Inc/Encoder/as5600.h:
+../Core/Inc/tasks/UserTasks.h:
+../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
+../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
+../Core/Inc/tasks/OledMenu.h:
+../Core/Inc/tasks/SensOut.h:
+../Core/Inc/tasks/OledOut.h:

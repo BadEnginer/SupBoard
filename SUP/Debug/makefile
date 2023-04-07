@@ -15,6 +15,7 @@ RM := rm -rf
 -include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
+-include Core/Src/tasks/subdir.mk
 -include Core/Src/Encoder/subdir.mk
 -include Core/Src/Display/ws2812/subdir.mk
 -include Core/Src/Display/ssd1306/subdir.mk

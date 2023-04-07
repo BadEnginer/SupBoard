@@ -37,6 +37,7 @@ extern "C" {
 #include "ADC_out/ADS1115.h"
 #include "DAC_out/MCP4725.h"
 #include "Encoder/as5600.h"
+#include "tasks/UserTasks.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -72,6 +73,9 @@ void Error_Handler(void);
 #define EPD_Data_Control_GPIO_Port GPIOB
 #define EPD_Busy_Pin GPIO_PIN_10
 #define EPD_Busy_GPIO_Port GPIOB
+#define EXT_button_on_Pin GPIO_PIN_14
+#define EXT_button_on_GPIO_Port GPIOB
+#define EXT_button_on_EXTI_IRQn EXTI15_10_IRQn
 
 /* USER CODE BEGIN Private defines */
 
