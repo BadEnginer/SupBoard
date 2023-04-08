@@ -99,6 +99,13 @@ void drawMainMenu() {
     uint8_t next_item_menu = current_item_menu + 1;
     uint8_t prev_item_menu = MENU_ITEMS_COUNT - 1;
     while( exit ){
+    	 ssd1306_Line(0, 0, 128, 64, White); // Рисуем рамку 1 пиксель
+
+    	 HAL_Delay(1000);
+    	 ssd1306_Line(2, 2, 126, 62, White); // Рисуем рамку 1 пиксель
+
+    	 HAL_Delay(1000);
+    	 ssd1306_Line(1, 1, 127, 63, White); // Рисуем рамку 1 пиксель
          next_item_menu = current_item_menu + 1;
          prev_item_menu = current_item_menu - 1;
     	if(current_item_menu == (MENU_ITEMS_COUNT-1))
