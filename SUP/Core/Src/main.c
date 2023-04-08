@@ -129,6 +129,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uint8_t num[10] ={0};
   uint8_t coutn = 0;
+  /*
   HAL_StatusTypeDef type;
   // Подсчёт устройств в сети I2C 60-display, 72-ацп, 54-encoder, 96 -dac/
   for(uint8_t i = 1; i < 127 ; i++){
@@ -147,15 +148,17 @@ int main(void)
   // Update - Option 1
   //extern  unsigned char *gImage_BW;
   //extern  unsigned char *gImage_R;
+   */
+
   ssd1306_Init();
   ssd1306_Fill(Black);
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
+  ssd1306_SetCursor(3, 40);
+  ssd1306_WriteString("Tap Start for continue", Font_6x8, White);
   ssd1306_UpdateScreen();
   HAL_Delay(1000);
-  ssd1306_Fill(Black);
-  ssd1306_UpdateScreen();
-
+/*
   ssd1306_SetCursor(0, 0);
     ssd1306_WriteString("ANG - ", Font_11x18, White);
     ssd1306_SetCursor(100, 0);
@@ -169,6 +172,7 @@ int main(void)
   //EPD_WhiteScreen_ALL(default_dis,gqImage_R);
   //EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
   //driver_delay_xms(5000);
+            /*
   ADS1115_Config_t configReg;
   ADS1115_Handle_t *pADS;
 	#define ADS1115_ADR 72

@@ -7,13 +7,13 @@ static int8_t  encoderr = 0;
 
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT] = {
-    "00:Motor",
-    "01:LED  ",
-    "02:E-ink",
-	"03:ADC  ",
-	"04:Encod",
-	"05:DAC  ",
-	"06:Exit "
+    "1.Motor   ",
+    "2.LED     ",
+    "3.E-ink   ",
+	"4.ADC     ",
+	"5.Encod.  ",
+	"6.DAC     ",
+	"0.Exit    "
 };
 
 void drawSubMenu(uint8_t i){
@@ -98,14 +98,25 @@ void drawMainMenu() {
     uint8_t current_item_menu = 0;
     uint8_t next_item_menu = current_item_menu + 1;
     uint8_t prev_item_menu = MENU_ITEMS_COUNT - 1;
+    ssd1306_DrawRectangle(1, 1, 127, 63, White);
+
+#define START_POS_X 5
+#define LAST_POS_X (127 - START_POS_X)
+
+#define START_POS_Y 5
+#define LAST_POS_Y (63 - START_POS_Y)
+
+#define SIZE_FONT_X 7
+#define SIZE_FONT_Y 10
+
+#define SIZE_MAIN_FONT_X 11
+#define SIZE_MAIN_FONT_Y 18
+//#define MAIN_FONT_MENU Font_11x18
+//#define SECOND_FONT_MENU Font_7x10
+	//ssd1306_Line(START_POS_X, START_POS_Y+SIZE_FONT_Y+1, LAST_POS_X, START_POS_Y+SIZE_FONT_Y+1, White);
+	//ssd1306_Line(START_POS_X, LAST_POS_Y- SIZE_FONT_Y-1, LAST_POS_X, LAST_POS_Y- SIZE_FONT_Y-1, White);
+    ssd1306_UpdateScreen();
     while( exit ){
-    	 ssd1306_Line(0, 0, 128, 64, White); // Рисуем рамку 1 пиксель
-
-    	 HAL_Delay(1000);
-    	 ssd1306_Line(2, 2, 126, 62, White); // Рисуем рамку 1 пиксель
-
-    	 HAL_Delay(1000);
-    	 ssd1306_Line(1, 1, 127, 63, White); // Рисуем рамку 1 пиксель
          next_item_menu = current_item_menu + 1;
          prev_item_menu = current_item_menu - 1;
     	if(current_item_menu == (MENU_ITEMS_COUNT-1))
@@ -113,21 +124,26 @@ void drawMainMenu() {
     	if(current_item_menu == 0) // Для нулевого элемента предыдущий символ будет последним
     		prev_item_menu = MENU_ITEMS_COUNT - 1;
 
-    	ssd1306_SetCursor(0, 0);
-    	ssd1306_WriteString(menuItems[prev_item_menu], Font_11x18, White);
-
-    	ssd1306_SetCursor(0, MENU_ITEM_HEIGHT);
-    	ssd1306_WriteString("> ", Font_16x24, White);
-    	ssd1306_SetCursor(17, MENU_ITEM_HEIGHT);
-    		ssd1306_WriteString(menuItems[current_item_menu], Font_16x24, White);
-
-    	ssd1306_SetCursor(0, MENU_ITEM_MAIN_HEIGHT+MENU_ITEM_HEIGHT);
-    	ssd1306_WriteString(menuItems[next_item_menu], Font_11x18, White);
-
+    	ssd1306_SetCursor(START_POS_X, SIZE_FONT_Y + START_POS_Y+8);// Магический номер что бы сделать по центру
+    		ssd1306_WriteString(">", Font_11x18, White);
+    	ssd1306_SetCursor(START_POS_X+SIZE_MAIN_FONT_X+5, SIZE_FONT_Y + START_POS_Y+8);
+    		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
     	ssd1306_UpdateScreen();
+
+    	HAL_Delay(50);
+
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y); // В первой строке пишем предыдущий пункт
+    		ssd1306_WriteString(menuItems[prev_item_menu], Font_7x10, White);
+    		ssd1306_UpdateScreen();
+
+        	ssd1306_SetCursor(START_POS_X, LAST_POS_Y - SIZE_FONT_Y);
+        		ssd1306_WriteString(menuItems[next_item_menu], Font_7x10, White);
+        	ssd1306_UpdateScreen();
+
     	buttonEnSet(OFF);
     	while(buttonEn() != ON){}
     		current_item_menu++;
+    		HAL_Delay(300);
     		if(current_item_menu >= MENU_ITEMS_COUNT )
     			current_item_menu = 0;
     }
