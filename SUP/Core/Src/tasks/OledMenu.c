@@ -2,12 +2,10 @@
 #include "tasks/OledMenu.h"
 
 void StartOledMenuTask(void *argument){
-	  for(;;)
-	  {
+	for(;;){
 		if(buttonEn() == ON){
 			drawMainMenu();
-			buttonEnSet(OFF);
 		}
-	    osDelay(100);
-	  }
+	osDelay(100);
+	}
 }

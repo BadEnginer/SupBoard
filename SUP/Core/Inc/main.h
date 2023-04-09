@@ -47,6 +47,23 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+void startDisplay();
+// Блок для опредления устройств на линии
+#define DIS_ADRESS 60
+#define ADC_ADRESS 72
+#define ENC_ADRESS 54
+#define DAC_ADRESS 96
+
+typedef struct {
+	uint8_t encoder_dev:1;
+	uint8_t display_dev:1;
+	uint8_t ADC_dev:1;
+	uint8_t DAC_dev:1;
+	uint8_t unknown_dev:4;
+}s_devise_i2c_tree;
+
+uint8_t test_i2c_dev();
+
 
 /* USER CODE END EC */
 

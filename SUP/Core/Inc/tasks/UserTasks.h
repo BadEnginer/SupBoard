@@ -4,7 +4,8 @@
 #include "cmsis_os.h"
 #include "tasks/OledMenu.h"
 #include "tasks/SensOut.h"
-#include "tasks/OledOut.h"
+#include "tasks/LedControl.h"
+
 /**
  * @fn void initUserTasks()
  * @brief Инициализация всех пользовательских потоков

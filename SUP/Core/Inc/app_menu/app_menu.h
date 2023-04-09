@@ -8,7 +8,10 @@
 #ifndef INC_APP_MENU_H_
 #define INC_APP_MENU_H_
 
+//#include <main.h>
 #include "Display/ssd1306/ssd1306.h"
+#include "stm32f4xx_hal.h"
+#include "cmsis_os2.h"
 
 #define MENU_ITEMS_COUNT 7 	// Количество пунктов меню
 #define MENU_ITEM_HEIGHT 10 // Высота пункта меню
@@ -28,15 +31,6 @@
 
 void drawMainMenu();
 void drawSubMenu(uint8_t);
-
-void buttonUpSet(uint8_t);
-void buttonEnSet(uint8_t);
-void encoderSet(int8_t);
-
-uint8_t buttonUp();
-uint8_t buttonEn();
-int8_t  encoder();
-
 void drawItemNum00();
 void drawItemNum01();
 void drawItemNum02();
@@ -44,5 +38,25 @@ void drawItemNum03();
 void drawItemNum04();
 void drawItemNum05();
 void drawItemNum06();
+void udpateDisplay();
+void drawSubMenu(uint8_t i);
+
+uint8_t buttonUp();
+void buttonUpSet();
+void buttonUpReset();
+uint8_t buttonEn();
+void buttonEnSet();
+void buttonEnReset();
+uint8_t buttonCounter();
+void buttonCounterSet();
+void buttonCounterReset();
+uint8_t buttonLong();
+void buttonLongSet();
+void buttonLongReset();
+int8_t encoderData();
+void encoderSetUp();
+void encoderSetDown();
+void encoderReset();
+
 
 #endif /* INC_APP_MENU_H_ */

@@ -3,6 +3,7 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
+
 void AS5600_WriteReg(uint8_t Reg, uint8_t Data)
 {
 	HAL_I2C_Master_Transmit(&hi2c1,AS5600_ADDR,&Data,1,10);	

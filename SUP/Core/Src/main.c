@@ -59,8 +59,11 @@ const osThreadAttr_t EmptyTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow1,
 };
-/* USER CODE BEGIN PV */
 
+
+
+/* USER CODE BEGIN PV */
+s_devise_i2c_tree devise_i2c_tree = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,24 +76,15 @@ static void MX_TIM2_Init(void);
 void StartEmptyTask(void *argument);
 
 /* USER CODE BEGIN PFP */
-
+const osMutexAttr_t BlockI2C_attributes = {
+  .name = "BlockI2C"
+};
+osMutexId_t BlockI2CHandle;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t raw_angle = 0;
-uint16_t old_raw_angle = 0;
-typedef struct {
-	  uint8_t num:2;
-	  uint8_t MD:1;
-	  uint8_t ML:1;
-	  uint8_t MH:1;
-	  uint8_t dum:3
-}s_magnit;
-union{
-	  s_magnit state_magnit;
-	  uint8_t data;
-} magnituda;
+
 /* USER CODE END 0 */
 
 /**
@@ -127,67 +121,21 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t num[10] ={0};
-  uint8_t coutn = 0;
-  /*
-  HAL_StatusTypeDef type;
-  // Подсчёт устройств в сети I2C 60-display, 72-ацп, 54-encoder, 96 -dac/
-  for(uint8_t i = 1; i < 127 ; i++){
-	  type = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
-	  if(type == HAL_OK){
-		  num[coutn++] = i;
-	  }
-  }
-  ARGB_Init();  // Initialization
-  //ARGB_STATE ARGB_GetState;
-  ARGB_Clear();
-  while (ARGB_Show() != ARGB_OK);
-  ARGB_SetBrightness(80);
- // ARGB_SetRGB(0, 255, 0, 128);
-
-  // Update - Option 1
-  //extern  unsigned char *gImage_BW;
-  //extern  unsigned char *gImage_R;
-   */
-
+  uint8_t test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
   ssd1306_Init();
-  ssd1306_Fill(Black);
-  ssd1306_SetCursor(5, 10);
-  ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
-  ssd1306_SetCursor(3, 40);
-  ssd1306_WriteString("Tap Start for continue", Font_6x8, White);
-  ssd1306_UpdateScreen();
+  startDisplay();
+
+  BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
+  //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
+  //osMutexRelease (BlockI2CHandle);
+
   HAL_Delay(1000);
-/*
-  ssd1306_SetCursor(0, 0);
-    ssd1306_WriteString("ANG - ", Font_11x18, White);
-    ssd1306_SetCursor(100, 0);
-                   ssd1306_WriteString("°", Font_11x18, White);
-    ssd1306_SetCursor(0, 19);
-      ssd1306_WriteString("BAT - ", Font_11x18, White);
-      ssd1306_SetCursor(100, 19);
-            ssd1306_WriteString("%", Font_11x18, White);
+
   //EPD_HW_Init(); //Electronic paper initialization
   //EPD_WhiteScreen_ALL(gqImage_R,gqImage_R); //Refresh the picture in full screen
   //EPD_WhiteScreen_ALL(default_dis,gqImage_R);
   //EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
-  //driver_delay_xms(5000);
-            /*
-  ADS1115_Config_t configReg;
-  ADS1115_Handle_t *pADS;
-	#define ADS1115_ADR 72
-  configReg.channel = CHANNEL_AIN1_GND;
-  configReg.pgaConfig = PGA_4_096;
-  configReg.operatingMode = MODE_CONTINOUS;
-  configReg.dataRate = DRATE_250;
-  configReg.compareMode = COMP_HYSTERESIS;
-  configReg.polarityMode = POLARITY_ACTIVE_LOW;
-  configReg.latchingMode = LATCHING_NONE;
-  configReg.queueComparator = QUEUE_ONE;
-	uint8_t bytes[3] = {0};
-  pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configReg);
-  ADS1115_updateConfig(pADS, configReg);
-  ADS1115_startContinousMode(pADS);
+
   //ADS1115_setConversionReadyPin(pADS);
   float data_from_adc_0 = 0;
   MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.30);
@@ -197,34 +145,13 @@ int main(void)
   for(uint8_t temp = 0; temp < 80; temp++){
 	  MCP4725_setValue(&myMCP4725, v_out, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
 	  HAL_Delay(50);
-	  data_from_adc_0 = (ADS1115_getData(pADS));
+	  //data_from_adc_0 = (ADS1115_getData(pADS));
 	  v_out+= 150;
 	  if(v_out > 4060)
 		  v_out = 0;
   }
 
-  uint16_t angle = 0;
-  uint8_t staty_encoder = 0;
-  for(uint8_t test = 0; test < 50; test++){
-	  angle = AS5600_GetAngle();
-	  raw_angle = AS5600_GetRawAngle();
 
-	  HAL_Delay(10);
-  }
-  uint8_t color = 0;
-  		  magnituda.data = AS5600_GetStatus();
-  		  raw_angle = AS5600_GetAngle();
-  		  if(magnituda.state_magnit.MD != 1){
-  			  raw_angle = 0;
-  		  }
-
-		  char sym[3];
-		  itoa(raw_angle,sym,10);
-		  	  ssd1306_SetCursor(67, 0);
-		      ssd1306_WriteString(sym, Font_11x18, White);
-		      ssd1306_SetCursor(67, 19);
-		      ssd1306_UpdateScreen();
-		      HAL_Delay(40);
 
 
   //Clean
@@ -235,6 +162,9 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();
+  /* Create the mutex(es) */
+  /* creation of BlockI2C */
+  BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -518,12 +448,37 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint8_t ButtonUp = 0;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == EXT_button_on_Pin){
 		buttonEnSet(ON);
+		buttonUpSet();
 	}
 }
+void startDisplay(){
+	    ssd1306_Fill(Black);
+	    ssd1306_SetCursor(5, 10);
+	    ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
+	    ssd1306_SetCursor(3, 40);
+	    ssd1306_WriteString("Tap Start for continue", Font_6x8, White);
+	    ssd1306_UpdateScreen();
+  }
+
+uint8_t test_i2c_dev(){
+	HAL_StatusTypeDef stateI2c;
+	  // Подсчёт устройств в сети I2C 60-display, 72-ацп, 54-encoder, 96 -dac/
+	  for(uint8_t i = 1; i < 127 ; i++){
+		  stateI2c = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
+		  if(stateI2c == HAL_OK){
+			  switch ( i ) {
+			  	  case ENC_ADRESS: devise_i2c_tree.encoder_dev = ON; break;
+			  	  case DIS_ADRESS: devise_i2c_tree.display_dev = ON; break;
+			  	  case ADC_ADRESS: devise_i2c_tree.ADC_dev 	   = ON; break;
+			  	  case DAC_ADRESS: devise_i2c_tree.DAC_dev 	   = ON; break;
+			      default: devise_i2c_tree.unknown_dev++;
+			      }
+		  }
+	  }
+  }
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartEmptyTask */
