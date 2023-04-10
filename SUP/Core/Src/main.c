@@ -459,7 +459,7 @@ void startDisplay(){
 	    ssd1306_SetCursor(5, 10);
 	    ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
 	    ssd1306_SetCursor(3, 40);
-	    ssd1306_WriteString("Tap Start for continue", Font_6x8, White);
+	    ssd1306_WriteString("Tap Start for continue", Font_7x10, White);
 	    ssd1306_UpdateScreen();
   }
 

@@ -48,12 +48,12 @@ void calcDeltaAngle(int16_t current_encoder_data){
 		encoderSetDown();
 }
 void longButton(){
-	if(buttonUp() == OFF){
+	if(buttonEn() == OFF){
 		buttonCounterReset();
 	}
-	if(buttonUp() == ON){
+	if(buttonEn() == ON){
 		buttonCounterSet();
-		buttonUpReset();
+		buttonEnReset();
 	}
 	if(buttonCounter() > 10){
 		buttonLongSet();

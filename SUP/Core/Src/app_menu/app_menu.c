@@ -109,7 +109,7 @@ void udpateDisplay(){
 }
 
 void drawSubMenu(uint8_t i){
-	ssd1306_SetCursor(10, 10);
+	ssd1306_SetCursor(20, 2);
 	ssd1306_WriteString(menuItems[i], Font_7x10, White);
 }
 
@@ -215,13 +215,13 @@ void drawItemNum01(){
 
 
 	ssd1306_Fill(Black);
-	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	//ssd1306_DrawRectangle(1, 1, 127, 63, White);
 	drawSubMenu(0);
-	ssd1306_SetCursor(10, 29);
+	ssd1306_SetCursor(10, 25);
 	ssd1306_WriteString("ButEn:", Font_7x10, White);
 	ssd1306_SetCursor(10, 40);
 	ssd1306_WriteString("ButLo:", Font_7x10, White);
-	ssd1306_SetCursor(10, 51);
+	ssd1306_SetCursor(10, 55);
 	ssd1306_WriteString("Encod:", Font_7x10, White);
 	while(1){
 		if(buttonEn() == ON){
@@ -243,10 +243,12 @@ void drawItemNum01(){
 		itoa(butEn, sym_butEn, 10);
 		itoa(butLo, sym_butLo, 10);
 		itoa(encod, sym_encod, 10);
-		ssd1306_SetCursor(10, 29);
-		ssd1306_WriteString("ButEn:", Font_7x10, White);
-		ssd1306_SetCursor(10, 40);
-		ssd1306_SetCursor(10, 40);
+		ssd1306_SetCursor(50, 25);
+			ssd1306_WriteString(sym_butEn, Font_7x10, White);
+		ssd1306_SetCursor(50, 40);
+			ssd1306_WriteString(sym_butLo, Font_7x10, White);
+		ssd1306_SetCursor(50, 55);
+			ssd1306_WriteString(sym_encod, Font_7x10, White);
 		udpateDisplay();
 		HAL_Delay(80);
 	}

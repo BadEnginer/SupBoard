@@ -25,11 +25,11 @@ void initAllChanelADC();
 void calcDeltaAngle(int16_t);
 
 typedef struct {
-	  uint8_t num:2;
-	  uint8_t MD:1;
-	  uint8_t ML:1;
-	  uint8_t MH:1;
-	  uint8_t dum:3;
+	uint8_t dum:3;
+	uint8_t MH:1;
+	uint8_t ML:1;
+	uint8_t MD:1;
+	uint8_t num:2;
 }s_magnit;
 
 typedef union{
