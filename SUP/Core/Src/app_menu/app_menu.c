@@ -11,7 +11,7 @@ static int8_t  encoderAS56 = 0;		// Положение энкодера 1 кру
 
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT] = {
-    "1:Motor   ",
+    "1:Button  ",
     "2:LED     ",
     "3:E-ink   ",
 	"4:ADC     ",
@@ -64,6 +64,7 @@ void drawMainMenu() {
         		ssd1306_WriteString(menuItems[next_item_menu], Font_7x10, White);
         udpateDisplay();
         HAL_Delay(500);
+        buttonEnReset();
         buttonLongReset();
         encoderReset();
     	while(1){
@@ -82,7 +83,16 @@ void drawMainMenu() {
     			current_item_menu = 0;
     			break;
     		}
-
+    		if(buttonEn()){
+    			switch(current_item_menu){
+    				case 0: drawItemNum01(); break;
+    				case 1: drawItemNum02(); break;
+    				case 2: drawItemNum03(); break;
+    				case 3: drawItemNum04(); break;
+    				case 4: drawItemNum05(); break;
+    				case 5: drawItemNum06(); break;
+    			}
+    		}
     		if(current_item_menu >= MENU_ITEMS_COUNT )
     			current_item_menu = 0;
     	}
@@ -99,7 +109,7 @@ void udpateDisplay(){
 }
 
 void drawSubMenu(uint8_t i){
-	ssd1306_SetCursor(0, 0);
+	ssd1306_SetCursor(10, 10);
 	ssd1306_WriteString(menuItems[i], Font_7x10, White);
 }
 
@@ -193,28 +203,87 @@ void drawItemNum00(){
 	    }
 
 }
-
+*/
 void drawItemNum01(){
+	uint8_t butEn = 0;
+	uint8_t butLo = 0;
+	 int8_t encod = 0;
+	char sym_butEn[3];
+	char sym_butLo[3];
+	char sym_encod[3];
 
+
+
+	ssd1306_Fill(Black);
+	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	drawSubMenu(0);
+	ssd1306_SetCursor(10, 29);
+	ssd1306_WriteString("ButEn:", Font_7x10, White);
+	ssd1306_SetCursor(10, 40);
+	ssd1306_WriteString("ButLo:", Font_7x10, White);
+	ssd1306_SetCursor(10, 51);
+	ssd1306_WriteString("Encod:", Font_7x10, White);
+	while(1){
+		if(buttonEn() == ON){
+			buttonEnReset();
+			butEn++;
+		}
+		if(buttonLong() == ON){
+			buttonLongReset();
+			butLo++;
+		}
+		if(encoderData() > 0){
+			encoderReset();
+			encod++;
+		}
+		if(encoderData() < 0){
+			encoderReset();
+			encod--;
+		}
+		itoa(butEn, sym_butEn, 10);
+		itoa(butLo, sym_butLo, 10);
+		itoa(encod, sym_encod, 10);
+		ssd1306_SetCursor(10, 29);
+		ssd1306_WriteString("ButEn:", Font_7x10, White);
+		ssd1306_SetCursor(10, 40);
+		ssd1306_SetCursor(10, 40);
+		udpateDisplay();
+		HAL_Delay(80);
+	}
 }
 
 void drawItemNum02(){
-
+	ssd1306_Fill(Black);
+	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	drawSubMenu(1);
+	udpateDisplay();
 }
 
 void drawItemNum03(){
-
+	ssd1306_Fill(Black);
+	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	drawSubMenu(2);
+	udpateDisplay();
 }
 
 void drawItemNum04(){
-
+	ssd1306_Fill(Black);
+	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	drawSubMenu(3);
+	udpateDisplay();
 }
 
 void drawItemNum05(){
-
+	ssd1306_Fill(Black);
+	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	drawSubMenu(4);
+	udpateDisplay();
 }
 
 void drawItemNum06(){
-
+	ssd1306_Fill(Black);
+	ssd1306_DrawRectangle(1, 1, 127, 63, White);
+	drawSubMenu(5);
+	udpateDisplay();
 }
-*/
+

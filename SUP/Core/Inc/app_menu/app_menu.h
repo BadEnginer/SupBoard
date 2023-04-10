@@ -12,6 +12,7 @@
 #include "Display/ssd1306/ssd1306.h"
 #include "stm32f4xx_hal.h"
 #include "cmsis_os2.h"
+#include <stdlib.h>
 
 #define MENU_ITEMS_COUNT 7 	// Количество пунктов меню
 #define MENU_ITEM_HEIGHT 10 // Высота пункта меню
