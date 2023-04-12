@@ -48,17 +48,17 @@ void calcDeltaAngle(int16_t current_encoder_data){
 		encoderSetDown();
 }
 void longButton(){
-	if(buttonEn() == OFF){
+	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14);
+	if(pinState == GPIO_PIN_RESET){
+		buttonCounterSet();
+	}
+	else{
 		buttonCounterReset();
 	}
-	if(buttonEn() == ON){
-		buttonCounterSet();
-		buttonEnReset();
-	}
-	if(buttonCounter() > 10){
+
+	if(buttonCounter() > 50){
 		buttonLongSet();
 		buttonCounterReset();
-		buttonUpReset();
 	}
 }
 

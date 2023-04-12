@@ -456,10 +456,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 }
 void startDisplay(){
 	    ssd1306_Fill(Black);
+	    /*
 	    ssd1306_SetCursor(5, 10);
 	    ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
 	    ssd1306_SetCursor(3, 40);
 	    ssd1306_WriteString("Tap Start for continue", Font_7x10, White);
+	    */
+	    ssd1306_Line(0, 1, 128, 1, White);
+	    ssd1306_Line(0, 12, 128, 2, White);
+	    ssd1306_SetCursor(0, 3); //
+	    ssd1306_WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Font_11x18, White);
+	 	ssd1306_SetCursor(0, 22); //
+	 	ssd1306_WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Font_11x18, Black);
+	 	ssd1306_SetCursor(0, 41); //
+	 	ssd1306_WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Font_11x18, White);
+	 	ssd1306_Line(0, 63, 128, 63, White);
 	    ssd1306_UpdateScreen();
   }
 

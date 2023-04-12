@@ -7,7 +7,7 @@ main.c:391:13:MX_DMA_Init	1
 main.c:409:13:MX_GPIO_Init	1
 main.c:451:6:HAL_GPIO_EXTI_Callback	2
 main.c:457:6:startDisplay	1
-main.c:466:9:test_i2c_dev	9
-main.c:491:6:StartEmptyTask	1
-main.c:510:6:HAL_TIM_PeriodElapsedCallback	2
-main.c:527:6:Error_Handler	1
+main.c:477:9:test_i2c_dev	9
+main.c:502:6:StartEmptyTask	1
+main.c:521:6:HAL_TIM_PeriodElapsedCallback	2
+main.c:538:6:Error_Handler	1
