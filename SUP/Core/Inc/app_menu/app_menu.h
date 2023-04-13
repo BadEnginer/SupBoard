@@ -21,26 +21,31 @@
 #define ON 1
 #define OFF 0
 
-#define ZERO_POS 2
-#define LAST_POS 62
+#define ZERO_POS_X 2
+#define ZERO_POS_Y 0
 
-#define SIZE_FONT_X 7
-#define SIZE_FONT_Y 10
 
-#define SIZE_MAIN_FONT_X 11
-#define SIZE_MAIN_FONT_Y 18
+#define SIZE_FONT_X 11
+#define SIZE_FONT_Y 18
+
+#define START_POS_X 2
+#define LAST_POS_X (127 - START_POS_X)
+
+#define START_POS_Y 0
 
 void drawMainMenu();
-void drawSubMenu(uint8_t);
-void drawItemNum00();
-void drawItemNum01();
-void drawItemNum02();
-void drawItemNum03();
-void drawItemNum04();
-void drawItemNum05();
-void drawItemNum06();
+void drawStartMenu();
+
+void drawLEDMenu();
+void drawE_inkMenu();
+void drawADCMenu();
+void drawEncodMenu();
+void drawDACMenu();
+void drawSettinMenu();
+void drawButtonMenu();
+
 void udpateDisplay();
-void drawSubMenu(uint8_t i);
+
 
 uint8_t buttonUp();
 void buttonUpSet();

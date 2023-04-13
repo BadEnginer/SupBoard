@@ -10,97 +10,122 @@ static uint8_t button_long = 0;		// Кнопка ввода удержана 1
 static int8_t  encoderAS56 = 0;		// Положение энкодера 1 крутят в плюс -1 крутят в минус
 
 // Названия пунктов меню
-const char* menuItems[MENU_ITEMS_COUNT] = {
-    "1:Button  ",
-    "2:LED     ",
-    "3:E-ink   ",
-	"4:ADC     ",
-	"5:Encod.  ",
-	"6:DAC     ",
-	"0:Exit    "
+const char* menuItems[MENU_ITEMS_COUNT+1] = {
+    "1:Button   ",
+    "2:LED      ",
+    "3:E-ink    ",
+	"4:ADC      ",
+	"5:Encod.   ",
+	"6:DAC      ",
+	"7:Settings ",
+	"   Menu    "
+};
+
+
+const char* menuButton[3] = {
+    "Lon:  Enc: ",
+    "Ena:       ",
+	"  Button   "
+};
+
+const char* menuEncoder[3] = {
+    "MAG:   MD: ",
+    "ANG:   MN: ",
+	"  Encoder  "
+};
+const char* menuSettings[7] = {
+    "Default:   ",
+    "Сell:      ",
+	"Сell min:  ",
+    "Max.V:     ",
+	"Mix.V:     ",
+	"Capacity:  ",
+	" Settings  "
+};
+
+const char* menuDAC[3] = {
+    "Lon:  Ena: ",
+    "Encod:     ",
+	"    DAC    "
+};
+
+const char* menuE_inc[3] = {
+    "Pic.1 Pic.2",
+	"Pic.3 Pic.4",
+	"   E-ink   "
+};
+
+const char* menuLED[3] = {
+    "Num:  GRN: ",
+    "RED:  BLU: ",
+	"    LED    "
+};
+
+const char* menuADC[3] = {
+    "C1:   C3:  ",
+    "C2:   C4:  ",
+	"    ADC    "
 };
 
 void drawMainMenu() {
     ssd1306_Fill(Black);
     uint8_t exit = 1;
-    uint8_t current_item_menu = 0;
-    uint8_t next_item_menu = current_item_menu + 1;
-    uint8_t prev_item_menu = MENU_ITEMS_COUNT - 1;
+    int8_t  current_item_menu = 0;
     ssd1306_DrawRectangle(1, 1, 127, 63, White);
-
-#define START_POS_X 5
-#define LAST_POS_X (127 - START_POS_X)
-
-#define START_POS_Y 5
-#define LAST_POS_Y (63 - START_POS_Y)
-
-#define SIZE_FONT_X 7
-#define SIZE_FONT_Y 10
-
-#define SIZE_MAIN_FONT_X 11
-#define SIZE_MAIN_FONT_Y 18
     udpateDisplay();
-    while( exit ){
-         next_item_menu = current_item_menu + 1;
-         prev_item_menu = current_item_menu - 1;
-    	if(current_item_menu == (MENU_ITEMS_COUNT-1))
-    		next_item_menu = 0;
-    	if(current_item_menu == 0) // Для нулевого элемента предыдущий символ будет последним
-    		prev_item_menu = MENU_ITEMS_COUNT - 1;
 
-    	ssd1306_SetCursor(START_POS_X, SIZE_FONT_Y + START_POS_Y+8);// Магический номер что бы сделать по центру
-    		ssd1306_WriteString(">", Font_11x18, White);
-    	ssd1306_SetCursor(START_POS_X+SIZE_MAIN_FONT_X+5, SIZE_FONT_Y + START_POS_Y+8);
+    while(1){ // Вывод главного меню
+    	exit = ON;
+    	if(current_item_menu >= MENU_ITEMS_COUNT )
+			current_item_menu = 0;
+    	if(current_item_menu <= 0 )
+    	    current_item_menu = 0;
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y);
+    		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT+1], Font_11x18, White);
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5);
     		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
-
     	udpateDisplay();
-    	HAL_Delay(50);
-
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y); // В первой строке пишем предыдущий пункт
-    		ssd1306_WriteString(menuItems[prev_item_menu], Font_7x10, White);
-    	udpateDisplay();
-
-        	ssd1306_SetCursor(START_POS_X, LAST_POS_Y - SIZE_FONT_Y);
-        		ssd1306_WriteString(menuItems[next_item_menu], Font_7x10, White);
-        udpateDisplay();
-        HAL_Delay(500);
         buttonEnReset();
         buttonLongReset();
         encoderReset();
-    	while(1){
-    		if(encoderData() > 0){
-    			current_item_menu++;
-    			encoderReset();
-    			break;
-    		}
-    		if(encoderData() < 0){
-    			current_item_menu--;
-    			encoderReset();
-    			break;
-    		}
+        HAL_Delay(800);
+    	while(exit){
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
     			current_item_menu = 0;
     			break;
     		}
     		if(buttonEn()){
-    			switch(current_item_menu){
-    				case 0: drawItemNum01(); break;
-    				case 1: drawItemNum02(); break;
-    				case 2: drawItemNum03(); break;
-    				case 3: drawItemNum04(); break;
-    				case 4: drawItemNum05(); break;
-    				case 5: drawItemNum06(); break;
-    			}
+    		    			switch(current_item_menu){
+    		    				case 0: drawButtonMenu();	break;
+    		    				case 1: drawLEDMenu(); 		break;
+    		    				case 2: drawE_inkMenu();	break;
+    		    				case 3: drawADCMenu();		break;
+    		    				case 4: drawEncodMenu();	break;
+    		    				case 5: drawDACMenu();		break;
+    		    				case 6: drawSettinMenu();	break;
+    		    				default: current_item_menu = 0;
+    		    			}
     		}
-    		if(current_item_menu >= MENU_ITEMS_COUNT )
-    			current_item_menu = 0;
+    		if(encoderData() > 0){
+    			current_item_menu++;
+    			exit = 0;
+    			encoderReset();
+    			break;
+    		}
+    		if(encoderData() < 0){
+    			current_item_menu--;
+    			exit = 0;
+    			encoderReset();
+    			break;
+    		}
     	}
     }
 
 }
 
 extern osMutexId_t BlockI2CHandle;
+
 void udpateDisplay(){
 	statusMutex = osMutexAcquire(BlockI2CHandle, 1000);
 	if(statusMutex == osOK)
@@ -108,10 +133,6 @@ void udpateDisplay(){
 	osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 }
 
-void drawSubMenu(uint8_t i){
-	ssd1306_SetCursor(20, 2);
-	ssd1306_WriteString(menuItems[i], Font_7x10, White);
-}
 
 uint8_t buttonUp(){
 	return buttonUpper;
@@ -204,25 +225,31 @@ void drawItemNum00(){
 
 }
 */
-void drawItemNum01(){
+#define LED_NUM 8
+struct sLedData{
+	uint8_t numLED	[LED_NUM];
+	uint8_t on_off	[LED_NUM];
+	uint8_t red		[LED_NUM];
+	uint8_t grn		[LED_NUM];
+	uint8_t blu		[LED_NUM];
+}LedData;
+
+void drawButtonMenu(){
 	uint8_t butEn = 0;
 	uint8_t butLo = 0;
 	 int8_t encod = 0;
-	char sym_butEn[3];
-	char sym_butLo[3];
-	char sym_encod[3];
-
-
+	char sym_butEn[1];
+	char sym_butLo[1];
+	char sym_encod[2];
 
 	ssd1306_Fill(Black);
-	//ssd1306_DrawRectangle(1, 1, 127, 63, White);
-	drawSubMenu(0);
-	ssd1306_SetCursor(10, 25);
-	ssd1306_WriteString("ButEn:", Font_7x10, White);
-	ssd1306_SetCursor(10, 40);
-	ssd1306_WriteString("ButLo:", Font_7x10, White);
-	ssd1306_SetCursor(10, 55);
-	ssd1306_WriteString("Encod:", Font_7x10, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y);
+		ssd1306_WriteString(menuButton[3], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
+		ssd1306_WriteString(menuButton[1], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
+		ssd1306_WriteString(menuButton[1], Font_11x18, White);
+
 	while(1){
 		if(buttonEn() == ON){
 			buttonEnReset();
@@ -240,52 +267,76 @@ void drawItemNum01(){
 			encoderReset();
 			encod--;
 		}
+		butEn = butEn % 10;
+		butLo = butLo % 10;
+		encod = encod % 10;
+
 		itoa(butEn, sym_butEn, 10);
 		itoa(butLo, sym_butLo, 10);
 		itoa(encod, sym_encod, 10);
-		ssd1306_SetCursor(50, 25);
-			ssd1306_WriteString(sym_butEn, Font_7x10, White);
-		ssd1306_SetCursor(50, 40);
-			ssd1306_WriteString(sym_butLo, Font_7x10, White);
-		ssd1306_SetCursor(50, 55);
-			ssd1306_WriteString(sym_encod, Font_7x10, White);
+
+		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_butEn, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_butLo, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 5, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_encod, Font_11x18, White);
+
 		udpateDisplay();
-		HAL_Delay(80);
+		HAL_Delay(50);
 	}
 }
+void drawLEDMenu(){
+	uint8_t currentLed = 0;
+	uint8_t red,grn,blu;
 
-void drawItemNum02(){
-	ssd1306_Fill(Black);
-	ssd1306_DrawRectangle(1, 1, 127, 63, White);
-	drawSubMenu(1);
-	udpateDisplay();
 }
 
-void drawItemNum03(){
-	ssd1306_Fill(Black);
-	ssd1306_DrawRectangle(1, 1, 127, 63, White);
-	drawSubMenu(2);
-	udpateDisplay();
-}
+/*
+const char* menuButton[3] = {
+	"  Button   "
+    "Lon:  Ena: ",
+    "Enc:       ",
 
-void drawItemNum04(){
-	ssd1306_Fill(Black);
-	ssd1306_DrawRectangle(1, 1, 127, 63, White);
-	drawSubMenu(3);
-	udpateDisplay();
-}
+};
 
-void drawItemNum05(){
-	ssd1306_Fill(Black);
-	ssd1306_DrawRectangle(1, 1, 127, 63, White);
-	drawSubMenu(4);
-	udpateDisplay();
-}
+const char* menuEncoder[3] = {
+    "MAG:   MD: ",
+    "ANG:   MN: ",
+	"  Encoder  "
+};
+const char* menuSettings[7] = {
+    "Default:   ",
+    "Сell:      ",
+	"Сell min:  ",
+    "Max.V:     ",
+	"Mix.V:     ",
+	"Capacity:  ",
+	" Settings  "
+};
 
-void drawItemNum06(){
-	ssd1306_Fill(Black);
-	ssd1306_DrawRectangle(1, 1, 127, 63, White);
-	drawSubMenu(5);
-	udpateDisplay();
-}
+const char* menuDAC[3] = {
+    "Lon:  Ena: ",
+    "Encod:     ",
+	"    DAC    "
+};
+
+const char* menuE_inc[3] = {
+    "Pic.1 Pic.2",
+	"Pic.3 Pic.4",
+	"   E-ink   "
+};
+
+const char* menuLED[3] = {
+    "Num:  GRN: ",
+    "RED:  BLU: ",
+	"    LED    "
+};
+
+const char* menuADC[3] = {
+    "C1:   C3:  ",
+    "C2:   C4:  ",
+	"    ADC    "
+};
+*/
 
