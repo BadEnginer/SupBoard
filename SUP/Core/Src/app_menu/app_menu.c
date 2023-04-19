@@ -292,7 +292,7 @@ void drawLEDMenu(){
 
 }
 
-/*
+
 const char* menuButton[3] = {
 	"  Button   "
     "Lon:  Ena: ",
@@ -338,5 +338,5 @@ const char* menuADC[3] = {
     "C2:   C4:  ",
 	"    ADC    "
 };
-*/
+
 
