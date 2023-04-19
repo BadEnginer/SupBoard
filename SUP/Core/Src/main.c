@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -32,7 +33,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+s_devise_i2c_tree devise_i2c_tree;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -59,11 +60,13 @@ const osThreadAttr_t EmptyTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow1,
 };
-
-
-
+/* Definitions for BlockI2C */
+osMutexId_t BlockI2CHandle;
+const osMutexAttr_t BlockI2C_attributes = {
+  .name = "BlockI2C"
+};
 /* USER CODE BEGIN PV */
-s_devise_i2c_tree devise_i2c_tree = {0};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -76,10 +79,7 @@ static void MX_TIM2_Init(void);
 void StartEmptyTask(void *argument);
 
 /* USER CODE BEGIN PFP */
-const osMutexAttr_t BlockI2C_attributes = {
-  .name = "BlockI2C"
-};
-osMutexId_t BlockI2CHandle;
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -121,10 +121,9 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
+  test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
   ssd1306_Init();
   startDisplay();
-
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
   //osMutexRelease (BlockI2CHandle);
@@ -233,7 +232,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLM = 25;
   RCC_OscInitStruct.PLL.PLLN = 144;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 3;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -463,13 +462,12 @@ void startDisplay(){
 	    ssd1306_WriteString("Tap Start for continue", Font_7x10, White);
 	    */
 	    ssd1306_Line(0, 1, 128, 1, White);
-	    ssd1306_Line(0, 12, 128, 2, White);
-	    ssd1306_SetCursor(0, 3); //
-	    ssd1306_WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Font_11x18, White);
-	 	ssd1306_SetCursor(0, 22); //
-	 	ssd1306_WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Font_11x18, Black);
-	 	ssd1306_SetCursor(0, 41); //
-	 	ssd1306_WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", Font_11x18, White);
+	    ssd1306_SetCursor(7, 7); //
+	    ssd1306_WriteString("SPEED:-2", Font_11x18, White);
+	 	ssd1306_SetCursor(7, 7+18); //
+	 	ssd1306_WriteString("CHARG:82%", Font_11x18, White);
+	 	ssd1306_SetCursor(7, 7+18+18); //
+	 	ssd1306_WriteString("TIMER:3h22m", Font_11x18, White);
 	 	ssd1306_Line(0, 63, 128, 63, White);
 	    ssd1306_UpdateScreen();
   }
@@ -501,6 +499,8 @@ uint8_t test_i2c_dev(){
 /* USER CODE END Header_StartEmptyTask */
 void StartEmptyTask(void *argument)
 {
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
 	  for(;;)

@@ -30,6 +30,9 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
  ../Core/Inc/Display/e-ink/epaper.h ../Core/Inc/Display/ws2812/ARGB.h \
  ../Core/Inc/Display/ws2812/libs.h ../Core/Inc/Display/ssd1306/ssd1306.h \
  ../Core/Inc/Display/ssd1306/ssd1306_conf.h \
@@ -84,6 +87,9 @@ Core/Src/DAC_out/MCP4725.o: ../Core/Src/DAC_out/MCP4725.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
 ../Core/Inc/Display/e-ink/epaper.h:
 ../Core/Inc/Display/ws2812/ARGB.h:
 ../Core/Inc/Display/ws2812/libs.h:

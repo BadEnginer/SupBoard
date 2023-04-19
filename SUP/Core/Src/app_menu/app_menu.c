@@ -248,7 +248,7 @@ void drawButtonMenu(){
 	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
 		ssd1306_WriteString(menuButton[1], Font_11x18, White);
 	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
-		ssd1306_WriteString(menuButton[1], Font_11x18, White);
+		ssd1306_WriteString(menuButton[2], Font_11x18, White);
 
 	while(1){
 		if(buttonEn() == ON){
@@ -286,13 +286,30 @@ void drawButtonMenu(){
 		HAL_Delay(50);
 	}
 }
+
 void drawLEDMenu(){
 	uint8_t currentLed = 0;
 	uint8_t red,grn,blu;
-
 }
 
+void drawE_inkMenu(){
+	uint8_t exit = 0;
+}
 
+void drawADCMenu(){
+	uint8_t exit = 0;
+}
+void drawEncodMenu(){
+	uint8_t exit = 0;
+}
+void drawDACMenu(){
+	uint8_t exit = 0;
+}
+void drawSettinMenu(){
+	uint8_t exit = 0;
+}
+
+/*
 const char* menuButton[3] = {
 	"  Button   "
     "Lon:  Ena: ",
@@ -339,4 +356,4 @@ const char* menuADC[3] = {
 	"    ADC    "
 };
 
-
+*/

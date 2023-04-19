@@ -17,14 +17,20 @@ ADS1115_Config_t configChanel4;
 ADS1115_Handle_t *pADS;
 
 osStatus_t statusMutexI2C;
-
+extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
+uint8_t command_CMD[10] = {0};
 // Задача для опросо кнопок ADC и энкодера
 void StartSensOutTask(void *argument){
 	initAllChanelADC();
     pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel1);
     ADS1115_updateConfig(pADS, configChanel1);
     ADS1115_startContinousMode(pADS);
+    uint8_t buffer[] = "i'm not a robo !";
 	for(;;){
+				if(command_CMD[0] != 0){
+					command_CMD[0] = 0;
+				  CDC_Transmit_FS(buffer, sizeof(buffer));
+				}
 		// Попытка захвата мьютекса с таймаутом 1000 мс
 		statusMutexI2C = osMutexAcquire(BlockI2CHandle, 1000);
 		if(statusMutexI2C == osOK){
