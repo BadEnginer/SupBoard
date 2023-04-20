@@ -35,6 +35,7 @@
 
 void drawMainMenu();
 void drawStartMenu();
+void startDisplay();
 
 void drawLEDMenu();
 void drawE_inkMenu();

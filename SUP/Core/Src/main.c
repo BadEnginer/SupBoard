@@ -123,7 +123,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
   test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
   ssd1306_Init();
-  startDisplay();
+  ssd1306_SetCursor(5, 10);
+  ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
+  ssd1306_SetCursor(3, 40);
+  ssd1306_WriteString(" Tap Start ", Font_11x18, White);
+  ssd1306_UpdateScreen();
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
   //osMutexRelease (BlockI2CHandle);
@@ -453,24 +457,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		buttonUpSet();
 	}
 }
-void startDisplay(){
-	    ssd1306_Fill(Black);
-	    /*
-	    ssd1306_SetCursor(5, 10);
-	    ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
-	    ssd1306_SetCursor(3, 40);
-	    ssd1306_WriteString("Tap Start for continue", Font_7x10, White);
-	    */
-	    ssd1306_Line(0, 1, 128, 1, White);
-	    ssd1306_SetCursor(7, 7); //
-	    ssd1306_WriteString("SPEED:-2", Font_11x18, White);
-	 	ssd1306_SetCursor(7, 7+18); //
-	 	ssd1306_WriteString("CHARG:82%", Font_11x18, White);
-	 	ssd1306_SetCursor(7, 7+18+18); //
-	 	ssd1306_WriteString("TIMER:3h22m", Font_11x18, White);
-	 	ssd1306_Line(0, 63, 128, 63, White);
-	    ssd1306_UpdateScreen();
-  }
+
 
 uint8_t test_i2c_dev(){
 	HAL_StatusTypeDef stateI2c;

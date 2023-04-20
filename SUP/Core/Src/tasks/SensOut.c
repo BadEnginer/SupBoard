@@ -25,9 +25,16 @@ void StartSensOutTask(void *argument){
     pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel1);
     ADS1115_updateConfig(pADS, configChanel1);
     ADS1115_startContinousMode(pADS);
-    uint8_t buffer[] = "i'm not a robo !";
+    uint8_t buffer[] = {0};
 	for(;;){
 				if(command_CMD[0] != 0){
+					switch(command_CMD[0] - 48){
+						case 1: buttonEnSet();    break;
+						case 2: buttonLongSet();  break;
+						case 3: encoderSetUp();   break;
+						case 4: encoderSetDown(); break;
+					}
+					buffer[0] = command_CMD[0] ;
 					command_CMD[0] = 0;
 				  CDC_Transmit_FS(buffer, sizeof(buffer));
 				}

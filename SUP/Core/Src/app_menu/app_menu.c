@@ -23,8 +23,8 @@ const char* menuItems[MENU_ITEMS_COUNT+1] = {
 
 
 const char* menuButton[3] = {
-    "Lon:  Enc: ",
-    "Ena:       ",
+    "Lon:  Ena: ",
+    "EPC:  EMC: ",
 	"  Button   "
 };
 
@@ -68,54 +68,65 @@ const char* menuADC[3] = {
 };
 
 void drawMainMenu() {
-    ssd1306_Fill(Black);
+
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
+    ssd1306_Fill(Black);
     ssd1306_DrawRectangle(1, 1, 127, 63, White);
     udpateDisplay();
 
-    while(1){ // Вывод главного меню
-    	exit = ON;
+    while(exit){ // Вывод главного меню
+        ssd1306_Fill(Black);
+        ssd1306_DrawRectangle(1, 1, 127, 63, White);
+        udpateDisplay();
     	if(current_item_menu >= MENU_ITEMS_COUNT )
 			current_item_menu = 0;
     	if(current_item_menu <= 0 )
     	    current_item_menu = 0;
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y);
-    		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT+1], Font_11x18, White);
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5);
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y+6);
+    		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5+6);
     		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
     	udpateDisplay();
         buttonEnReset();
         buttonLongReset();
         encoderReset();
-        HAL_Delay(800);
-    	while(exit){
+        HAL_Delay(500);
+    	while(1){
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
-    			current_item_menu = 0;
+    			exit = 0;
     			break;
     		}
-    		if(buttonEn()){
-    		    			switch(current_item_menu){
-    		    				case 0: drawButtonMenu();	break;
-    		    				case 1: drawLEDMenu(); 		break;
-    		    				case 2: drawE_inkMenu();	break;
-    		    				case 3: drawADCMenu();		break;
-    		    				case 4: drawEncodMenu();	break;
-    		    				case 5: drawDACMenu();		break;
-    		    				case 6: drawSettinMenu();	break;
-    		    				default: current_item_menu = 0;
-    		    			}
+    		if(buttonEn()){// если нажали ввод переходим в подменю
+    			HAL_Delay(600);
+        		if(buttonLong()){ // если нажата кнопка подтверждения ждем что это не выход
+        			// Вернуться на стартовый дисплей
+        			exit = 0;
+        			break;
+        		}
+    		    switch(current_item_menu){
+    		    	case 0: drawButtonMenu();	break;
+    		    	case 1: drawLEDMenu(); 		break;
+    		    	case 2: drawE_inkMenu();	break;
+    		    	case 3: drawADCMenu();		break;
+    		    	case 4: drawEncodMenu();	break;
+    		    	case 5: drawDACMenu();		break;
+    		    	case 6: drawSettinMenu();	break;
+    		    	default: current_item_menu = 0;
+    		    }
+                buttonEnReset();
+                buttonLongReset();
+                encoderReset();
+                break;
     		}
     		if(encoderData() > 0){
     			current_item_menu++;
-    			exit = 0;
     			encoderReset();
     			break;
     		}
     		if(encoderData() < 0){
     			current_item_menu--;
-    			exit = 0;
     			encoderReset();
     			break;
     		}
@@ -234,21 +245,41 @@ struct sLedData{
 	uint8_t blu		[LED_NUM];
 }LedData;
 
+
+void startDisplay(){
+	    ssd1306_Fill(Black);
+	    ssd1306_Line(0, 1, 128, 1, White);
+	    ssd1306_SetCursor(7, 7); //
+	    ssd1306_WriteString("SPEED:-2", Font_11x18, White);
+	 	ssd1306_SetCursor(7, 7+18); //
+	 	ssd1306_WriteString("CHARG:82%", Font_11x18, White);
+	 	ssd1306_SetCursor(7, 7+18+18); //
+	 	ssd1306_WriteString("TIMER:3h22m", Font_11x18, White);
+	 	ssd1306_Line(0, 63, 128, 63, White);
+  }
+
+// Тестовая функция для проверки кнопок  готова
 void drawButtonMenu(){
 	uint8_t butEn = 0;
 	uint8_t butLo = 0;
-	 int8_t encod = 0;
+	uint8_t encodP = 0;
+	uint8_t encodM = 0;
+
 	char sym_butEn[1];
 	char sym_butLo[1];
-	char sym_encod[2];
+	char sym_encP[1];
+	char sym_encM[1];
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
 
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(START_POS_X, START_POS_Y);
-		ssd1306_WriteString(menuButton[3], Font_11x18, White);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
-		ssd1306_WriteString(menuButton[1], Font_11x18, White);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
 		ssd1306_WriteString(menuButton[2], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
+		ssd1306_WriteString(menuButton[0], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
+		ssd1306_WriteString(menuButton[1], Font_11x18, White);
 
 	while(1){
 		if(buttonEn() == ON){
@@ -261,29 +292,36 @@ void drawButtonMenu(){
 		}
 		if(encoderData() > 0){
 			encoderReset();
-			encod++;
+			encodP++;
 		}
 		if(encoderData() < 0){
 			encoderReset();
-			encod--;
+			encodM++;
 		}
+		encodM %=10;
+		encodP %=10;
+
 		butEn = butEn % 10;
 		butLo = butLo % 10;
-		encod = encod % 10;
 
 		itoa(butEn, sym_butEn, 10);
 		itoa(butLo, sym_butLo, 10);
-		itoa(encod, sym_encod, 10);
+		itoa(encodM, sym_encM, 10);
+		itoa(encodP, sym_encP, 10);
 
 		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y);
-			ssd1306_WriteString(sym_butEn, Font_11x18, White);
-		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y);
 			ssd1306_WriteString(sym_butLo, Font_11x18, White);
-		ssd1306_SetCursor(SIZE_FONT_X * 5, START_POS_Y + SIZE_FONT_Y*2);
-			ssd1306_WriteString(sym_encod, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_butEn, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_encM, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_encP, Font_11x18, White);
 
 		udpateDisplay();
 		HAL_Delay(50);
+		if(butLo > 2)
+			break;
 	}
 }
 
