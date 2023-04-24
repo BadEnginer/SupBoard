@@ -53,7 +53,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Core/Inc/Display/ssd1306/ssd1306.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Core/Inc/tasks/SensOut.h ../Core/Inc/ADC_out/ADS1115.h \
- ../Core/Inc/tasks/LedControl.h
+ ../Core/Inc/DAC_out/MCP4725.h ../Core/Inc/tasks/LedControl.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -115,4 +115,5 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/tasks/SensOut.h:
 ../Core/Inc/ADC_out/ADS1115.h:
+../Core/Inc/DAC_out/MCP4725.h:
 ../Core/Inc/tasks/LedControl.h:

@@ -5,6 +5,7 @@
 //#include <main.h>
 #include "stm32f4xx_hal.h"
 #include "ADC_out/ADS1115.h"
+#include "DAC_out/MCP4725.h"
 #include "cmsis_os2.h"
 #include "app_menu/app_menu.h"
 

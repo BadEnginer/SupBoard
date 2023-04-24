@@ -55,9 +55,10 @@ const char* menuE_inc[3] = {
 	"   E-ink   "
 };
 
-const char* menuLED[3] = {
+const char* menuLED[4] = {
     "Num:  GRN: ",
     "RED:  BLU: ",
+	"MAX.BGHT:  ",
 	"    LED    "
 };
 
@@ -135,7 +136,197 @@ void drawMainMenu() {
 
 }
 
+uint16_t global_DAC;
 extern osMutexId_t BlockI2CHandle;
+
+void startDisplay(){
+	static int8_t speed = 0;
+	uint16_t set_dac_zero = 1248;
+	uint16_t step_speed = 120;
+	    ssd1306_Fill(Black);
+	    ssd1306_Line(0, 1, 128, 1, White);
+	    ssd1306_SetCursor(7, 7); //
+	    ssd1306_WriteString("SPEED:  ", Font_11x18, White);
+	 	ssd1306_SetCursor(7, 7+18); //
+	 	ssd1306_WriteString("CHARG:82%", Font_11x18, White);
+	 	ssd1306_SetCursor(7, 7+18+18); //
+	 	ssd1306_WriteString("TIMER: -- h", Font_11x18, White);
+	 	ssd1306_Line(0, 63, 128, 63, White);
+	 	while(1){
+	 		if(encoderData() > 0){
+	 			encoderReset();
+	 			speed++;
+	 			if(speed > 9)
+	 				speed = 9;
+	 		}
+	 		if(encoderData() < 0){
+	 			encoderReset();
+	 			speed--;
+	 			if(speed < -9)
+	 				speed = -9;
+	 		}
+	 		global_DAC = set_dac_zero +(step_speed*speed);
+	 	}
+  }
+
+// Тестовая функция для проверки кнопок  готова
+void drawButtonMenu(){
+	uint8_t butEn = 0;
+	uint8_t butLo = 0;
+	uint8_t encodP = 0;
+	uint8_t encodM = 0;
+
+	char sym_butEn[1];
+	char sym_butLo[1];
+	char sym_encP[1];
+	char sym_encM[1];
+
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y);
+		ssd1306_WriteString(menuButton[2], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
+		ssd1306_WriteString(menuButton[0], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
+		ssd1306_WriteString(menuButton[1], Font_11x18, White);
+	// Сброс состояния всех кнопок управления
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+	while(1){
+		if(buttonEn() == ON){
+			buttonEnReset();
+			butEn++;
+		}
+		if(buttonLong() == ON){
+			buttonLongReset();
+			butLo++;
+		}
+		if(encoderData() > 0){
+			encoderReset();
+			encodP++;
+		}
+		if(encoderData() < 0){
+			encoderReset();
+			encodM++;
+		}
+		encodM %=10;
+		encodP %=10;
+
+		butEn = butEn % 10;
+		butLo = butLo % 10;
+
+		itoa(butEn, sym_butEn, 10);
+		itoa(butLo, sym_butLo, 10);
+		itoa(encodM, sym_encM, 10);
+		itoa(encodP, sym_encP, 10);
+
+		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_butLo, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_butEn, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_encM, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_encP, Font_11x18, White);
+
+		udpateDisplay();
+		HAL_Delay(50);
+		if(butLo > 2)
+			break;
+	}
+}
+
+
+#define LED_NUM 8
+typedef struct {
+	uint8_t numLED;
+	uint8_t red	[LED_NUM];
+	uint8_t grn	[LED_NUM];
+	uint8_t blu	[LED_NUM];
+}sLedData;
+
+sLedData LedData = {0};
+/*const char* menuLED[4] = {
+    "Num:  GRN: ",
+    "RED:  BLU: ",
+    "MAX.BRGHT: ",
+	"  LED test "
+};
+*/
+typedef enum{
+	LINE_HEADER = 0,
+	LINE_1 = 1,
+	LINE_2
+}eNumLine;
+
+// todo заменить шрифт попробовать а то мелкие шрифты не читаемые
+void headerOutput(char* header){
+	lineOutput(header, LINE_HEADER);
+}
+void lineOutput(char* line, eNumLine numLine){
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*((uint8_t)numLine));
+		ssd1306_WriteString(line, Font_11x18, White);
+}
+
+void resetControl(){
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+}
+// todo переделать на очереди в будущем
+uint8_t global_color;
+
+
+void drawLEDMenu(){ // Для проверки диодов функция
+	char sym_NumLed[1];
+	char sym_MaxBright[2];
+	char sym_red[1];
+	char sym_green[1];
+	char sym_blue[1];
+	uint8_t current_menu = 0;
+	ssd1306_Fill(Black); // Очищаем
+	headerOutput(menuLED[3]);
+	lineOutput(menuLED[0], LINE_1);
+	lineOutput(menuLED[1], LINE_2);
+	udpateDisplay();
+	// Сброс состояния всех кнопок управления
+	resetControl();
+	while(1){
+		HAL_Delay(50);
+		if(buttonLong()){
+			break;
+		}
+		if(encoderData() > 0){
+			global_color++;
+			if(global_color > 240)
+				global_color = 240;
+			encoderReset();
+		}
+		if(encoderData() < 0){
+			global_color--;
+			if(global_color > 241)
+				global_color = 0;
+			encoderReset();
+		}
+	}
+}
+
+void drawE_inkMenu(){
+	uint8_t exit = 0;
+}
+
+void drawADCMenu(){
+	uint8_t exit = 0;
+}
+void drawEncodMenu(){
+	uint8_t exit = 0;
+}
+void drawDACMenu(){
+	uint8_t exit = 0;
+}
+void drawSettinMenu(){
+	uint8_t exit = 0;
+}
 
 void udpateDisplay(){
 	statusMutex = osMutexAcquire(BlockI2CHandle, 1000);
@@ -201,151 +392,6 @@ void encoderReset(){
 	encoderAS56 = 0;
 }
 
-
-/*
- *  	  char sym[3];
-  	  itoa(raw_angle,sym,10);
-		  	  ssd1306_SetCursor(67, 0);
-		      ssd1306_WriteString(sym, Font_11x18, White);
-		      ssd1306_SetCursor(67, 19);
-		      ssd1306_UpdateScreen();
-		      HAL_Delay(40);
- */
-/*
-void drawItemNum00(){
-	int8_t current_speed; // текущая скорость
-	int8_t exit = 1;	 // флаг выхода
-	char current_sight;  // знак скорости
-	char c_speed[2]; // Храним символы текущей скорости
-	ssd1306_Fill(Black);// чистим экран
-	drawSubMenu(0); // Рисуем шапку
-	ssd1306_SetCursor(0, 11);
-	ssd1306_WriteString("Speed:  ", Font_7x10, White);
-	while(exit){
-		ssd1306_SetCursor(7, 11);
-		if(speed == 0)
-			current_sight = "0";
-		if(speed > 0)
-			current_sight = "+";
-		if(speed < 0)
-			current_sight = "-";
-		//itoa(current_speed)
-	        ssd1306_UpdateScreen();
-	        HAL_Delay(100);
-	    }
-
-}
-*/
-#define LED_NUM 8
-struct sLedData{
-	uint8_t numLED	[LED_NUM];
-	uint8_t on_off	[LED_NUM];
-	uint8_t red		[LED_NUM];
-	uint8_t grn		[LED_NUM];
-	uint8_t blu		[LED_NUM];
-}LedData;
-
-
-void startDisplay(){
-	    ssd1306_Fill(Black);
-	    ssd1306_Line(0, 1, 128, 1, White);
-	    ssd1306_SetCursor(7, 7); //
-	    ssd1306_WriteString("SPEED:-2", Font_11x18, White);
-	 	ssd1306_SetCursor(7, 7+18); //
-	 	ssd1306_WriteString("CHARG:82%", Font_11x18, White);
-	 	ssd1306_SetCursor(7, 7+18+18); //
-	 	ssd1306_WriteString("TIMER:3h22m", Font_11x18, White);
-	 	ssd1306_Line(0, 63, 128, 63, White);
-  }
-
-// Тестовая функция для проверки кнопок  готова
-void drawButtonMenu(){
-	uint8_t butEn = 0;
-	uint8_t butLo = 0;
-	uint8_t encodP = 0;
-	uint8_t encodM = 0;
-
-	char sym_butEn[1];
-	char sym_butLo[1];
-	char sym_encP[1];
-	char sym_encM[1];
-	buttonEnReset();
-	buttonLongReset();
-	encoderReset();
-
-	ssd1306_Fill(Black);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y);
-		ssd1306_WriteString(menuButton[2], Font_11x18, White);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
-		ssd1306_WriteString(menuButton[0], Font_11x18, White);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
-		ssd1306_WriteString(menuButton[1], Font_11x18, White);
-
-	while(1){
-		if(buttonEn() == ON){
-			buttonEnReset();
-			butEn++;
-		}
-		if(buttonLong() == ON){
-			buttonLongReset();
-			butLo++;
-		}
-		if(encoderData() > 0){
-			encoderReset();
-			encodP++;
-		}
-		if(encoderData() < 0){
-			encoderReset();
-			encodM++;
-		}
-		encodM %=10;
-		encodP %=10;
-
-		butEn = butEn % 10;
-		butLo = butLo % 10;
-
-		itoa(butEn, sym_butEn, 10);
-		itoa(butLo, sym_butLo, 10);
-		itoa(encodM, sym_encM, 10);
-		itoa(encodP, sym_encP, 10);
-
-		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y);
-			ssd1306_WriteString(sym_butLo, Font_11x18, White);
-		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y);
-			ssd1306_WriteString(sym_butEn, Font_11x18, White);
-		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y*2);
-			ssd1306_WriteString(sym_encM, Font_11x18, White);
-		ssd1306_SetCursor(SIZE_FONT_X * 10, START_POS_Y + SIZE_FONT_Y*2);
-			ssd1306_WriteString(sym_encP, Font_11x18, White);
-
-		udpateDisplay();
-		HAL_Delay(50);
-		if(butLo > 2)
-			break;
-	}
-}
-
-void drawLEDMenu(){
-	uint8_t currentLed = 0;
-	uint8_t red,grn,blu;
-}
-
-void drawE_inkMenu(){
-	uint8_t exit = 0;
-}
-
-void drawADCMenu(){
-	uint8_t exit = 0;
-}
-void drawEncodMenu(){
-	uint8_t exit = 0;
-}
-void drawDACMenu(){
-	uint8_t exit = 0;
-}
-void drawSettinMenu(){
-	uint8_t exit = 0;
-}
 
 /*
 const char* menuButton[3] = {

@@ -10,42 +10,70 @@ uint16_t angle = 0;
 int16_t old_encoder_data = 0;
 int16_t delta_encoder = 0;
 
-ADS1115_Config_t configChanel1;
-ADS1115_Config_t configChanel2;
-ADS1115_Config_t configChanel3;
-ADS1115_Config_t configChanel4;
+ADS1115_Config_t configChanel[4];
+#define ADC_CHANEL_1 0
+#define ADC_CHANEL_2 1
+#define ADC_CHANEL_3 2
+#define ADC_CHANEL_4 3
+//ADS1115_Config_t configChanel2;
+//ADS1115_Config_t configChanel3;
+//ADS1115_Config_t configChanel4;
 ADS1115_Handle_t *pADS;
 
 osStatus_t statusMutexI2C;
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 uint8_t command_CMD[10] = {0};
-// Задача для опросо кнопок ADC и энкодера
+int16_t data_ch[4][10] = {0};
+extern uint16_t global_DAC;
+// Задача для опросо кнопок ADC и энкодера и система команд от usb
 void StartSensOutTask(void *argument){
-	initAllChanelADC();
-    pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel1);
-    ADS1115_updateConfig(pADS, configChanel1);
+	uint8_t currentChanel = 0;
+	initAllChanelADC(); // todo сделать новую задачу для ацп
+    pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel[currentChanel]);
+    ADS1115_updateConfig(pADS, configChanel[currentChanel]);
     ADS1115_startContinousMode(pADS);
     uint8_t buffer[] = {0};
+    MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.30);
+    global_DAC = 1244;// это вроде 1 вольт
+    setDAC(myMCP4725,  global_DAC);
+
 	for(;;){
-				if(command_CMD[0] != 0){
-					switch(command_CMD[0] - 48){
-						case 1: buttonEnSet();    break;
-						case 2: buttonLongSet();  break;
-						case 3: encoderSetUp();   break;
-						case 4: encoderSetDown(); break;
-					}
-					buffer[0] = command_CMD[0] ;
-					command_CMD[0] = 0;
-				  CDC_Transmit_FS(buffer, sizeof(buffer));
-				}
+		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
+			switch(command_CMD[0] - 48){
+				case 1: buttonEnSet();    break;
+				case 2: buttonLongSet();  break;
+				case 3: encoderSetUp();   break;
+				case 4: encoderSetDown(); break;
+			}
+			buffer[0] = command_CMD[0] ;
+			command_CMD[0] = 0;
+			CDC_Transmit_FS(buffer, sizeof(buffer));
+		}
 		// Попытка захвата мьютекса с таймаутом 1000 мс
 		statusMutexI2C = osMutexAcquire(BlockI2CHandle, 1000);
 		if(statusMutexI2C == osOK){
 			calcDeltaAngle((int16_t)getEncoderData()); // Расчитываем смещение энкодера
 			osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 		}
+		for(uint8_t i = 0; i < 10; i++){ // Читаем с ацп порта 10 значений
+				if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
+					data_ch[currentChanel][i] = ADS1115_getData(pADS);
+					osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
+					osDelay(5);
+				}
+				// меняем канал
+				currentChanel++;
+				if(currentChanel > 3)
+					currentChanel = 0;
+				if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
+					ADS1115_updateConfig(pADS, configChanel[currentChanel]);
+					osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
+					osDelay(5);
+				}
+		}
+		setDAC(myMCP4725,  global_DAC);
 		longButton();
-		osDelay(50);
+		//osDelay(50);
 	}
 }
 
@@ -84,15 +112,15 @@ uint16_t getEncoderData(){
 }
 
 void initAllChanelADC(){
-	initADC(&configChanel1);
-	initADC(&configChanel2);
-	initADC(&configChanel3);
-	initADC(&configChanel4);
+	initADC(&configChanel[ADC_CHANEL_1]);
+	initADC(&configChanel[ADC_CHANEL_2]);
+	initADC(&configChanel[ADC_CHANEL_3]);
+	initADC(&configChanel[ADC_CHANEL_4]);
 
-	initChanelADC(&configChanel1, CHANNEL_AIN0_GND);
-	initChanelADC(&configChanel2, CHANNEL_AIN1_GND);
-	initChanelADC(&configChanel3, CHANNEL_AIN2_GND);
-	initChanelADC(&configChanel4, CHANNEL_AIN3_GND);
+	initChanelADC(&configChanel[ADC_CHANEL_1], CHANNEL_AIN0_GND);
+	initChanelADC(&configChanel[ADC_CHANEL_2], CHANNEL_AIN1_GND);
+	initChanelADC(&configChanel[ADC_CHANEL_3], CHANNEL_AIN2_GND);
+	initChanelADC(&configChanel[ADC_CHANEL_4], CHANNEL_AIN3_GND);
 }
 
 void initADC(ADS1115_Config_t* configReg){
@@ -108,3 +136,13 @@ void initADC(ADS1115_Config_t* configReg){
 void initChanelADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel){
 	configReg->channel = chanel;
 }
+
+void setDAC(MCP4725 myMCP4725, uint16_t Vout){
+	MCP4725_setValue(&myMCP4725, Vout, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
+}
+
+
+
+
+
+

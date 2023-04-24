@@ -140,22 +140,6 @@ int main(void)
   //EPD_DeepSleep(); //Enter deep sleep,Sleep instruction is necessary, please do not delete!!!
 
   //ADS1115_setConversionReadyPin(pADS);
-  float data_from_adc_0 = 0;
-  MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.30);
-	// Check the connection:
-	uint8_t state_dac = MCP4725_isConnected(&myMCP4725);
-	uint16_t v_out = 0;
-  for(uint8_t temp = 0; temp < 80; temp++){
-	  MCP4725_setValue(&myMCP4725, v_out, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
-	  HAL_Delay(50);
-	  //data_from_adc_0 = (ADS1115_getData(pADS));
-	  v_out+= 150;
-	  if(v_out > 4060)
-		  v_out = 0;
-  }
-
-
-
 
   //Clean
   //EPD_HW_Init(); //Electronic paper initialization
