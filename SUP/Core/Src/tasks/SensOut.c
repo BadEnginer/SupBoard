@@ -25,6 +25,14 @@ extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 uint8_t command_CMD[10] = {0};
 int16_t data_ch[4][10] = {0};
 extern uint16_t global_DAC;
+uint8_t aver_mass(int16_t* data){
+	uint16_t temp = 0;
+	for(uint8_t i = 0; i < 9; i++)
+		temp += data[i];
+	temp /= 10;
+	temp /= 8;
+	return (uint8_t)temp;
+}
 // Задача для опросо кнопок ADC и энкодера и система команд от usb
 void StartSensOutTask(void *argument){
 	uint8_t currentChanel = 0;
@@ -45,7 +53,12 @@ void StartSensOutTask(void *argument){
 				case 3: encoderSetUp();   break;
 				case 4: encoderSetDown(); break;
 			}
-			buffer[0] = command_CMD[0] ;
+			buffer[0] = command_CMD[0];
+			buffer[1] = aver_mass(data_ch[0]);
+			buffer[2] = aver_mass(data_ch[1]);
+			buffer[3] = aver_mass(data_ch[2]);
+			buffer[4] = aver_mass(data_ch[3]);
+			buffer[5] = (int16_t)"\n";
 			command_CMD[0] = 0;
 			CDC_Transmit_FS(buffer, sizeof(buffer));
 		}
