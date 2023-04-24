@@ -34,6 +34,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 s_devise_i2c_tree devise_i2c_tree;
+uint8_t global_color;
+uint16_t global_DAC;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/

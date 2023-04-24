@@ -68,22 +68,22 @@ void StartSensOutTask(void *argument){
 			calcDeltaAngle((int16_t)getEncoderData()); // Расчитываем смещение энкодера
 			osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 		}
-		for(uint8_t i = 0; i < 10; i++){ // Читаем с ацп порта 10 значений
-				if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
-					data_ch[currentChanel][i] = ADS1115_getData(pADS);
-					osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
-					osDelay(5);
-				}
-				// меняем канал
+		for(uint8_t i = 0; i < 10;){ // Читаем с ацп порта 10 значений
+			if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
+				data_ch[currentChanel][i] = ADS1115_getData(pADS);
+				osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
+				osDelay(6);
+				i++;
+			}
+		 }
+				// меняем канал после завершения цикла
 				currentChanel++;
 				if(currentChanel > 3)
 					currentChanel = 0;
-				if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
+				while(osMutexAcquire(BlockI2CHandle, 1000) != osOK){};
 					ADS1115_updateConfig(pADS, configChanel[currentChanel]);
 					osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
-					osDelay(5);
-				}
-		}
+					osDelay(10);
 		setDAC(myMCP4725,  global_DAC);
 		longButton();
 		//osDelay(50);
