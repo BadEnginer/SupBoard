@@ -76,8 +76,8 @@ all: main-build
 main-build: SUP.elf secondary-outputs
 
 # Tool invocations
-SUP.elf SUP.map: $(OBJS) $(USER_OBJS) D:\GIT\SupBoard\SUP\STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "SUP.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\GIT\SupBoard\SUP\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SUP.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+SUP.elf SUP.map: $(OBJS) $(USER_OBJS) C:\Users\POLTERGIST\Documents\GitHub\SupBoard\SUP\STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "SUP.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\POLTERGIST\Documents\GitHub\SupBoard\SUP\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SUP.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
