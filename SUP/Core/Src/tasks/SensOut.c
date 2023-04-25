@@ -27,7 +27,7 @@ int16_t data_ch[4][10] = {0};
 extern uint16_t global_DAC;
 uint8_t aver_mass(int16_t* data){
 	uint16_t temp = 0;
-	for(uint8_t i = 0; i < 9; i++)
+	for(uint8_t i = 0; i < 10; i++)
 		temp += data[i];
 	temp /= 10;
 	temp /= 8;
@@ -42,7 +42,7 @@ void StartSensOutTask(void *argument){
     ADS1115_startContinousMode(pADS);
     uint8_t buffer[] = {0};
     MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.30);
-    global_DAC = 1244;// это вроде 1 вольт
+    global_DAC = 1500;// это вроде 1.2 вольт
     setDAC(myMCP4725,  global_DAC);
 
 	for(;;){
@@ -53,14 +53,10 @@ void StartSensOutTask(void *argument){
 				case 3: encoderSetUp();   break;
 				case 4: encoderSetDown(); break;
 			}
-			buffer[0] = command_CMD[0];
-			buffer[1] = aver_mass(data_ch[0]);
-			buffer[2] = aver_mass(data_ch[1]);
-			buffer[3] = aver_mass(data_ch[2]);
-			buffer[4] = aver_mass(data_ch[3]);
-			buffer[5] = (int16_t)"\n";
+//			buffer[0] = command_CMD[0];
+			buffer[0] = (uint8_t)global_DAC/8;
 			command_CMD[0] = 0;
-			CDC_Transmit_FS(buffer, sizeof(buffer));
+			CDC_Transmit_FS(buffer, 2);
 		}
 		// Попытка захвата мьютекса с таймаутом 1000 мс
 		statusMutexI2C = osMutexAcquire(BlockI2CHandle, 1000);
@@ -84,6 +80,8 @@ void StartSensOutTask(void *argument){
 					ADS1115_updateConfig(pADS, configChanel[currentChanel]);
 					osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 					osDelay(10);
+					if(global_DAC > 3000)
+						global_DAC = 3000;
 		setDAC(myMCP4725,  global_DAC);
 		longButton();
 		//osDelay(50);

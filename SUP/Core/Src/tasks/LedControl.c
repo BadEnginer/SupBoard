@@ -30,11 +30,11 @@ void StartLedControlTask(void *argument){
 	  while (ARGB_Show() != ARGB_OK);
 */
 	for(;;){
-		HAL_Delay(50);
+		HAL_Delay(100);
 		// todo  сделать хорошо
 		// если значение цвета изменилось то
 		//определить сколько стало и попытаться зажечь нужноче число диодов
-		if(global_color != old_data){
+		if(global_color != old_data && global_color != 0 ){
 			old_data = global_color;
 			if(old_data > 80)
 				red = 80;

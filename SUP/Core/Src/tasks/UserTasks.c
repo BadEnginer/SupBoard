@@ -24,7 +24,7 @@ const osThreadAttr_t SensOutTask_attributes = {
 
 void initUserTasks(){
 	OledMenuTaskHandle   = osThreadNew(StartOledMenuTask,   NULL, &OledMenuTask_attributes);
-	LedControlTaskHandle = osThreadNew(StartLedControlTask, NULL, &LedControlTask_attributes);
+	//LedControlTaskHandle = osThreadNew(StartLedControlTask, NULL, &LedControlTask_attributes);
 	SensOutTaskHandle    = osThreadNew(StartSensOutTask,    NULL, &SensOutTask_attributes);
 };
 

@@ -200,53 +200,11 @@ void encoderSetDown(){
 void encoderReset(){
 	encoderAS56 = 0;
 }
-
-
-/*
- *  	  char sym[3];
-  	  itoa(raw_angle,sym,10);
-		  	  ssd1306_SetCursor(67, 0);
-		      ssd1306_WriteString(sym, Font_11x18, White);
-		      ssd1306_SetCursor(67, 19);
-		      ssd1306_UpdateScreen();
-		      HAL_Delay(40);
- */
-/*
-void drawItemNum00(){
-	int8_t current_speed; // текущая скорость
-	int8_t exit = 1;	 // флаг выхода
-	char current_sight;  // знак скорости
-	char c_speed[2]; // Храним символы текущей скорости
-	ssd1306_Fill(Black);// чистим экран
-	drawSubMenu(0); // Рисуем шапку
-	ssd1306_SetCursor(0, 11);
-	ssd1306_WriteString("Speed:  ", Font_7x10, White);
-	while(exit){
-		ssd1306_SetCursor(7, 11);
-		if(speed == 0)
-			current_sight = "0";
-		if(speed > 0)
-			current_sight = "+";
-		if(speed < 0)
-			current_sight = "-";
-		//itoa(current_speed)
-	        ssd1306_UpdateScreen();
-	        HAL_Delay(100);
-	    }
-
-}
-*/
-#define LED_NUM 8
-struct sLedData{
-	uint8_t numLED	[LED_NUM];
-	uint8_t on_off	[LED_NUM];
-	uint8_t red		[LED_NUM];
-	uint8_t grn		[LED_NUM];
-	uint8_t blu		[LED_NUM];
-}LedData;
-
+extern uint16_t global_DAC;
+int8_t speed = 0;
 
 void startDisplay(){
+
 	    ssd1306_Fill(Black);
 	    ssd1306_Line(0, 1, 128, 1, White);
 	    ssd1306_SetCursor(7, 7); //
@@ -256,6 +214,23 @@ void startDisplay(){
 	 	ssd1306_SetCursor(7, 7+18+18); //
 	 	ssd1306_WriteString("TIMER:3h22m", Font_11x18, White);
 	 	ssd1306_Line(0, 63, 128, 63, White);
+
+	 	while(1){
+	 		HAL_Delay(100);
+	 		if(encoderData() > 0){
+	 			encoderReset();
+	 		 	speed++;
+	 		 	if(speed > 9)
+	 		 		speed = 9;
+	 		}
+	 		if(encoderData() < 0){
+	 			encoderReset();
+	 		 	speed--;
+	 		 	if(speed < -9)
+	 		 		speed = -9;
+	 		}
+	 		global_DAC = 1500 + (100*speed);
+	 	}
   }
 
 // Тестовая функция для проверки кнопок  готова
@@ -341,57 +316,11 @@ void drawEncodMenu(){
 	uint8_t exit = 0;
 }
 void drawDACMenu(){
+
 	uint8_t exit = 0;
 }
 void drawSettinMenu(){
 	uint8_t exit = 0;
 }
 
-/*
-const char* menuButton[3] = {
-	"  Button   "
-    "Lon:  Ena: ",
-    "Enc:       ",
 
-};
-
-const char* menuEncoder[3] = {
-    "MAG:   MD: ",
-    "ANG:   MN: ",
-	"  Encoder  "
-};
-const char* menuSettings[7] = {
-    "Default:   ",
-    "Сell:      ",
-	"Сell min:  ",
-    "Max.V:     ",
-	"Mix.V:     ",
-	"Capacity:  ",
-	" Settings  "
-};
-
-const char* menuDAC[3] = {
-    "Lon:  Ena: ",
-    "Encod:     ",
-	"    DAC    "
-};
-
-const char* menuE_inc[3] = {
-    "Pic.1 Pic.2",
-	"Pic.3 Pic.4",
-	"   E-ink   "
-};
-
-const char* menuLED[3] = {
-    "Num:  GRN: ",
-    "RED:  BLU: ",
-	"    LED    "
-};
-
-const char* menuADC[3] = {
-    "C1:   C3:  ",
-    "C2:   C4:  ",
-	"    ADC    "
-};
-
-*/
