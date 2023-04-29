@@ -145,14 +145,19 @@ void udpateDisplay(){
 }
 
 
-#define SPEED_STEP 30
+#define SPEED_STEP 70
 #define MAX_SPEED  (1500/SPEED_STEP)
 #define MIN_SPEED ((-1) * MAX_SPEED)
 #define STD_WHITESPACE 7 // с учётом линии по краям экрана
 int8_t speed = 0;
 extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
 extern uint16_t global_DAC;
-
+int16_t current_speed;
+int16_t current_current;
+int16_t dis_curretn;
+int16_t old_current_zero;
+int16_t current_Vout;
+extern int16_t delta_encoder;
 void startDisplay(){
 	// todo сделать отдельную функцию для упрощения
 	    ssd1306_Fill(Black);
@@ -166,14 +171,21 @@ void startDisplay(){
 	 	ssd1306_WriteString("Vout:", Font_11x18, White);
 	 	ssd1306_Line(0, 63, 128, 63, White);
 	 	udpateDisplay();
-	 	uint16_t current_speed;
-	 	int16_t current_current;
-	 	uint16_t current_Vout;
+	 	old_current_zero = 0;
 	 	char symSpeed[5];
 	 	char symCurrent[5];
 	 	char symVout[5];
+
+	 	HAL_Delay(500);
+		buttonLongReset();
+		buttonEnReset();
+		encoderReset();
 	 	while(1){
-	 		HAL_Delay(350);
+	 		HAL_Delay(150);
+	 		if(buttonEn()){
+	 			//buttonEnReset();
+	 			break;
+	 		}
 	 		if(buttonLong()){
 	 			speed = 0;
 	 			buttonLongReset();
@@ -193,24 +205,41 @@ void startDisplay(){
 	 		global_DAC = 1500 + (SPEED_STEP*speed);
 
 	 		itoa(current_speed  , symSpeed  , 10);
-	 		itoa(current_current, symCurrent, 10);
+	 		itoa(dis_curretn, symCurrent, 10);
 	 		itoa(current_Vout   , symVout   , 10);
 	 		current_speed = speed;
-	 		current_current = (((aver_mass(data_ch[2])* ADC_TO_V)-1500)*V_TO_A)-3900;
-	 		current_Vout = aver_mass(data_ch[1]) * ADC_TO_V;
+
+	 		current_current = (((getAverADC(data_ch[2])* ADC_TO_V)-1500)*V_TO_A); // 1500 MI_DIS
+	 		if(global_DAC == 1500){
+	 			old_current_zero = current_current;
+	 		}
+	 		current_current = current_current - old_current_zero;
+	 		dis_curretn = expFiltr(current_current, KOEFF_K) ;
+	 		current_Vout = delta_encoder;//getAverADC(data_ch[1]) * ADC_TO_V;
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
-	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 7, STD_WHITESPACE );
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
+	 			ssd1306_WriteString("       ", Font_11x18, White);
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
 	 			ssd1306_WriteString(symSpeed, Font_11x18, White);
 	 		// х-линейный отступ плюс слово cur: 4 символов+1символ для знака : Вывод тока
-	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y);
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 4, STD_WHITESPACE + SIZE_FONT_Y);
+	 			ssd1306_WriteString("       ", Font_11x18, White);
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 4, STD_WHITESPACE + SIZE_FONT_Y);
 	 			ssd1306_WriteString(symCurrent, Font_11x18, White);
 	 		// х-линейный отступ плюс слово Vout: 5 символов : Вывод напряжения управления
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
+	 			ssd1306_WriteString("       ", Font_11x18, White);
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
 	 			ssd1306_WriteString(symVout, Font_11x18, White);
 	 		udpateDisplay();
 	 	}
   }
 
+int16_t expFiltr(int16_t newVal, float k) {
+	  static int16_t filVal = 0;
+	  filVal += (newVal - filVal) * k;
+	  return filVal;
+}
 // Тестовая функция для проверки кнопок  готова
 void drawButtonMenu(){
 	uint8_t butEn = 0;

@@ -18,6 +18,7 @@
 "./Core/Src/tasks/LedControl.o"
 "./Core/Src/tasks/MotorControl.o"
 "./Core/Src/tasks/OledMenu.o"
+"./Core/Src/tasks/ReadData.o"
 "./Core/Src/tasks/SensOut.o"
 "./Core/Src/tasks/UserTasks.o"
 "./Core/Startup/startup_stm32f411ceux.o"

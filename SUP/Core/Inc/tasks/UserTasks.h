@@ -5,6 +5,8 @@
 #include "tasks/OledMenu.h"
 #include "tasks/SensOut.h"
 #include "tasks/LedControl.h"
+#include "tasks/ReadData.h"
+#include "tasks/MotorControl.h"
 
 /**
  * @fn void initUserTasks()

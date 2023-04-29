@@ -9,13 +9,13 @@ extern uint8_t global_color;
 
 void StartLedControlTask(void *argument){
 	uint8_t red,green,blue;
-	  uint8_t old_data;
-	  uint8_t numOnLed;
-	  ARGB_Init();  // Initialization
-	  ARGB_Clear();
-	  while (ARGB_Show() != ARGB_OK);
-	  ARGB_SetBrightness(100);
-	  ARGB_Clear(); // Clear stirp
+	 // uint8_t old_data;
+	 // uint8_t numOnLed;
+	//  ARGB_Init();  // Initialization
+	//  ARGB_Clear();
+	//  while (ARGB_Show() != ARGB_OK);
+	//  ARGB_SetBrightness(100);
+	//  ARGB_Clear(); // Clear stirp
 	/*  while (ARGB_Show() != ARGB_OK);
 		ARGB_SetRGB(1, 0, 50, 0); // Set LED №1 with 255 Green
 		ARGB_SetRGB(2, 50, 0, 0); // Set LED №2 with 255 Green
@@ -27,6 +27,7 @@ void StartLedControlTask(void *argument){
 		// todo  сделать хорошо
 		// если значение цвета изменилось то
 		//определить сколько стало и попытаться зажечь нужноче число диодов
+		/*
 		if(global_color != old_data && global_color != 0 ){
 			old_data = global_color;
 			if(old_data > 80)
@@ -49,11 +50,12 @@ void StartLedControlTask(void *argument){
 				setBlueLed(blue/10, blue%10);
 			while (ARGB_Show() != ARGB_OK);
 		}
+		*/
 
 	}
 }
 
-
+/*
 void setRedLed(uint8_t num, uint8_t last){
 	uint8_t i;
 	if(num > MAX_LED)
@@ -106,3 +108,4 @@ void setBlueLed(uint8_t num, uint8_t last){
 		}
 	}
 }
+*/

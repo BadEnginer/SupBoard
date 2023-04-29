@@ -55,12 +55,12 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 
-/* Definitions for EmptyTask */
-osThreadId_t EmptyTaskHandle;
-const osThreadAttr_t EmptyTask_attributes = {
-  .name = "EmptyTask",
+/* Definitions for InitTask */
+osThreadId_t InitTaskHandle;
+const osThreadAttr_t InitTask_attributes = {
+  .name = "InitTask",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityLow1,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for BlockI2C */
 osMutexId_t BlockI2CHandle;
@@ -78,7 +78,7 @@ static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM2_Init(void);
-void StartEmptyTask(void *argument);
+void StartInitTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -172,8 +172,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of EmptyTask */
-  EmptyTaskHandle = osThreadNew(StartEmptyTask, NULL, &EmptyTask_attributes);
+  /* creation of InitTask */
+  InitTaskHandle = osThreadNew(StartInitTask, NULL, &InitTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -463,14 +463,14 @@ uint8_t test_i2c_dev(){
   }
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartEmptyTask */
+/* USER CODE BEGIN Header_StartInitTask */
 /**
-  * @brief  Function implementing the EmptyTask thread.
+  * @brief  Function implementing the InitTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartEmptyTask */
-void StartEmptyTask(void *argument)
+/* USER CODE END Header_StartInitTask */
+void StartInitTask(void *argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
@@ -478,7 +478,7 @@ void StartEmptyTask(void *argument)
   /* Infinite loop */
 	  for(;;)
 	  {
-	    osDelay(1);
+	    osDelay(10);
 	  }
   /* USER CODE END 5 */
 }

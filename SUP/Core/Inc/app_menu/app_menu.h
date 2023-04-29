@@ -38,6 +38,8 @@ void drawMainMenu();
 void drawStartMenu();
 void startDisplay();
 
+int16_t expFiltr(int16_t newVal, float k);
+#define KOEFF_K 0.25
 void drawLEDMenu();
 void drawE_inkMenu();
 void drawADCMenu();
