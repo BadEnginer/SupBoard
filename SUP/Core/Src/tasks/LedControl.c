@@ -1,15 +1,8 @@
 
 #include "tasks/LedControl.h"
 extern uint8_t global_color;
-
 /*диодов допустим 3*8 = 24 , разрядов 240 то есть если разделить число на /10 будет 24 это количество горящих диодов */
 
-#define RED 0
-#define GREEN 1
-#define BLUE 2
-
-
-#define MAX_LED 7
 
 //сложная фигня получается функции говорится сколько светодиодов горит и с какой яркостью горит последний остальные обнуляем
 
@@ -61,7 +54,7 @@ void StartLedControlTask(void *argument){
 }
 
 
-static void setRedLed(uint8_t num, uint8_t last){
+void setRedLed(uint8_t num, uint8_t last){
 	uint8_t i;
 	if(num > MAX_LED)
 		num = MAX_LED;
@@ -80,7 +73,7 @@ static void setRedLed(uint8_t num, uint8_t last){
 	}
 }
 
-static void setGreenLed(uint8_t num, uint8_t last){
+void setGreenLed(uint8_t num, uint8_t last){
 	uint8_t i;
 	for(i = 0; i < num; i++){
 		ARGB_SetRGB(i, 0, 250, 0);
@@ -97,7 +90,7 @@ static void setGreenLed(uint8_t num, uint8_t last){
 	}
 }
 
-static void setBlueLed(uint8_t num, uint8_t last){
+void setBlueLed(uint8_t num, uint8_t last){
 	uint8_t i;
 	for(i = 0; i < num; i++){
 		ARGB_SetRGB(i, 0, 0, 250);

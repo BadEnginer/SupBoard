@@ -50,11 +50,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  ../Core/Inc/tasks/OledMenu.h ../Core/Inc/app_menu/app_menu.h \
- ../Core/Inc/Display/ssd1306/ssd1306.h \
+ ../Core/Inc/Display/ssd1306/ssd1306.h ../Core/Inc/tasks/SensOut.h \
+ ../Core/Inc/ADC_out/ADS1115.h ../Core/Inc/DAC_out/MCP4725.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/tasks/SensOut.h ../Core/Inc/ADC_out/ADS1115.h \
- ../Core/Inc/DAC_out/MCP4725.h ../Core/Inc/tasks/LedControl.h \
- ../USB_DEVICE/App/usb_device.h \
+ ../Core/Inc/tasks/LedControl.h ../USB_DEVICE/App/usb_device.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h \
  ../USB_DEVICE/Target/usbd_conf.h ../Core/Inc/Display/e-ink/picture.h
 ../Core/Inc/main.h:
@@ -115,10 +114,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/tasks/OledMenu.h:
 ../Core/Inc/app_menu/app_menu.h:
 ../Core/Inc/Display/ssd1306/ssd1306.h:
-../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/tasks/SensOut.h:
 ../Core/Inc/ADC_out/ADS1115.h:
 ../Core/Inc/DAC_out/MCP4725.h:
+../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/tasks/LedControl.h:
 ../USB_DEVICE/App/usb_device.h:
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h:

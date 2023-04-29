@@ -10,6 +10,7 @@
 
 //#include <main.h>
 #include "Display/ssd1306/ssd1306.h"
+#include "tasks/SensOut.h"
 #include "stm32f4xx_hal.h"
 #include "cmsis_os2.h"
 #include <stdlib.h>

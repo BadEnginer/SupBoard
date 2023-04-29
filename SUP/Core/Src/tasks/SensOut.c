@@ -11,10 +11,7 @@ int16_t old_encoder_data = 0;
 int16_t delta_encoder = 0;
 
 ADS1115_Config_t configChanel[4];
-#define ADC_CHANEL_1 0
-#define ADC_CHANEL_2 1
-#define ADC_CHANEL_3 2
-#define ADC_CHANEL_4 3
+
 //ADS1115_Config_t configChanel2;
 //ADS1115_Config_t configChanel3;
 //ADS1115_Config_t configChanel4;
@@ -23,15 +20,20 @@ ADS1115_Handle_t *pADS;
 osStatus_t statusMutexI2C;
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 uint8_t command_CMD[10] = {0};
-int16_t data_ch[4][10] = {0};
+
+
+
+int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF] = {0};
 extern uint16_t global_DAC;
-uint8_t aver_mass(int16_t* data){
-	uint16_t temp = 0;
-	for(uint8_t i = 0; i < 10; i++)
+
+// Много дефайнов
+
+int16_t aver_mass(int16_t* data){
+	int32_t temp = 0;
+	for(uint8_t i = 0; i < SIZE_ADC_BUFF; i++)
 		temp += data[i];
-	temp /= 10;
-	temp /= 8;
-	return (uint8_t)temp;
+	temp /= SIZE_ADC_BUFF;
+	return (int16_t)temp;
 }
 // Задача для опросо кнопок ADC и энкодера и система команд от usb
 void StartSensOutTask(void *argument){
@@ -47,7 +49,7 @@ void StartSensOutTask(void *argument){
 
 	for(;;){
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
-			switch(command_CMD[0] - 48){
+			switch(command_CMD[0] - 48){ // преобразуем символ в число
 				case 1: buttonEnSet();    break;
 				case 2: buttonLongSet();  break;
 				case 3: encoderSetUp();   break;

@@ -145,91 +145,68 @@ void udpateDisplay(){
 }
 
 
-uint8_t buttonUp(){
-	return buttonUpper;
-}
-void buttonUpSet(){
-	buttonUpper = 1;
-}
-void buttonUpReset(){
-	buttonUpper = 0;
-}
-
-uint8_t buttonEn(){
-	return buttonEnable;
-}
-void buttonEnSet(){
-	buttonEnable = 1;
-}
-void buttonEnReset(){
-	buttonEnable = 0;
-}
-
-uint8_t buttonCounter(){
-	return button_counter;
-}
-void buttonCounterSet(){
-	button_counter++;
-}
-
-void buttonCounterReset(){
-	button_counter = 0;
-}
-
-uint8_t buttonLong(){
-	return button_long;
-}
-void buttonLongSet(){
-	button_long = 1;
-}
-void buttonLongReset(){
-	button_long = 0;
-}
-
-int8_t encoderData(){
-	return encoderAS56;
-}
-void encoderSetUp(){
-	encoderAS56 = 1;
-}
-
-void encoderSetDown(){
-	encoderAS56 = -1;
-}
-
-void encoderReset(){
-	encoderAS56 = 0;
-}
-extern uint16_t global_DAC;
+#define SPEED_STEP 30
+#define MAX_SPEED  (1500/SPEED_STEP)
+#define MIN_SPEED ((-1) * MAX_SPEED)
+#define STD_WHITESPACE 7 // с учётом линии по краям экрана
 int8_t speed = 0;
+extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
+extern uint16_t global_DAC;
 
 void startDisplay(){
-
+	// todo сделать отдельную функцию для упрощения
 	    ssd1306_Fill(Black);
 	    ssd1306_Line(0, 1, 128, 1, White);
-	    ssd1306_SetCursor(7, 7); //
-	    ssd1306_WriteString("SPEED:-2", Font_11x18, White);
-	 	ssd1306_SetCursor(7, 7+18); //
-	 	ssd1306_WriteString("CHARG:82%", Font_11x18, White);
-	 	ssd1306_SetCursor(7, 7+18+18); //
-	 	ssd1306_WriteString("TIMER:3h22m", Font_11x18, White);
+	    ssd1306_SetCursor(STD_WHITESPACE, STD_WHITESPACE); //
+	    ssd1306_WriteString("SPEED:", Font_11x18, White);
+	    // х-отступ для линии у-отступ линии плюс ширина текста
+	 	ssd1306_SetCursor(STD_WHITESPACE, STD_WHITESPACE+SIZE_FONT_Y);
+	 	ssd1306_WriteString("CUR:", Font_11x18, White);
+	 	ssd1306_SetCursor(STD_WHITESPACE, STD_WHITESPACE+SIZE_FONT_Y*2); //
+	 	ssd1306_WriteString("Vout:", Font_11x18, White);
 	 	ssd1306_Line(0, 63, 128, 63, White);
-
+	 	udpateDisplay();
+	 	uint8_t current_speed;
+	 	uint8_t current_current;
+	 	uint8_t current_Vout;
+	 	char symSpeed[2];
+	 	char symCurrent[3];
+	 	char symVout[2];
 	 	while(1){
-	 		HAL_Delay(100);
+	 		HAL_Delay(350);
+	 		if(buttonLong()){
+	 			speed = 0;
+	 			buttonLongReset();
+	 		}
 	 		if(encoderData() > 0){
 	 			encoderReset();
 	 		 	speed++;
-	 		 	if(speed > 9)
-	 		 		speed = 9;
+	 		 	if(speed >= MAX_SPEED)
+	 		 		speed = MAX_SPEED;
 	 		}
 	 		if(encoderData() < 0){
 	 			encoderReset();
 	 		 	speed--;
-	 		 	if(speed < -9)
-	 		 		speed = -9;
+	 		 	if(speed <= MIN_SPEED)
+	 		 		speed = MIN_SPEED;
 	 		}
-	 		global_DAC = 1500 + (100*speed);
+	 		global_DAC = 1500 + (SPEED_STEP*speed);
+
+	 		itoa(current_speed  , symSpeed  , 10);
+	 		itoa(current_current, symCurrent, 10);
+	 		itoa(current_Vout   , symVout   , 10);
+	 		current_speed = speed;
+	 		current_current = aver_mass(data_ch[2])* ADC_TO_V * V_TO_A;
+	 		current_Vout = aver_mass(data_ch[1]) * ADC_TO_V;
+	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 7, STD_WHITESPACE );
+	 			ssd1306_WriteString(symSpeed, Font_11x18, White);
+	 		// х-линейный отступ плюс слово cur: 4 символов+1символ для знака : Вывод тока
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y);
+	 			ssd1306_WriteString(symCurrent, Font_11x18, White);
+	 		// х-линейный отступ плюс слово Vout: 5 символов : Вывод напряжения управления
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
+	 			ssd1306_WriteString(symVout, Font_11x18, White);
 	 	}
   }
 
@@ -322,5 +299,62 @@ void drawDACMenu(){
 void drawSettinMenu(){
 	uint8_t exit = 0;
 }
+
+uint8_t buttonUp(){
+	return buttonUpper;
+}
+void buttonUpSet(){
+	buttonUpper = 1;
+}
+void buttonUpReset(){
+	buttonUpper = 0;
+}
+
+uint8_t buttonEn(){
+	return buttonEnable;
+}
+void buttonEnSet(){
+	buttonEnable = 1;
+}
+void buttonEnReset(){
+	buttonEnable = 0;
+}
+
+uint8_t buttonCounter(){
+	return button_counter;
+}
+void buttonCounterSet(){
+	button_counter++;
+}
+
+void buttonCounterReset(){
+	button_counter = 0;
+}
+
+uint8_t buttonLong(){
+	return button_long;
+}
+void buttonLongSet(){
+	button_long = 1;
+}
+void buttonLongReset(){
+	button_long = 0;
+}
+
+int8_t encoderData(){
+	return encoderAS56;
+}
+void encoderSetUp(){
+	encoderAS56 = 1;
+}
+
+void encoderSetDown(){
+	encoderAS56 = -1;
+}
+
+void encoderReset(){
+	encoderAS56 = 0;
+}
+extern uint16_t global_DAC;
 
 
