@@ -26,10 +26,10 @@ extern I2C_HandleTypeDef hi2c1;
 
 #define NUM_ADC 16
 #define MAX_ADC_RANGE (4096 * 2) // Расчёт для режима 4 вольта
-#define MAX_DATA_ADC 65536
+#define MAX_DATA_ADC 65536.0
 #define ADC_TO_V (MAX_ADC_RANGE/MAX_DATA_ADC)
-#define MAX_CURRENT 70
-#define FULL_RANGE_CURRENT 1500
+#define MAX_CURRENT 70000.0F
+#define FULL_RANGE_CURRENT 1500.0
 #define V_TO_A (MAX_CURRENT/FULL_RANGE_CURRENT) // 21mV на 1 А
 
 

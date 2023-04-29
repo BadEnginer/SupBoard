@@ -74,7 +74,6 @@ void StartSensOutTask(void *argument){
 				i++;
 			}
 		 }
-				// меняем канал после завершения цикла
 				currentChanel++;
 				if(currentChanel > 3)
 					currentChanel = 0;

@@ -166,12 +166,12 @@ void startDisplay(){
 	 	ssd1306_WriteString("Vout:", Font_11x18, White);
 	 	ssd1306_Line(0, 63, 128, 63, White);
 	 	udpateDisplay();
-	 	uint8_t current_speed;
-	 	uint8_t current_current;
-	 	uint8_t current_Vout;
-	 	char symSpeed[2];
-	 	char symCurrent[3];
-	 	char symVout[2];
+	 	uint16_t current_speed;
+	 	int16_t current_current;
+	 	uint16_t current_Vout;
+	 	char symSpeed[5];
+	 	char symCurrent[5];
+	 	char symVout[5];
 	 	while(1){
 	 		HAL_Delay(350);
 	 		if(buttonLong()){
@@ -196,7 +196,7 @@ void startDisplay(){
 	 		itoa(current_current, symCurrent, 10);
 	 		itoa(current_Vout   , symVout   , 10);
 	 		current_speed = speed;
-	 		current_current = aver_mass(data_ch[2])* ADC_TO_V * V_TO_A;
+	 		current_current = (((aver_mass(data_ch[2])* ADC_TO_V)-1500)*V_TO_A)-3900;
 	 		current_Vout = aver_mass(data_ch[1]) * ADC_TO_V;
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 7, STD_WHITESPACE );
@@ -207,6 +207,7 @@ void startDisplay(){
 	 		// х-линейный отступ плюс слово Vout: 5 символов : Вывод напряжения управления
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
 	 			ssd1306_WriteString(symVout, Font_11x18, White);
+	 		udpateDisplay();
 	 	}
   }
 
