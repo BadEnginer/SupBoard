@@ -8,8 +8,12 @@ int16_t old_encoder_data = 0;
 int16_t delta_encoder = 0;
 uint8_t command_CMD[10] = {0};
 uint8_t test_data = 0;
+int16_t arr_delta_angle[MAX_DELTA];
+uint8_t counter = 0;
+
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 extern uint16_t current_angle;
+extern uint16_t arr_angle[MAX_COUNTER_ANGLE];
 char* tr_data;
 char symData[8] = {'L','a','s','t','-'};
 uint8_t time;
@@ -29,52 +33,39 @@ void StartSensOutTask(void *argument){
 		    symData[7] = '\r';
 			CDC_Transmit_FS(symData, sizeof(symData));
 		}
-
 		longButton();
+		calcDeltaAngle(arr_angle);
 		osDelay(100);
-		time++;
-		if(time == 3){
-			calcDeltaAngle(current_angle);
-			time = 0;
-		}
 	}
 }
-int16_t arr_big[10];
-int16_t arr_reght[10];
-int16_t arr_left[10];
-uint8_t counter_big = 0;
-uint8_t couunter_right = 0;
-uint8_t counter_left = 0;
 
-void calcDeltaAngle(uint16_t current_encoder_data){
-	if(current_encoder_data == old_encoder_data)
-		return;
-	delta_encoder = current_encoder_data - old_encoder_data;
-	if(delta_encoder < 10 && delta_encoder > -10)
-		return;
-	old_encoder_data = current_encoder_data;
-	if(delta_encoder > MAX_ANGLE || delta_encoder < (-1)*MAX_ANGLE){
-		arr_big[counter_big] = delta_encoder;
-		counter_big++;
-		if(counter_big >= 10)
-			counter_big = 0;
-		delta_encoder = 0;
+void calcDeltaAngle(uint16_t* data){
+	int16_t deltaAngle = 0;
+	uint8_t plus = 0;
+	counter = 0;
+	for(uint8_t i = 0; i < MAX_DELTA; i++){
+		deltaAngle = data[i+1] - data[i];
+		// логика простая если число в нужном диапазоне то добавить его в массив
+		if( ((deltaAngle > MIN_ANGLE) || (deltaAngle < ((-1)*MIN_ANGLE)))
+		  &&((deltaAngle < MAX_ANGLE) || (deltaAngle > ((-1)*MAX_ANGLE)))){
+			arr_delta_angle[counter] = 	deltaAngle;
+			counter++;
+			if(counter >=MAX_DELTA)
+				counter = 0;
+		}
 	}
-	if(delta_encoder > MIN_ANGLE ){
-		arr_reght[couunter_right] = delta_encoder;
-		couunter_right++;
-		if(couunter_right >= 10)
-			couunter_right = 0;
+	if(counter < 6)
+		return;
+	for(uint8_t i = 0; i < MAX_DELTA; i++){
+		if(arr_delta_angle[i] > 0)
+			plus++;
+		if(arr_delta_angle[i] < 0)
+			plus--;
+	}
+	if(plus > 4)
 		encoderSetUp();
-		return;
-	}
-	if(delta_encoder < (-1)*MIN_ANGLE){
-		arr_left[counter_left] = delta_encoder;
-		counter_left++;
-		if(counter_left >= 10)
-			counter_left = 0;
+	if(plus < -4)
 		encoderSetDown();
-	}
 }
 
 void longButton(){

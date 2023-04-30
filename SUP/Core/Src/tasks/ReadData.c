@@ -7,6 +7,8 @@ ADS1115_Handle_t *pADS;
 int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF] = {0};
 osStatus_t statusMutexI2C;
 uint16_t current_angle;
+uint16_t arr_angle[MAX_COUNTER_ANGLE];
+uint8_t counterAngle = 0;
 // задача для чтения данных с ацп и магнитного энкодера
 void StartReadDataTask(void *argument){
 	initAllChanelADC();
@@ -14,14 +16,15 @@ void StartReadDataTask(void *argument){
 	pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel[currentChanel]);
 	ADS1115_updateConfig(pADS, configChanel[currentChanel]);
 	ADS1115_startContinousMode(pADS);
-
 	for(;;){
 		// Попытка захвата мьютекса с таймаутом 1000 мс
-
 		for(uint8_t i = 0; i < SIZE_ADC_BUFF;){ // Читаем с ацп порта 10 значений
 			if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
 				data_ch[currentChanel][i] = ADS1115_getData(pADS);
-				current_angle = getEncoderData();
+				arr_angle[counterAngle] = getEncoderData();
+				counterAngle++;
+				if(counterAngle >= MAX_COUNTER_ANGLE)
+					counterAngle = 0;
 				osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 				osDelay(6);
 				i++;

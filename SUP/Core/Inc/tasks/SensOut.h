@@ -6,11 +6,12 @@
 
 
 #define MAX_ANGLE 600
-#define MIN_ANGLE 150
+#define MIN_ANGLE 5
 #define ON 1
+#define MAX_DELTA (MAX_COUNTER_ANGLE-1)
 
 void longButton();
 void StartSensOutTask(void *argument);
-void calcDeltaAngle(uint16_t);
+void calcDeltaAngle(uint16_t*);
 
 #endif /* INC_TASKS_SENSOUT_H_ */
