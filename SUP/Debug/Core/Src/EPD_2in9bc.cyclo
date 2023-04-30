@@ -1,8 +1,0 @@
-EPD_2in9bc.c:91:13:EPD_2IN9BC_Reset	1
-EPD_2in9bc.c:106:13:EPD_2IN9BC_SendCommand	1
-EPD_2in9bc.c:119:13:EPD_2IN9BC_SendData	1
-EPD_2in9bc.c:131:6:EPD_2IN9BC_ReadBusy	2
-EPD_2in9bc.c:144:6:EPD_2IN9BC_Init	1
-EPD_2in9bc.c:175:6:EPD_2IN9BC_Clear	5
-EPD_2in9bc.c:204:6:EPD_2IN9BC_Display	5
-EPD_2in9bc.c:234:6:EPD_2IN9BC_Sleep	1
