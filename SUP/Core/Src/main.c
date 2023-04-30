@@ -124,7 +124,30 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
+  devise_i2c_tree.
   ssd1306_Init();
+  if(devise_i2c_tree.unknown_dev > 0){
+	  ssd1306_SetCursor(2, 2);
+  	  ssd1306_WriteString("Unknown I2C", Font_11x18, White);
+  }
+  if(devise_i2c_tree.DAC_dev == ON){
+	  ssd1306_SetCursor(2, 22);
+  	  ssd1306_WriteString("DAC:On", Font_11x18, White);
+  }
+  if(devise_i2c_tree.ADC_dev == ON){
+ 	  ssd1306_SetCursor(2+(11*7), 22);
+   	  ssd1306_WriteString("ADC:On", Font_11x18, White);
+   }
+  if(devise_i2c_tree.display_dev == ON){
+ 	  ssd1306_SetCursor(2, 42);
+   	  ssd1306_WriteString("DIS:On", Font_11x18, White);
+   }
+  if(devise_i2c_tree.encoder_dev == ON){
+ 	  ssd1306_SetCursor(2+(11*7), 42);
+   	  ssd1306_WriteString("ENC:On", Font_11x18, White);
+   }
+  ssd1306_UpdateScreen();
+  HAL_Delay(1000);
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_SetCursor(3, 40);
