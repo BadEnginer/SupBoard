@@ -1,5 +1,0 @@
-epdif.c:55:6:EpdDigitalWriteCallback	2
-epdif.c:63:5:EpdDigitalReadCallback	2
-epdif.c:71:6:EpdDelayMsCallback	1
-epdif.c:75:6:EpdSpiTransferCallback	1
-epdif.c:81:5:EpdInitCallback	1
