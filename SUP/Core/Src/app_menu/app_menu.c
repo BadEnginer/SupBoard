@@ -154,7 +154,10 @@ extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
 extern uint16_t global_DAC;
 int16_t current_speed;
 int16_t current_current;
+int16_t set_zero = 0;
 int16_t dis_curretn;
+uint8_t mantisa = 0;
+int8_t  expter = 0;
 int16_t old_current_zero;
 int16_t current_Vout;
 extern int16_t delta_encoder;
@@ -173,9 +176,9 @@ void startDisplay(){
 	 	udpateDisplay();
 	 	old_current_zero = 0;
 	 	char symSpeed[5];
-	 	char symCurrent[5];
+	 	char symCurrent[6];
 	 	char symVout[5];
-
+	 	uint8_t calibr = 0;
 	 	HAL_Delay(500);
 		buttonLongReset();
 		buttonEnReset();
@@ -188,6 +191,7 @@ void startDisplay(){
 	 		}
 	 		if(buttonLong()){
 	 			speed = 0;
+	 			calibr = ON;
 	 			buttonLongReset();
 	 		}
 	 		if(encoderData() > 0){
@@ -204,17 +208,26 @@ void startDisplay(){
 	 		}
 	 		global_DAC = 1500 + (SPEED_STEP*speed);
 
-	 		itoa(current_speed  , symSpeed  , 10);
-	 		itoa(dis_curretn, symCurrent, 10);
-	 		itoa(current_Vout   , symVout   , 10);
+	 		itoa(current_speed, symSpeed  , 10);
+	 		itoa(mantisa,       symCurrent+3, 10);
+	 		itoa(expter,        symCurrent, 10);
+	 		itoa(current_Vout,  symVout   , 10);
+	 		symCurrent[4] = 'A';
+	 		symVout[4] = 'V';
 	 		current_speed = speed;
-
-	 		current_current = (((getAverADC(data_ch[2])* ADC_TO_V)-1500)*V_TO_A); // 1500 MI_DIS
-	 		if(global_DAC == 1500){
-	 			old_current_zero = current_current;
+	 		if(calibr == ON){
+	 			HAL_Delay(500);
 	 		}
-	 		current_current = current_current - old_current_zero;
-	 		dis_curretn = expFiltr(current_current, KOEFF_K) ;
+	 		current_current = (((getAverADC(data_ch[2])* ADC_TO_V)-1500)*V_TO_A) - set_zero; // 1500 MI_DIS
+	 		if(calibr == ON){
+	 			calibr = 0;
+	 			set_zero = current_current;
+	 		}
+	 		if(current_current < -100)
+	 			current_current = 0;
+	 		mantisa = (current_current%1000)/100;
+	 		expter = (current_current/1000);
+	 		dis_curretn = current_current;
 	 		current_Vout = delta_encoder;//getAverADC(data_ch[1]) * ADC_TO_V;
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
