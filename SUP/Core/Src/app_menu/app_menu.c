@@ -154,6 +154,7 @@ extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
 extern uint16_t global_DAC;
 int16_t current_speed;
 int16_t current_current;
+int16_t current_current_raw;
 int16_t set_zero = 0;
 int16_t dis_curretn;
 uint8_t mantisa = 0;
@@ -210,21 +211,29 @@ void startDisplay(){
 
 	 		itoa(current_speed, symSpeed  , 10);
 	 		itoa(mantisa,       symCurrent+3, 10);
-	 		itoa(expter,        symCurrent, 10);
+	 		if(expter > 9)
+	 			itoa(expter,        symCurrent, 10);
+	 		else{
+	 			itoa( 0 ,        symCurrent, 10);
+	 			itoa(expter,     symCurrent+1, 10);
+	 		}
 	 		itoa(current_Vout,  symVout   , 10);
+	 		symCurrent[2] = '.';
 	 		symCurrent[4] = 'A';
 	 		symVout[4] = 'V';
 	 		current_speed = speed;
 	 		if(calibr == ON){
 	 			HAL_Delay(500);
 	 		}
-	 		current_current = (((getAverADC(data_ch[2])* ADC_TO_V)-1500)*V_TO_A) - set_zero; // 1500 MI_DIS
+	 		current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
+	 		if(current_current_raw < 0)
+	 			current_current_raw = 0;
 	 		if(calibr == ON){
-	 			calibr = 0;
-	 			set_zero = current_current;
+	 			calibr = 0;// todo добавить условие что движетель должен остановлен быть
+	 			set_zero = current_current_raw;
 	 		}
-	 		if(current_current < -100)
-	 			current_current = 0;
+	 		current_current = current_current_raw - set_zero;
+	 		current_current *= V_TO_A;
 	 		mantisa = (current_current%1000)/100;
 	 		expter = (current_current/1000);
 	 		dis_curretn = current_current;

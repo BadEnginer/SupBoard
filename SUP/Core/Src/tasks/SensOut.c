@@ -1,7 +1,8 @@
 #include "tasks/SensOut.h"
 
 //
-
+volatile uint16_t temp_counter_plus = 0;
+volatile uint16_t temp_counter_min = 0;
 uint16_t old_raw_angle = 0;
 uint16_t angle = 0;
 int16_t old_encoder_data = 0;
@@ -20,6 +21,7 @@ uint8_t time;
 // Задача для опросо кнопок, энкодера и система команд от usb
 void StartSensOutTask(void *argument){
 	for(;;){
+		//data_right++;
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
 			switch(command_CMD[0] - 48){ // преобразуем символ в число
 				case 1: buttonEnSet();    break;
@@ -39,9 +41,11 @@ void StartSensOutTask(void *argument){
 	}
 }
 
+
+
 void calcDeltaAngle(uint16_t* data){
 	int16_t deltaAngle = 0;
-	uint8_t plus = 0;
+	int8_t plus = 0;
 	counter = 0;
 	for(uint8_t i = 0; i < MAX_DELTA; i++){
 		deltaAngle = data[i+1] - data[i];
@@ -62,10 +66,14 @@ void calcDeltaAngle(uint16_t* data){
 		if(arr_delta_angle[i] < 0)
 			plus--;
 	}
-	if(plus > 4)
+	if(plus > 4){
 		encoderSetUp();
-	if(plus < -4)
+		temp_counter_plus++;
+	}
+	if(plus < -4){
 		encoderSetDown();
+		temp_counter_min++;
+	}
 }
 
 void longButton(){
