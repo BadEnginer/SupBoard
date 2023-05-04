@@ -11,20 +11,20 @@ static int8_t  encoderAS56 = 0;		// Положение энкодера 1 кру
 
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT+1] = {
-    "1:Button   ",
-    "2:LED      ",
-    "3:E-ink    ",
-	"4:ADC      ",
-	"5:Encod.   ",
-	"6:DAC      ",
-	"7:Settings ",
-	"   Menu    "
+    ">  Button <",
+    ">   LED   <",
+    ">  E-ink  <",
+	">   ADC   <",
+	"> Encoder <",
+	">   DAC   <",
+	"> Setting <",
+	" Main Menu "
 };
 
 
 const char* menuButton[3] = {
     "Lon:  Ena: ",
-    "EPC:  EMC: ",
+    "EDP:  EDM: ",
 	"  Button   "
 };
 
@@ -91,7 +91,7 @@ void drawMainMenu() {
         buttonEnReset();
         buttonLongReset();
         encoderReset();
-        HAL_Delay(1000);
+        HAL_Delay(700);
     	while(1){
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
