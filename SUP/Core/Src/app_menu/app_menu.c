@@ -81,8 +81,8 @@ void drawMainMenu() {
         udpateDisplay();
     	if(current_item_menu >= MENU_ITEMS_COUNT )
 			current_item_menu = 0;
-    	if(current_item_menu <= 0 )
-    	    current_item_menu = 0;
+    	if(current_item_menu < 0 )
+    	    current_item_menu = MENU_ITEMS_COUNT-1;
     	ssd1306_SetCursor(START_POS_X, START_POS_Y+6);
     		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
     	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5+6);
@@ -91,7 +91,7 @@ void drawMainMenu() {
         buttonEnReset();
         buttonLongReset();
         encoderReset();
-        HAL_Delay(500);
+        HAL_Delay(1000);
     	while(1){
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей

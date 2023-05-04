@@ -37,7 +37,7 @@ void StartSensOutTask(void *argument){
 		}
 		longButton();
 		calcDeltaAngle(arr_angle);
-		osDelay(100);
+		osDelay(300);
 	}
 }
 
@@ -50,15 +50,14 @@ void calcDeltaAngle(uint16_t* data){
 	for(uint8_t i = 0; i < MAX_DELTA; i++){
 		deltaAngle = data[i+1] - data[i];
 		// логика простая если число в нужном диапазоне то добавить его в массив
-		if( ((deltaAngle > MIN_ANGLE) || (deltaAngle < ((-1)*MIN_ANGLE)))
-		  &&((deltaAngle < MAX_ANGLE) || (deltaAngle > ((-1)*MAX_ANGLE)))){
+		if( (abs(deltaAngle) > MIN_ANGLE) && (abs(deltaAngle) < MAX_ANGLE)){
 			arr_delta_angle[counter] = 	deltaAngle;
 			counter++;
 			if(counter >=MAX_DELTA)
 				counter = 0;
 		}
 	}
-	if(counter < 6)
+	if(counter < 20)
 		return;
 	for(uint8_t i = 0; i < MAX_DELTA; i++){
 		if(arr_delta_angle[i] > 0)
@@ -66,11 +65,11 @@ void calcDeltaAngle(uint16_t* data){
 		if(arr_delta_angle[i] < 0)
 			plus--;
 	}
-	if(plus > 4){
+	if(plus > 16){
 		encoderSetUp();
 		temp_counter_plus++;
 	}
-	if(plus < -4){
+	if(plus < -16){
 		encoderSetDown();
 		temp_counter_min++;
 	}
@@ -85,7 +84,7 @@ void longButton(){
 		buttonCounterReset();
 	}
 
-	if(buttonCounter() > 10){
+	if(buttonCounter() > 6){
 		buttonLongSet();
 		buttonCounterReset();
 	}

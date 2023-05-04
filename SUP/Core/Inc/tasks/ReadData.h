@@ -18,7 +18,7 @@
 #define MAX_CURRENT 70000.0F
 #define FULL_RANGE_CURRENT 1500.0
 #define V_TO_A (MAX_CURRENT/FULL_RANGE_CURRENT) // 21mV на 1 А
-#define MAX_COUNTER_ANGLE 10
+#define MAX_COUNTER_ANGLE 30
 
 void StartReadDataTask(void *argument);
 void initAllChanelADC();

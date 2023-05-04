@@ -3,10 +3,11 @@
 #define INC_TASKS_SENSOUT_H_
 
 #include <main.h>
+#include <stdlib.h>
 
 
 #define MAX_ANGLE 600
-#define MIN_ANGLE 5
+#define MIN_ANGLE 1
 #define ON 1
 #define MAX_DELTA (MAX_COUNTER_ANGLE-1)
 
