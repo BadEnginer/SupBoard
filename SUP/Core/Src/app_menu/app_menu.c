@@ -336,7 +336,27 @@ void drawE_inkMenu(){
 }
 
 void drawADCMenu(){
-	uint8_t exit = 0;
+	uint8_t ch0 = 0;
+	uint8_t ch1 = 0;
+	uint8_t ch2 = 0;
+	uint8_t ch3 = 0;
+
+	char sym_ch0 [3];
+	char sym_ch1 [3];
+	char sym_ch2 [3];
+	char sym_ch3 [3];
+
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+
+	ssd1306_Fill(Black);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y);
+		ssd1306_WriteString(menuADC[2], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
+		ssd1306_WriteString(menuADC[0], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
+		ssd1306_WriteString(menuADC[1], Font_11x18, White);
 }
 void drawEncodMenu(){
 	uint8_t exit = 0;
