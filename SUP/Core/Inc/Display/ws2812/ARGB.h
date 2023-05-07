@@ -15,7 +15,7 @@
 #ifndef ARGB_H_
 #define ARGB_H_
 
-#include "libs.h"
+#include "Display/ws2812/libs.h"
 
 /**
  * @addtogroup ARGB_Driver

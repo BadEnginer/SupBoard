@@ -19,6 +19,11 @@
 #define MENU_ITEM_HEIGHT 10 // Высота пункта меню
 #define MENU_ITEM_MAIN_HEIGHT 18 // Высота основного пункта меню
 
+#define SPEED_STEP 100
+#define MAX_SPEED  (1500/SPEED_STEP)
+#define MIN_SPEED ((-1) * MAX_SPEED)
+#define STD_WHITESPACE 7 // с учётом линии по краям экрана
+
 #define ON 1
 #define OFF 0
 

@@ -1,6 +1,7 @@
 
 #include "tasks/LedControl.h"
 extern uint8_t global_color;
+extern int8_t speed;
 /*диодов допустим 3*8 = 24 , разрядов 240 то есть если разделить число на /10 будет 24 это количество горящих диодов */
 
 
@@ -8,8 +9,95 @@ extern uint8_t global_color;
 
 
 void StartLedControlTask(void *argument){
-	uint8_t red,green,blue;
-	 // uint8_t old_data;
+	ARGB_Init();  // Initialization
+	ARGB_Clear();
+	while (ARGB_Show() != ARGB_OK);
+	ARGB_SetBrightness(100);
+	ARGB_Clear(); // Clear stirp
+	ARGB_SetRGB(0, 100, 0, 250);
+	while (ARGB_Show() != ARGB_OK);
+	HAL_Delay(3000);
+	SetZeroSpeed();
+	int8_t old_speed = 0;
+	for(;;){
+		if(old_speed != speed){ // если скорость изменится выполнить
+			ARGB_Clear(); // Clear stirp
+			SetColorSpeed(speed);
+			while (ARGB_Show() != ARGB_OK);
+			old_speed = speed;
+		}
+		HAL_Delay(200);
+
+	}
+}
+void SetZeroSpeed(){ // функция для установки нулевого значения сокрости
+	ARGB_Clear(); // Clear stirp
+	ARGB_SetRGB(0, 0, 255, 0);
+	while (ARGB_Show() != ARGB_OK);
+}
+
+void SetColorSpeed(int8_t currentSpeed){
+	uint8_t curretn_color = BLUE;
+	uint8_t percentSpeed = 0;
+	if(currentSpeed < 0)
+		curretn_color = YELLOW;
+	if(currentSpeed == 0){
+		SetZeroSpeed();
+		return;
+	}
+	percentSpeed = ((abs(currentSpeed)) / MAX_SPEED) * 100.0;
+	// Зажигает количество диодов пропорционалное скорости
+	step_color(curretn_color, percentSpeed);
+}
+
+void step_color(uint8_t color, uint8_t percent){
+	uint8_t num_led = (percent / PRE_FOR_ONE_LED);
+	// Зажигаем все предыдущие диоды максимальной яркостью кроме последнего
+	for(uint8_t i = 0; i < num_led; i++){
+		set_color_led(i, color, MAX_BRIGHT);
+	}
+	if(percent == 100){
+		set_color_led(7, RED, MAX_BRIGHT);
+		return;
+	}
+	set_color_led((num_led), color, STEP_BRIGHT *(percent%PRE_FOR_ONE_LED));
+}
+
+void set_color_led(uint8_t numLed, uint8_t color, uint8_t bright){
+	if(color == BLUE){
+		ARGB_SetRGB(numLed, 0, 0, bright);
+		return;
+	}
+	if(color == RED){
+		ARGB_SetRGB(numLed, bright, 0, 0);
+		return;
+	}
+	if(color == GREEN){
+		ARGB_SetRGB(numLed, 0, bright, 0);
+		return;
+	}
+	if(color == YELLOW){
+		ARGB_SetRGB(numLed, bright, bright, 0);
+		return;
+	}
+	if(color == MAGENTA){
+		ARGB_SetRGB(numLed, bright, 0, bright);
+		return;
+	}
+	if(color == WHITE){
+		ARGB_SetRGB(numLed, bright, bright, bright);
+		return;
+	}
+	if(color == CYAN){
+		ARGB_SetRGB(numLed, 0, bright, bright);
+		return;
+	}
+	ARGB_SetRGB(numLed, bright, bright, bright);
+	return;
+}
+
+/*
+ * 	 // uint8_t old_data;
 	 // uint8_t numOnLed;
 	//  ARGB_Init();  // Initialization
 	//  ARGB_Clear();
@@ -21,10 +109,8 @@ void StartLedControlTask(void *argument){
 		ARGB_SetRGB(2, 50, 0, 0); // Set LED №2 with 255 Green
 		ARGB_SetRGB(3, 0, 0, 50); // Set LED №3 with 255 Green
 	  while (ARGB_Show() != ARGB_OK);
-*/
-	for(;;){
-		HAL_Delay(100);
-		// todo  сделать хорошо
+
+// todo  сделать хорошо
 		// если значение цвета изменилось то
 		//определить сколько стало и попытаться зажечь нужноче число диодов
 		/*
@@ -50,12 +136,8 @@ void StartLedControlTask(void *argument){
 				setBlueLed(blue/10, blue%10);
 			while (ARGB_Show() != ARGB_OK);
 		}
-		*/
 
-	}
-}
 
-/*
 void setRedLed(uint8_t num, uint8_t last){
 	uint8_t i;
 	if(num > MAX_LED)

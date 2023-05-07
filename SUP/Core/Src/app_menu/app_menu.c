@@ -145,10 +145,7 @@ void udpateDisplay(){
 }
 
 
-#define SPEED_STEP 70
-#define MAX_SPEED  (1500/SPEED_STEP)
-#define MIN_SPEED ((-1) * MAX_SPEED)
-#define STD_WHITESPACE 7 // с учётом линии по краям экрана
+
 int8_t speed = 0;
 extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
 extern uint16_t global_DAC;
