@@ -14,6 +14,10 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
+#define STOP_MOTOR 1700
+#define MAX_FORVARD_SPEED 3000
+#define MAX_BACK_SPEED 200
+
 void StartMotorControlTask(void *argument);
 
 

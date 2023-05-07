@@ -1,9 +1,7 @@
 #include "tasks/MotorControl.h"
 
 extern uint16_t global_DAC;
-#define STOP_MOTOR 1500
-#define MAX_FORVARD_SPEED 3000
-#define MAX_BACK_SPEED 200
+
 
 /// Функция управления мотором через дак + сложные условия остановки
 void StartMotorControlTask(void *argument){
