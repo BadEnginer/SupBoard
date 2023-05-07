@@ -11,12 +11,12 @@ static int8_t  encoderAS56 = 0;		// Положение энкодера 1 кру
 
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT+1] = {
-    ">  Button <",
-    ">   LED   <",
-    ">  E-ink  <",
-	">   ADC   <",
+    " >Buttons< ",
+    "  > LED <  ",
+    " > E-ink < ",
+	"  > ADC <  ",
 	"> Encoder <",
-	">   DAC   <",
+	"  > DAC <  ",
 	"> Setting <",
 	" Main Menu "
 };
@@ -91,7 +91,7 @@ void drawMainMenu() {
         buttonEnReset();
         buttonLongReset();
         encoderReset();
-        HAL_Delay(700);
+        HAL_Delay(100);
     	while(1){
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
@@ -173,10 +173,10 @@ void startDisplay(){
 	 	ssd1306_Line(0, 63, 128, 63, White);
 	 	udpateDisplay();
 	 	old_current_zero = 0;
-	 	char symSpeed[5];
+	 	char symSpeed[6];
 	 	char symCurrent[6];
-	 	char symVout[5];
-	 	uint8_t calibr = 0;
+	 	char symVout[6];
+	 	uint8_t calibr = 1;
 	 	HAL_Delay(500);
 		buttonLongReset();
 		buttonEnReset();
@@ -189,7 +189,7 @@ void startDisplay(){
 	 		}
 	 		if(buttonLong()){
 	 			speed = 0;
-	 			calibr = ON;
+	 			//calibr = ON;
 	 			buttonLongReset();
 	 		}
 	 		if(encoderData() > 0){
@@ -204,37 +204,37 @@ void startDisplay(){
 	 		 	if(speed <= MIN_SPEED)
 	 		 		speed = MIN_SPEED;
 	 		}
-	 		global_DAC = 1500 + (SPEED_STEP*speed);
+	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed);
 
-	 		itoa(current_speed, symSpeed  , 10);
-	 		itoa(mantisa,       symCurrent+3, 10);
+	 		itoa(current_speed, symSpeed  , 	10);
+	 		itoa(mantisa,       symCurrent+3, 	10);
 	 		if(expter > 9)
-	 			itoa(expter,        symCurrent, 10);
+	 			itoa(expter,	symCurrent, 	10);
 	 		else{
-	 			itoa( 0 ,        symCurrent, 10);
-	 			itoa(expter,     symCurrent+1, 10);
+	 			symCurrent[0] = ' ';
+	 			itoa(expter,     symCurrent+1,	10);
 	 		}
 	 		itoa(current_Vout,  symVout   , 10);
 	 		symCurrent[2] = '.';
-	 		symCurrent[4] = 'A';
-	 		symVout[4] = 'V';
+	 		symCurrent[4] = ' ';
+	 		symCurrent[5] = 'A';
+	 		symVout[5] = 'V';
 	 		current_speed = speed;
 	 		if(calibr == ON){
 	 			HAL_Delay(500);
 	 		}
 	 		current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
-	 		if(current_current_raw < 0)
-	 			current_current_raw = 0;
 	 		if(calibr == ON){
 	 			calibr = 0;// todo добавить условие что движетель должен остановлен быть
 	 			set_zero = current_current_raw;
 	 		}
-	 		current_current = current_current_raw - set_zero;
-	 		current_current *= V_TO_A;
+	 		current_current = (current_current_raw - set_zero) * V_TO_A;
+	 		if(current_current < 0)
+	 			current_current = 0;
 	 		mantisa = (current_current%1000)/100;
 	 		expter = (current_current/1000);
 	 		dis_curretn = current_current;
-	 		current_Vout = delta_encoder;//getAverADC(data_ch[1]) * ADC_TO_V;
+	 		current_Vout = getAverADC(data_ch[1]) * ADC_TO_V;
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
 	 			ssd1306_WriteString("       ", Font_11x18, White);
@@ -357,6 +357,35 @@ void drawADCMenu(){
 		ssd1306_WriteString(menuADC[0], Font_11x18, White);
 	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
 		ssd1306_WriteString(menuADC[1], Font_11x18, White);
+	udpateDisplay();
+	HAL_Delay(50);
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+	while(1){
+		ch0 = ((getAverADC(data_ch[0])) * ADC_TO_V)/10;
+		ch1 = ((getAverADC(data_ch[1])) * ADC_TO_V)/10;
+		ch2 = ((getAverADC(data_ch[2])) * ADC_TO_V)/10;
+		ch3 = ((getAverADC(data_ch[3])) * ADC_TO_V)/10;
+		itoa(ch0, sym_ch0, 10);
+		itoa(ch1, sym_ch1, 10);
+		itoa(ch2, sym_ch2, 10);
+		itoa(ch3, sym_ch3, 10);
+		ssd1306_SetCursor(SIZE_FONT_X * 3, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_ch0, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 9, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(sym_ch1, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 3, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_ch2, Font_11x18, White);
+		ssd1306_SetCursor(SIZE_FONT_X * 9, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(sym_ch3, Font_11x18, White);
+			udpateDisplay();
+		if(buttonLong() == ON){
+			buttonLongReset();
+			break;
+		}
+		HAL_Delay(50);
+	}
 }
 void drawEncodMenu(){
 	uint8_t exit = 0;

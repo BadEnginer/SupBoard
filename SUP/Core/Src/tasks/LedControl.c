@@ -12,7 +12,7 @@ void StartLedControlTask(void *argument){
 	ARGB_Init();  // Initialization
 	ARGB_Clear();
 	while (ARGB_Show() != ARGB_OK);
-	ARGB_SetBrightness(100);
+	ARGB_SetBrightness(50);
 	ARGB_Clear(); // Clear stirp
 	ARGB_SetRGB(0, 100, 0, 250);
 	while (ARGB_Show() != ARGB_OK);
@@ -45,7 +45,7 @@ void SetColorSpeed(int8_t currentSpeed){
 		SetZeroSpeed();
 		return;
 	}
-	percentSpeed = ((abs(currentSpeed)) / MAX_SPEED) * 100.0;
+	percentSpeed = ((abs(currentSpeed)) * 100.0)/MAX_SPEED;
 	// Зажигает количество диодов пропорционалное скорости
 	step_color(curretn_color, percentSpeed);
 }
@@ -77,22 +77,22 @@ void set_color_led(uint8_t numLed, uint8_t color, uint8_t bright){
 		return;
 	}
 	if(color == YELLOW){
-		ARGB_SetRGB(numLed, bright, bright, 0);
+		ARGB_SetRGB(numLed, bright/2, bright/2, 0);
 		return;
 	}
 	if(color == MAGENTA){
-		ARGB_SetRGB(numLed, bright, 0, bright);
+		ARGB_SetRGB(numLed, bright/2, 0, bright/2);
 		return;
 	}
 	if(color == WHITE){
-		ARGB_SetRGB(numLed, bright, bright, bright);
+		ARGB_SetRGB(numLed, bright/3, bright/3, bright/3);
 		return;
 	}
 	if(color == CYAN){
-		ARGB_SetRGB(numLed, 0, bright, bright);
+		ARGB_SetRGB(numLed, 0, bright/2, bright/2);
 		return;
 	}
-	ARGB_SetRGB(numLed, bright, bright, bright);
+	ARGB_SetRGB(numLed, bright/3, bright/3, bright/3);
 	return;
 }
 
