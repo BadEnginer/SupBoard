@@ -147,6 +147,7 @@ int main(void)
    }
   ssd1306_UpdateScreen();
   HAL_Delay(1000);
+  ssd1306_Fill(Black);
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_SetCursor(3, 40);
