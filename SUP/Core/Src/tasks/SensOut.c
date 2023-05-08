@@ -18,6 +18,7 @@ extern uint16_t arr_angle[MAX_COUNTER_ANGLE];
 char* tr_data;
 char symData[8] = {'L','a','s','t','-'};
 uint8_t time;
+extern uint8_t calibr;
 // Задача для опросо кнопок, энкодера и система команд от usb
 void StartSensOutTask(void *argument){
 	for(;;){
@@ -28,6 +29,7 @@ void StartSensOutTask(void *argument){
 				case 2: buttonLongSet();  break;
 				case 3: encoderSetUp();   break;
 				case 4: encoderSetDown(); break;
+				case 5: calibr = ON;	  break;
 			}//todo добавить больше данных
 			test_data =command_CMD[0];
 			command_CMD[0] = 0;
