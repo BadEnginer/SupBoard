@@ -8,7 +8,7 @@ static uint8_t buttonEnable = 0; 	// Кнопка ввода нажата 1
 static uint8_t button_counter = 0;  // Количество отсчётом сколько кнопка удерживалась
 static uint8_t button_long = 0;		// Кнопка ввода удержана 1
 static int8_t  encoderAS56 = 0;		// Положение энкодера 1 крутят в плюс -1 крутят в минус
-
+uint8_t calibr = 1;
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT+1] = {
     " >Buttons< ",
@@ -154,7 +154,7 @@ int16_t current_current;
 int16_t current_current_raw;
 int16_t set_zero = 0;
 int16_t dis_curretn;
-uint8_t mantisa = 0;
+int8_t  mantisa = 0;
 int8_t  expter = 0;
 int16_t old_current_zero;
 int16_t current_Vout;
@@ -176,7 +176,7 @@ void startDisplay(){
 	 	char symSpeed[6];
 	 	char symCurrent[6];
 	 	char symVout[6];
-	 	uint8_t calibr = 1;
+	 	float multi_speed = ADC_TO_V * V_TO_A;
 	 	HAL_Delay(500);
 		buttonLongReset();
 		buttonEnReset();
@@ -186,11 +186,6 @@ void startDisplay(){
 	 		if(buttonEn()){
 	 			//buttonEnReset();
 	 			break;
-	 		}
-	 		if(buttonLong()){
-	 			speed = 0;
-	 			//calibr = ON;
-	 			buttonLongReset();
 	 		}
 	 		if(encoderData() > 0){
 	 			encoderReset();
@@ -204,14 +199,20 @@ void startDisplay(){
 	 		 	if(speed <= MIN_SPEED)
 	 		 		speed = MIN_SPEED;
 	 		}
+	 		if(buttonLong()){
+	 			speed = 0;
+	 			buttonLongReset();
+	 		}
 	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed);
 
 	 		itoa(current_speed, symSpeed  , 	10);
 	 		itoa(mantisa,       symCurrent+3, 	10);
 	 		if(expter > 9)
 	 			itoa(expter,	symCurrent, 	10);
-	 		else{
+	 		else {
 	 			symCurrent[0] = ' ';
+	 			if(current_current < -90)
+	 				symCurrent[0] = '-';
 	 			itoa(expter,     symCurrent+1,	10);
 	 		}
 	 		itoa(current_Vout,  symVout   , 10);
@@ -223,17 +224,16 @@ void startDisplay(){
 	 		if(calibr == ON){
 	 			HAL_Delay(500);
 	 		}
-	 		current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
+	 		//current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
+	 		current_current_raw = getAverADC(data_ch[2]);
+	 		current_current = (current_current_raw) * multi_speed;
 	 		if(calibr == ON){
 	 			calibr = 0;// todo добавить условие что движетель должен остановлен быть
-	 			set_zero = current_current_raw;
+	 			set_zero = current_current;
 	 		}
-	 		current_current = (current_current_raw - set_zero) * V_TO_A;
-	 		if(current_current < 0)
-	 			current_current = 0;
-	 		mantisa = (current_current%1000)/100;
-	 		expter = (current_current/1000);
-	 		dis_curretn = current_current;
+	 		current_current -= set_zero;
+	 		mantisa = abs((current_current%1000)/100);
+	 		expter = abs((current_current/1000));
 	 		current_Vout = getAverADC(data_ch[1]) * ADC_TO_V;
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
@@ -254,11 +254,7 @@ void startDisplay(){
 	 	}
   }
 
-int16_t expFiltr(int16_t newVal, float k) {
-	  static int16_t filVal = 0;
-	  filVal += (newVal - filVal) * k;
-	  return filVal;
-}
+
 // Тестовая функция для проверки кнопок  готова
 void drawButtonMenu(){
 	uint8_t butEn = 0;
