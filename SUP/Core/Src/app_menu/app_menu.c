@@ -11,13 +11,13 @@ static int8_t  encoderAS56 = 0;		// Положение энкодера 1 кру
 uint8_t calibr = 1;
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT+1] = {
-    " >Buttons< ",
-    "  > LED <  ",
-    " > E-ink < ",
-	"  > ADC <  ",
-	"> Encoder <",
-	"  > DAC <  ",
-	"> Setting <",
+    "  Buttons  ",
+    "    LED    ",
+    "   Error   ",
+	"    ADC    ",
+	"  Encoder  ",
+	"    DAC    ",
+	"  Setting  ",
 	" Main Menu "
 };
 
@@ -72,12 +72,14 @@ void drawMainMenu() {
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
     ssd1306_Fill(Black);
-    ssd1306_DrawRectangle(1, 1, 127, 63, White);
-    udpateDisplay();
-
+    //ssd1306_DrawRectangle(1, 1, 127, 63, White);
+    //udpateDisplay();
+#define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 5+4)
     while(exit){ // Вывод главного меню
         ssd1306_Fill(Black);
-        ssd1306_DrawRectangle(1, 1, 127, 63, White);
+        //ssd1306_DrawRectangle(1, 1, 127, 63, White);
+        // Вроде должны нарисовать линию под словом меню 7 и 120 просто MN
+        ssd1306_Line(7, LST_MENU_POINT, 120, LST_MENU_POINT, White);
         udpateDisplay();
     	if(current_item_menu >= MENU_ITEMS_COUNT )
 			current_item_menu = 0;
@@ -301,8 +303,8 @@ void drawButtonMenu(){
 		butEn = butEn % 10;
 		butLo = butLo % 10;
 
-		itoa(butEn, sym_butEn, 10);
-		itoa(butLo, sym_butLo, 10);
+		itoa(butEn,  sym_butEn, 10);
+		itoa(butLo,  sym_butLo, 10);
 		itoa(encodM, sym_encM, 10);
 		itoa(encodP, sym_encP, 10);
 
@@ -375,7 +377,7 @@ void drawADCMenu(){
 			ssd1306_WriteString(sym_ch2, Font_11x18, White);
 		ssd1306_SetCursor(SIZE_FONT_X * 9, START_POS_Y + SIZE_FONT_Y*2);
 			ssd1306_WriteString(sym_ch3, Font_11x18, White);
-			udpateDisplay();
+		udpateDisplay();
 		if(buttonLong() == ON){
 			buttonLongReset();
 			break;
