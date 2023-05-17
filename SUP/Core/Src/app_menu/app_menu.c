@@ -223,12 +223,16 @@ void startDisplay(){
 	 		symCurrent[5] = 'A';
 	 		symVout[5] = 'V';
 	 		current_speed = speed;
-	 		if(calibr == ON){
-	 			HAL_Delay(500);
-	 		}
+	 		//if(speed == 0 )
+	 		//	calibr = ON;
+	 		//if(calibr == ON){
+	 		//	HAL_Delay(500);
+	 		//}
+
 	 		//current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
 	 		current_current_raw = getAverADC(data_ch[2]);
-	 		current_current = (current_current_raw) * multi_speed;
+	 		current_current = 1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
+
 	 		if(calibr == ON){
 	 			calibr = 0;// todo добавить условие что движетель должен остановлен быть
 	 			set_zero = current_current;

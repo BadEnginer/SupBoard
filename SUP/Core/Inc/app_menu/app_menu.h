@@ -24,6 +24,9 @@
 #define MIN_SPEED ((-1) * MAX_SPEED)
 #define STD_WHITESPACE 7 // с учётом линии по краям экрана
 
+#define LIN_CURR_K 4.3186f
+#define LIN_CURR_B (56143)
+
 #define ON 1
 #define OFF 0
 
