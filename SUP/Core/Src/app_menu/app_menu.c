@@ -90,11 +90,13 @@ void drawMainMenu() {
     	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5+6);
     		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
     	udpateDisplay();
-        buttonEnReset();
+    	HAL_Delay(150);
+    	buttonEnReset();
         buttonLongReset();
         encoderReset();
-        HAL_Delay(100);
+
     	while(1){
+    		HAL_Delay(100);
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
     			exit = 0;
@@ -162,6 +164,7 @@ int8_t  mantisa = 0;
 int8_t  expter = 0;
 int16_t old_current_zero;
 int16_t current_Vout;
+uint16_t deadArea = 0;
 extern int16_t delta_encoder;
 void startDisplay(){
 	// todo сделать отдельную функцию для упрощения
@@ -207,7 +210,11 @@ void startDisplay(){
 	 			speed = 0;
 	 			buttonLongReset();
 	 		}
-	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed+100);
+	 		if(speed != 0)
+	 			deadArea = 400;
+	 		else
+	 			deadArea = 0;
+	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed) + deadArea;
 
 	 		itoa(current_speed, symSpeed  , 	10);
 	 		itoa(mantisa,       symCurrent+3, 	10);
