@@ -151,6 +151,8 @@ void udpateDisplay(){
 int8_t speed = 0;
 extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
 extern uint16_t global_DAC;
+uint8_t start_callibr = 0;
+#define MAX_CALIBR 50
 int16_t current_speed;
 int16_t current_current;
 int16_t current_current_raw;
@@ -184,7 +186,7 @@ void startDisplay(){
 		buttonEnReset();
 		encoderReset();
 	 	while(1){
-	 		HAL_Delay(150);
+	 		HAL_Delay(100);
 	 		if(buttonEn()){
 	 			//buttonEnReset();
 	 			break;
@@ -205,7 +207,7 @@ void startDisplay(){
 	 			speed = 0;
 	 			buttonLongReset();
 	 		}
-	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed);
+	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed+100);
 
 	 		itoa(current_speed, symSpeed  , 	10);
 	 		itoa(mantisa,       symCurrent+3, 	10);
@@ -223,12 +225,13 @@ void startDisplay(){
 	 		symCurrent[5] = 'A';
 	 		symVout[5] = 'V';
 	 		current_speed = speed;
-	 		//if(speed == 0 )
-	 		//	calibr = ON;
-	 		//if(calibr == ON){
-	 		//	HAL_Delay(500);
-	 		//}
-
+	 		if(speed == 0 ){
+	 			start_callibr++;
+	 		}
+	 		else
+	 			start_callibr = 0;
+	 		if(start_callibr >= MAX_CALIBR)
+	 			calibr = ON;
 	 		//current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
 	 		current_current_raw = getAverADC(data_ch[2]);
 	 		current_current = 1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
