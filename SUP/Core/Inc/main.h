@@ -93,6 +93,18 @@ void Error_Handler(void);
 #define EXT_button_on_Pin GPIO_PIN_14
 #define EXT_button_on_GPIO_Port GPIOB
 #define EXT_button_on_EXTI_IRQn EXTI15_10_IRQn
+#define PB3_LB_Pin GPIO_PIN_3
+#define PB3_LB_GPIO_Port GPIOB
+#define PB3_LB_EXTI_IRQn EXTI3_IRQn
+#define PB4_EB_Pin GPIO_PIN_4
+#define PB4_EB_GPIO_Port GPIOB
+#define PB4_EB_EXTI_IRQn EXTI4_IRQn
+#define PB4_EP_Pin GPIO_PIN_5
+#define PB4_EP_GPIO_Port GPIOB
+#define PB4_EP_EXTI_IRQn EXTI9_5_IRQn
+#define PB8_EM_Pin GPIO_PIN_8
+#define PB8_EM_GPIO_Port GPIOB
+#define PB8_EM_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
