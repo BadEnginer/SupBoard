@@ -67,48 +67,52 @@ const char* menuADC[3] = {
 	"    ADC    "
 };
 
-void drawMainMenu() {
+#define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 6 + 2) // под надписью главное меню
 
+void drawMainMenu() {
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
-    ssd1306_Fill(Black);
-    //ssd1306_DrawRectangle(1, 1, 127, 63, White);
-    //udpateDisplay();
-#define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 5+4)
+    int8_t  next_item_menu = 0;
     while(exit){ // Вывод главного меню
         ssd1306_Fill(Black);
-        //ssd1306_DrawRectangle(1, 1, 127, 63, White);
-        // Вроде должны нарисовать линию под словом меню 7 и 120 просто MN
+        // Рисует линию под словом меню 7 и 120 просто MN
         ssd1306_Line(7, LST_MENU_POINT, 120, LST_MENU_POINT, White);
-        udpateDisplay();
     	if(current_item_menu >= MENU_ITEMS_COUNT )
 			current_item_menu = 0;
     	if(current_item_menu < 0 )
     	    current_item_menu = MENU_ITEMS_COUNT-1;
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y+6);
+    	next_item_menu = current_item_menu + 1;
+    	if(next_item_menu >= MENU_ITEMS_COUNT )
+    		next_item_menu = 0;
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y+6); // 6 + 18 = 24 ( последний пиксель)
     		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5+6);
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
     		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
+        ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
+        	ssd1306_WriteString(">", Font_11x18, White);
+        ssd1306_SetCursor(114, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
+            ssd1306_WriteString("<", Font_11x18, White);
+        ssd1306_SetCursor(START_POS_X, START_POS_Y + 2 * SIZE_FONT_Y + 6 + 2 + 2); // 18 + 18 = 46
+        	ssd1306_WriteString(menuItems[next_item_menu], Font_11x18, White);
     	udpateDisplay();
-    	HAL_Delay(150);
+    	HAL_Delay(50);
     	buttonEnReset();
         buttonLongReset();
         encoderReset();
-
     	while(1){
-    		HAL_Delay(100);
+    		HAL_Delay(10); // Даёт время для других задач
+    		if(buttonLong()){
+    		// Вернуться на стартовый дисплей
+    			exit = 0;
+    			break;
+    		}
+
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
     			exit = 0;
     			break;
     		}
     		if(buttonEn()){// если нажали ввод переходим в подменю
-    			HAL_Delay(600);
-        		if(buttonLong()){ // если нажата кнопка подтверждения ждем что это не выход
-        			// Вернуться на стартовый дисплей
-        			exit = 0;
-        			break;
-        		}
     		    switch(current_item_menu){
     		    	case 0: drawButtonMenu();	break;
     		    	case 1: drawLEDMenu(); 		break;

@@ -17,6 +17,7 @@ void trueButtonEB();
 void trueButtonEP();
 void trueButtonEM();
 
+
 void longButton();
 void StartSensOutTask(void *argument);
 void calcDeltaAngle(uint16_t*);

@@ -161,7 +161,7 @@ int main(void)
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
   //osMutexRelease (BlockI2CHandle);
 
-  HAL_Delay(1000);
+  //HAL_Delay(1000);
 
   //EPD_HW_Init(); //Electronic paper initialization
   //EPD_WhiteScreen_ALL(gqImage_R,gqImage_R); //Refresh the picture in full screen
@@ -458,7 +458,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : PB3_LB_Pin PB4_EB_Pin PB5_EP_Pin PB8_EM_Pin */
   GPIO_InitStruct.Pin = PB3_LB_Pin|PB4_EB_Pin|PB5_EP_Pin|PB8_EM_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
