@@ -11,6 +11,10 @@ uint8_t command_CMD[10] = {0};
 uint8_t test_data = 0;
 int16_t arr_delta_angle[MAX_DELTA];
 uint8_t counter = 0;
+uint8_t countLB = 0;
+uint8_t countEB = 0;
+uint8_t countEP = 0;
+uint8_t countEM = 0;
 
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 extern uint16_t current_angle;
@@ -39,11 +43,69 @@ void StartSensOutTask(void *argument){
 		}
 		longButton();
 		calcDeltaAngle(arr_angle);
-		osDelay(300);
+		trueButtonLB();
+		trueButtonEB();
+		trueButtonEP();
+		trueButtonEM();
+		osDelay(200);
 	}
 }
 
+void trueButtonLB(){
+	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
+		if(pinState == GPIO_PIN_RESET){
+			countLB++;
+		}
+		else{
+			countLB = 0;
+		}
+		if(countLB > MAX_COUNT){
+			buttonLongSet();
+			countLB = 0;
+		}
+}
 
+void trueButtonEB(){
+	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);
+		if(pinState == GPIO_PIN_RESET){
+			countEB++;
+		}
+		else{
+			countEB = 0;
+		}
+		if(countEB > MAX_COUNT){
+			buttonEnSet();
+			countEB = 0;
+		}
+}
+
+void trueButtonEP(){
+	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
+		if(pinState == GPIO_PIN_RESET){
+			countEP++;
+		}
+		else{
+			countEP = 0;
+		}
+		if(countEP > MAX_COUNT){
+			encoderSetUp();
+			countEP = 0;
+		}
+}
+
+void trueButtonEM(){
+	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8);
+		if(pinState == GPIO_PIN_RESET){
+			countEM++;
+		}
+		else{
+			countEM = 0;
+		}
+		if(countEM > MAX_COUNT){
+			encoderSetDown();
+			countEM = 0;
+		}
+}
 
 void calcDeltaAngle(uint16_t* data){
 	int16_t deltaAngle = 0;

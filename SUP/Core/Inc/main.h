@@ -97,8 +97,8 @@ void Error_Handler(void);
 #define PB3_LB_GPIO_Port GPIOB
 #define PB4_EB_Pin GPIO_PIN_4
 #define PB4_EB_GPIO_Port GPIOB
-#define PB4_EP_Pin GPIO_PIN_5
-#define PB4_EP_GPIO_Port GPIOB
+#define PB5_EP_Pin GPIO_PIN_5
+#define PB5_EP_GPIO_Port GPIOB
 #define PB8_EM_Pin GPIO_PIN_8
 #define PB8_EM_GPIO_Port GPIOB
 

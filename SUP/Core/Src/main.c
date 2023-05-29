@@ -455,8 +455,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(EXT_button_on_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB3_LB_Pin PB4_EB_Pin PB4_EP_Pin PB8_EM_Pin */
-  GPIO_InitStruct.Pin = PB3_LB_Pin|PB4_EB_Pin|PB4_EP_Pin|PB8_EM_Pin;
+  /*Configure GPIO pins : PB3_LB_Pin PB4_EB_Pin PB5_EP_Pin PB8_EM_Pin */
+  GPIO_InitStruct.Pin = PB3_LB_Pin|PB4_EB_Pin|PB5_EP_Pin|PB8_EM_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -473,38 +473,6 @@ static void MX_GPIO_Init(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == EXT_button_on_Pin){
 			buttonEnSet();
-	}
-	if(GPIO_Pin == PB3_LB_Pin){
-		iterLB++;
-		HAL_Delay(300);
-		if(iterLB >= 3){
-			iterLB = 0;
-			buttonLongSet();
-		}
-	}
-	if(GPIO_Pin == PB4_EB_Pin){
-		iterEN++;
-		HAL_Delay(300);
-		if(iterEN >= 3){
-			iterEN = 0;
-			buttonEnSet();
-		}
-	}
-	if(GPIO_Pin == PB4_EP_Pin){
-		iterEP++;
-		HAL_Delay(300);
-		if(iterEP >= 3){
-			iterEP = 0;
-			encoderSetUp();
-		}
-	}
-	if(GPIO_Pin == PB8_EM_Pin){
-		iterEM++;
-		HAL_Delay(300);
-		if(iterEM >= 3){
-			iterEM = 0;
-			encoderSetDown();
-		}
 	}
 }
 
