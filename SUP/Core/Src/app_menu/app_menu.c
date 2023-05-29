@@ -67,7 +67,7 @@ const char* menuADC[3] = {
 	"    ADC    "
 };
 
-#define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 6 + 2) // под надписью главное меню
+#define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 2 + 2) // под надписью главное меню
 
 void drawMainMenu() {
     uint8_t exit = 1;
@@ -76,7 +76,7 @@ void drawMainMenu() {
     while(exit){ // Вывод главного меню
         ssd1306_Fill(Black);
         // Рисует линию под словом меню 7 и 120 просто MN
-        ssd1306_Line(7, LST_MENU_POINT, 120, LST_MENU_POINT, White);
+        ssd1306_Line(7, 21, 120, 21, White);
     	if(current_item_menu >= MENU_ITEMS_COUNT )
 			current_item_menu = 0;
     	if(current_item_menu < 0 )
@@ -84,10 +84,11 @@ void drawMainMenu() {
     	next_item_menu = current_item_menu + 1;
     	if(next_item_menu >= MENU_ITEMS_COUNT )
     		next_item_menu = 0;
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y+6); // 6 + 18 = 24 ( последний пиксель)
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y+1); // 1 + 18 = 19 ( последний пиксель)
     		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5); // 26 + 18 = 44
     		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
+    	ssd1306_Line(7, 21, 120, 21, White);
         ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
         	ssd1306_WriteString(">", Font_11x18, White);
         ssd1306_SetCursor(114, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
