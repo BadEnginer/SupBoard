@@ -449,36 +449,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(EPD_Busy_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EXT_button_on_Pin PB4_EB_Pin PB4_EP_Pin PB8_EM_Pin */
-  GPIO_InitStruct.Pin = EXT_button_on_Pin|PB4_EB_Pin|PB4_EP_Pin|PB8_EM_Pin;
+  /*Configure GPIO pin : EXT_button_on_Pin */
+  GPIO_InitStruct.Pin = EXT_button_on_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(EXT_button_on_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB3_LB_Pin PB4_EB_Pin PB4_EP_Pin PB8_EM_Pin */
+  GPIO_InitStruct.Pin = PB3_LB_Pin|PB4_EB_Pin|PB4_EP_Pin|PB8_EM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB3_LB_Pin */
-  GPIO_InitStruct.Pin = PB3_LB_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(PB3_LB_GPIO_Port, &GPIO_InitStruct);
-
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI3_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI4_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
-
-uint8_t iterLB = 0; iterEN = 0, iterEP = 0, iterEM = 0;
 
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
