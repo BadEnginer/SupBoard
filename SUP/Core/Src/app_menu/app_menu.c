@@ -163,6 +163,7 @@ uint8_t start_callibr = 0;
 int16_t current_speed;
 int16_t current_current;
 int16_t current_current_raw;
+int16_t current_voltage_battery;
 int16_t set_zero = 0;
 int16_t dis_curretn;
 int8_t  mantisa = 0;
@@ -188,7 +189,6 @@ void startDisplay(){
 	 	char symSpeed[6];
 	 	char symCurrent[6];
 	 	char symVout[6];
-	 	float multi_speed = ADC_TO_V * V_TO_A;
 	 	HAL_Delay(500);
 		buttonLongReset();
 		buttonEnReset();
@@ -245,7 +245,8 @@ void startDisplay(){
 	 		if(start_callibr >= MAX_CALIBR)
 	 			calibr = ON;
 	 		//current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
-	 		current_current_raw = getAverADC(data_ch[2]);
+	 		current_current_raw = 		getAverADC(data_ch[2]);
+	 		current_voltage_battery = 	10*(getAverADC(data_ch[3]) * ADC_TO_V);
 	 		current_current = 1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
 
 	 		if(calibr == ON){
@@ -255,7 +256,7 @@ void startDisplay(){
 	 		current_current -= set_zero;
 	 		mantisa = abs((current_current%1000)/100);
 	 		expter = abs((current_current/1000));
-	 		current_Vout = getAverADC(data_ch[1]) * ADC_TO_V;
+	 		current_Vout = current_voltage_battery;//getAverADC(data_ch[1]) * ADC_TO_V;
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
 	 			ssd1306_WriteString("       ", Font_11x18, White);
