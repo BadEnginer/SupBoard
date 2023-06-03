@@ -36,6 +36,110 @@
 s_devise_i2c_tree devise_i2c_tree;
 uint8_t global_color;
 uint16_t global_DAC;
+typedef enum{
+	LOAD,
+	START,
+	MAIN_CONFIG,
+	LED_CONFIG,
+	BUTTON_CONFIG,
+	ADC_CONFIG,
+	DAC_CONFIG,
+	SYSTEM_CONFIG,
+	ERROR_STATE,
+} eDisplayState;
+
+typedef enum eStateButton{
+	BUTTON_ON,
+	BUTTON_OFF
+} StateButton;
+
+typedef struct{
+	StateButton ButtonEN;
+	StateButton ButtonBACK;
+	StateButton EncoderPLUS;
+	StateButton EncoderMINUS;
+} sButtonData;
+
+typedef enum{
+	DEVICE_NO_ANSWER,
+	DEVICE_NO_INIT,
+	DEVICE_READY
+} eDeviceState;
+
+typedef struct{
+	float current_voltage;
+	float set_voltage;
+	float calc_voltage;
+	uint16_t stop_cod;
+	uint16_t current_code;
+	uint8_t i2c_addres;
+	eDeviceState readyDAC;
+} sDacData;
+
+typedef struct{
+	eDeviceState readyADC;
+	uint8_t i2c_addres;
+	float chanel_1_voltage;
+	float chanel_2_voltage;
+	float chanel_3_voltage;
+	float chanel_4_voltage;
+} sAdcData;
+
+typedef struct{
+
+} sLED_STATE;
+
+typedef struct {
+	uint8_t dum:3;
+	uint8_t MH:1; // Magnit too strong
+	uint8_t ML:1; // Magnit too weak
+	uint8_t MD:1; // Magnit detected
+	uint8_t num:2;
+} sEncoderState;
+
+typedef union{
+	sEncoderState EncoderState;
+	uint8_t rawAngle;
+}uEncoderState;
+
+typedef struct{
+	uEncoderState EncoderState;
+	uint16_t curretn_raw_angle;
+} sMagnitEncoderData;
+
+typedef enum {
+	MAGNIT_NO_DETECT,
+	MAGNIT_TOO_STRONG,
+	MAGNIT_TOO_WEAK
+}eErrorEncoder;
+
+typedef struct{
+	uint8_t error_mismatch; // когда код управления 0 а ток не 0
+	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
+	eErrorEncoder error_encoder;
+	uint8_t error_DAC;
+	uint8_t error_ADC;
+	uint8_t error_LED;
+}sErrorState;
+
+typedef struct{
+	eDeviceState motorState;
+	float current;
+	float control_voltage;
+	int8_t current_speed;
+} sMotorData;
+
+typedef struct{
+	eDisplayState DisplayState;
+	sButtonData ButtonsData;
+	sMotorData MotorData;
+	sErrorState ErrorState;
+	sMagnitEncoderData MagnitEncoderData;
+	sAdcData AdcData;
+	sDacData DacData;
+} sSystemState;
+
+sSystemState SystemState;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -96,7 +200,6 @@ void StartInitTask(void *argument);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

@@ -5,10 +5,10 @@
 #include "stm32f4xx_hal.h"
 #include "ADC_out/ADS1115.h"
 #define ADS1115_ADR 72
-#define ADC_CHANEL_1 0
-#define ADC_CHANEL_2 1
-#define ADC_CHANEL_3 2
-#define ADC_CHANEL_4 3
+#define ADC_CHANEL_1 0 // Test ADC GDN
+#define ADC_CHANEL_2 1 // DAC
+#define ADC_CHANEL_3 2 // Current
+#define ADC_CHANEL_4 3 // Voltage
 #define SIZE_ADC_BUFF 30
 #define NUM_ADC_CH 4
 #define NUM_ADC 16
