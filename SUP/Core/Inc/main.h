@@ -62,9 +62,129 @@ typedef struct {
 	uint8_t unknown_dev:4;
 }s_devise_i2c_tree;
 
-uint8_t test_i2c_dev();
+void test_i2c_dev();
+
+typedef enum{
+	DEVICE_NO_INIT,
+	DEVICE_NO_ANSWER,
+	DEVICE_READY
+} eDeviceState;
+
+typedef enum{
+	UNKNOWN_PLACE,
+	LOAD,
+	START,
+	MAIN_CONFIG,
+	LED_CONFIG,
+	BUTTON_CONFIG,
+	ADC_CONFIG,
+	DAC_CONFIG,
+	SYSTEM_CONFIG,
+	ERROR_STATE,
+} eDisplayState;
+
+typedef struct{
+eDisplayState state;
+uint8_t i2c_addres;
+eDeviceState readyDISPLAY;
+} sDisplayState;
+
+typedef enum eStateButton{
+	BUTTON_ON,
+	BUTTON_OFF
+} StateButton;
+
+typedef struct{
+	StateButton ButtonEN;
+	StateButton ButtonBACK;
+	StateButton EncoderPLUS;
+	StateButton EncoderMINUS;
+} sButtonData;
 
 
+
+typedef struct{
+	float current_voltage;
+	float set_voltage;
+	float calc_voltage;
+	uint16_t stop_cod;
+	uint16_t current_code;
+	uint8_t i2c_addres;
+	eDeviceState readyDAC;
+} sDacData;
+
+typedef struct{
+	eDeviceState readyADC;
+	uint8_t i2c_addres;
+	float chanel_0_voltage;
+	float chanel_1_voltage;
+	float chanel_2_voltage;
+	float chanel_3_voltage;
+} sAdcData;
+
+typedef struct{
+
+} sLED_STATE;
+
+typedef struct {
+	uint8_t dum:3;
+	uint8_t MH:1; // Magnit too strong
+	uint8_t ML:1; // Magnit too weak
+	uint8_t MD:1; // Magnit detected
+	uint8_t num:2;
+} sEncoderState;
+
+typedef union{
+	sEncoderState EncoderState;
+	uint8_t hallState;
+}uEncoderState;
+
+typedef struct{
+	uEncoderState EncoderState;
+	uint16_t curretn_raw_angle;
+	eDeviceState readyENCODER;
+	uint8_t i2c_adres;
+} sMagnitEncoderData;
+
+typedef enum {
+	DEVISE_NO_ANSWER,
+	DEVISE_WORK,
+	MAGNIT_NO_DETECT,
+	MAGNIT_TOO_STRONG,
+	MAGNIT_TOO_WEAK
+}eErrorEncoder;
+
+typedef enum {
+	DEVISE_OK,
+	DEVISE_ERROR
+} eStandartError;
+
+typedef struct{
+	uint8_t error_mismatch_current; // когда код управления 0 а ток не 0
+	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
+	eErrorEncoder error_encoder;
+	eStandartError error_DISPLAY;
+	eStandartError error_DAC;
+	eStandartError error_ADC;
+	eStandartError error_LED;
+}sErrorState;
+
+typedef struct{
+	eDeviceState motorState;
+	float current;
+	float control_voltage;
+	int8_t current_speed;
+} sMotorData;
+
+typedef struct{
+	sDisplayState DisplayState;
+	sButtonData ButtonsData;
+	sMotorData MotorData;
+	sErrorState ErrorState;
+	sMagnitEncoderData MagnitEncoderData;
+	sAdcData AdcData;
+	sDacData DacData;
+} sSystemState;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

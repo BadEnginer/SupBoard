@@ -12,9 +12,12 @@
 #define SIZE_ADC_BUFF 30
 #define NUM_ADC_CH 4
 #define NUM_ADC 16
+#define MAX_ADC_RANGE_FLOTA (4.096 * 2)
 #define MAX_ADC_RANGE (4096 * 2) // Расчёт для режима 4 вольта
 #define MAX_DATA_ADC 65536.0
-#define ADC_TO_V (MAX_ADC_RANGE/MAX_DATA_ADC)
+#define ADC_TO_V    	 (MAX_ADC_RANGE/MAX_DATA_ADC)
+#define ADC_TO_VOLTAGE_F (MAX_ADC_RANGE_FLOTA/MAX_DATA_ADC)
+
 #define MAX_CURRENT 70000.0F
 #define FULL_RANGE_CURRENT 1500.0
 #define V_TO_A (MAX_CURRENT/FULL_RANGE_CURRENT) // 21mV на 1 А
@@ -25,6 +28,7 @@ void initAllChanelADC();
 void initADC(ADS1115_Config_t*);
 void initChanelADC(ADS1115_Config_t*, MultiplexerConfig_t );
 uint16_t getEncoderData();
+int16_t getAverADC(int16_t* data);
 
 typedef struct {
 	uint8_t dum:3;

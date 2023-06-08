@@ -1,6 +1,7 @@
 #include "tasks/ReadData.h"
 
 
+extern sSystemState SystemState;
 extern osMutexId_t BlockI2CHandle; //Блокировка чтения i2c
 ADS1115_Config_t configChanel[4];
 ADS1115_Handle_t *pADS;
@@ -31,8 +32,13 @@ void StartReadDataTask(void *argument){
 			}
 		}
 		currentChanel++;
-		if(currentChanel > 3)
+		if(currentChanel > 3){
 			currentChanel = 0;
+			SystemState.AdcData.chanel_0_voltage = (getAverADC(data_ch[0])* ADC_TO_VOLTAGE_F);
+			SystemState.AdcData.chanel_1_voltage = (getAverADC(data_ch[1])* ADC_TO_VOLTAGE_F);
+			SystemState.AdcData.chanel_2_voltage = (getAverADC(data_ch[2])* ADC_TO_VOLTAGE_F);
+			SystemState.AdcData.chanel_3_voltage = (getAverADC(data_ch[3])* ADC_TO_VOLTAGE_F);
+		}
 		while(osMutexAcquire(BlockI2CHandle, 1000) != osOK){};
 			ADS1115_updateConfig(pADS, configChanel[currentChanel]);
 			osMutexRelease(BlockI2CHandle);// Освобождение мьютекса

@@ -33,113 +33,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-s_devise_i2c_tree devise_i2c_tree;
 uint8_t global_color;
 uint16_t global_DAC;
-typedef enum{
-	LOAD,
-	START,
-	MAIN_CONFIG,
-	LED_CONFIG,
-	BUTTON_CONFIG,
-	ADC_CONFIG,
-	DAC_CONFIG,
-	SYSTEM_CONFIG,
-	ERROR_STATE,
-} eDisplayState;
-
-typedef enum eStateButton{
-	BUTTON_ON,
-	BUTTON_OFF
-} StateButton;
-
-typedef struct{
-	StateButton ButtonEN;
-	StateButton ButtonBACK;
-	StateButton EncoderPLUS;
-	StateButton EncoderMINUS;
-} sButtonData;
-
-typedef enum{
-	DEVICE_NO_ANSWER,
-	DEVICE_NO_INIT,
-	DEVICE_READY
-} eDeviceState;
-
-typedef struct{
-	float current_voltage;
-	float set_voltage;
-	float calc_voltage;
-	uint16_t stop_cod;
-	uint16_t current_code;
-	uint8_t i2c_addres;
-	eDeviceState readyDAC;
-} sDacData;
-
-typedef struct{
-	eDeviceState readyADC;
-	uint8_t i2c_addres;
-	float chanel_1_voltage;
-	float chanel_2_voltage;
-	float chanel_3_voltage;
-	float chanel_4_voltage;
-} sAdcData;
-
-typedef struct{
-
-} sLED_STATE;
-
-typedef struct {
-	uint8_t dum:3;
-	uint8_t MH:1; // Magnit too strong
-	uint8_t ML:1; // Magnit too weak
-	uint8_t MD:1; // Magnit detected
-	uint8_t num:2;
-} sEncoderState;
-
-typedef union{
-	sEncoderState EncoderState;
-	uint8_t rawAngle;
-}uEncoderState;
-
-typedef struct{
-	uEncoderState EncoderState;
-	uint16_t curretn_raw_angle;
-} sMagnitEncoderData;
-
-typedef enum {
-	MAGNIT_NO_DETECT,
-	MAGNIT_TOO_STRONG,
-	MAGNIT_TOO_WEAK
-}eErrorEncoder;
-
-typedef struct{
-	uint8_t error_mismatch; // когда код управления 0 а ток не 0
-	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
-	eErrorEncoder error_encoder;
-	uint8_t error_DAC;
-	uint8_t error_ADC;
-	uint8_t error_LED;
-}sErrorState;
-
-typedef struct{
-	eDeviceState motorState;
-	float current;
-	float control_voltage;
-	int8_t current_speed;
-} sMotorData;
-
-typedef struct{
-	eDisplayState DisplayState;
-	sButtonData ButtonsData;
-	sMotorData MotorData;
-	sErrorState ErrorState;
-	sMagnitEncoderData MagnitEncoderData;
-	sAdcData AdcData;
-	sDacData DacData;
-} sSystemState;
-
-sSystemState SystemState;
+sSystemState SystemState = {};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -227,38 +123,20 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
+
   ssd1306_Init();
-  if(devise_i2c_tree.unknown_dev > 0){
-	  ssd1306_SetCursor(2, 2);
-  	  ssd1306_WriteString("Unknown I2C", Font_11x18, White);
-  }
-  if(devise_i2c_tree.DAC_dev == ON){
-	  ssd1306_SetCursor(2, 22);
-  	  ssd1306_WriteString("DAC:On", Font_11x18, White);
-  }
-  if(devise_i2c_tree.ADC_dev == ON){
- 	  ssd1306_SetCursor(2+(11*7), 22);
-   	  ssd1306_WriteString("ADC:On", Font_11x18, White);
-   }
-  if(devise_i2c_tree.display_dev == ON){
- 	  ssd1306_SetCursor(2, 42);
-   	  ssd1306_WriteString("DIS:On", Font_11x18, White);
-   }
-  if(devise_i2c_tree.encoder_dev == ON){
- 	  ssd1306_SetCursor(2+(11*7), 42);
-   	  ssd1306_WriteString("ENC:On", Font_11x18, White);
-   }
+
+  ssd1306_Fill(Black);
   ssd1306_UpdateScreen();
+  errorOut();
+
   HAL_Delay(1000);
   ssd1306_Fill(Black);
+
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_SetCursor(3, 40);
-  if(devise_i2c_tree.encoder_dev == ON && devise_i2c_tree.display_dev == ON
-   &&devise_i2c_tree.ADC_dev == ON     && devise_i2c_tree.DAC_dev == ON)
-	  ssd1306_WriteString(" Tap Start ", Font_11x18, White);
-  else
-	  ssd1306_WriteString(" Error ", Font_11x18, White);
+  ssd1306_WriteString(" Tap Start ", Font_11x18, White);
   ssd1306_UpdateScreen();
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
@@ -305,6 +183,10 @@ int main(void)
   /* creation of InitTask */
   InitTaskHandle = osThreadNew(StartInitTask, NULL, &InitTask_attributes);
 
+  SystemState.AdcData.i2c_addres = ADC_ADRESS;
+  SystemState.DacData.i2c_addres = DAC_ADRESS;
+  SystemState.DisplayState.i2c_addres = DIS_ADRESS;
+  SystemState.MagnitEncoderData.i2c_adres = ENC_ADRESS;
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   initUserTasks();
@@ -580,21 +462,81 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 }
 
 
-uint8_t test_i2c_dev(){
-	HAL_StatusTypeDef stateI2c;
+void test_i2c_dev(){
+	HAL_StatusTypeDef stateI2cADC;
+	HAL_StatusTypeDef stateI2cDAC;
+	HAL_StatusTypeDef stateI2cENC;
+	HAL_StatusTypeDef stateI2cDIS;
 	  // Подсчёт устройств в сети I2C 60-display, 72-ацп, 54-encoder, 96 -dac/
-	  for(uint8_t i = 1; i < 127 ; i++){
-		  stateI2c = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 10);
-		  if(stateI2c == HAL_OK){
-			  switch ( i ) {
-			  	  case ENC_ADRESS: devise_i2c_tree.encoder_dev = ON; break;
-			  	  case DIS_ADRESS: devise_i2c_tree.display_dev = ON; break;
-			  	  case ADC_ADRESS: devise_i2c_tree.ADC_dev 	   = ON; break;
-			  	  case DAC_ADRESS: devise_i2c_tree.DAC_dev 	   = ON; break;
-			      default: devise_i2c_tree.unknown_dev++;
-			      }
-		  }
-	  }
+    if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
+    	stateI2cENC = HAL_I2C_IsDeviceReady(&hi2c1, (54 << 1), 2, 5);
+		stateI2cDIS = HAL_I2C_IsDeviceReady(&hi2c1, (60 << 1), 2, 5);
+		stateI2cADC = HAL_I2C_IsDeviceReady(&hi2c1, (72 << 1), 2, 5);
+		stateI2cDAC = HAL_I2C_IsDeviceReady(&hi2c1, (96 << 1), 2, 5);
+		osMutexRelease(BlockI2CHandle);
+		if(stateI2cENC == HAL_OK){
+			SystemState.MagnitEncoderData.readyENCODER = DEVICE_READY;
+			SystemState.ErrorState.error_encoder = DEVISE_WORK;
+		}
+		else {
+			SystemState.MagnitEncoderData.readyENCODER = DEVICE_NO_ANSWER;
+			SystemState.ErrorState.error_encoder = DEVISE_NO_ANSWER;
+		}
+		if(stateI2cADC == HAL_OK){
+			SystemState.AdcData.readyADC = DEVICE_READY;
+			SystemState.ErrorState.error_ADC = DEVISE_OK;
+		}
+		else {
+			SystemState.AdcData.readyADC = DEVICE_NO_ANSWER;
+			SystemState.ErrorState.error_ADC = DEVISE_ERROR;
+		}
+
+		if(stateI2cDAC == HAL_OK){
+			SystemState.DacData.readyDAC = DEVICE_READY;
+			SystemState.ErrorState.error_DAC = DEVISE_OK;
+		}
+		else {
+			SystemState.DacData.readyDAC = DEVICE_NO_ANSWER;
+			SystemState.ErrorState.error_DAC = DEVISE_ERROR;
+		}
+
+		if(stateI2cDIS == HAL_OK){
+			SystemState.DisplayState.readyDISPLAY = DEVICE_READY;
+			SystemState.ErrorState.error_DISPLAY = DEVISE_OK;
+		}
+		else {
+			SystemState.DisplayState.readyDISPLAY = DEVICE_NO_ANSWER;
+			SystemState.ErrorState.error_DISPLAY = DEVISE_NO_ANSWER;
+		}
+    }
+}
+
+void errorOut(){
+	  ssd1306_Fill(Black);
+	  ssd1306_SetCursor(2, 22);
+	  if(SystemState.DacData.readyDAC == DEVICE_READY)
+		  ssd1306_WriteString("DAC:On", Font_11x18, White);
+	  else
+		  ssd1306_WriteString("DAC:Er", Font_11x18, White);
+
+	  ssd1306_SetCursor(2+(11*7), 22);
+	  if(SystemState.AdcData.readyADC == DEVICE_READY)
+		  ssd1306_WriteString("ADC:On", Font_11x18, White);
+	  else
+		  ssd1306_WriteString("ADC:Er", Font_11x18, White);
+
+	  ssd1306_SetCursor(2, 42);
+	  if(SystemState.DisplayState.readyDISPLAY == DEVICE_READY)
+		  ssd1306_WriteString("DIS:On", Font_11x18, White);
+	  else
+		  ssd1306_WriteString("DIS:Er", Font_11x18, White);
+
+	  ssd1306_SetCursor(2+(11*7), 42);
+	  if(SystemState.MagnitEncoderData.readyENCODER == DEVICE_READY)
+		  ssd1306_WriteString("ENC:On", Font_11x18, White);
+	  else
+		  ssd1306_WriteString("ENC:Er", Font_11x18, White);
+	  ssd1306_UpdateScreen();
   }
 /* USER CODE END 4 */
 
@@ -613,7 +555,8 @@ void StartInitTask(void *argument)
   /* Infinite loop */
 	  for(;;)
 	  {
-	    osDelay(10);
+	    osDelay(1000);
+	    test_i2c_dev();
 	  }
   /* USER CODE END 5 */
 }
