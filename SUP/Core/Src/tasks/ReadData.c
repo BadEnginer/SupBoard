@@ -59,9 +59,10 @@ u_magnituda magnituda;
 
 uint16_t raw_angle = 0;
 uint16_t getEncoderData(){
-	magnituda.data = AS5600_GetStatus();
-	if(magnituda.state_magnit.MD == ON)
+	SystemState.MagnitEncoderData.EncoderState.u8MagnitState = AS5600_GetStatus();
+	if(SystemState.MagnitEncoderData.EncoderState.sMagnitState.MD == ON)
 		raw_angle = AS5600_GetRawAngle();
+	SystemState.MagnitEncoderData.curretn_raw_angle = raw_angle;
 	return 	raw_angle;
 }
 

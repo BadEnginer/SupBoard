@@ -47,7 +47,7 @@ void StartSensOutTask(void *argument){
 		trueButtonEB();
 		trueButtonEP();
 		trueButtonEM();
-		osDelay(200);
+		osDelay(100);
 	}
 }
 
