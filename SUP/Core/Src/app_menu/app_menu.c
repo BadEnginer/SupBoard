@@ -2,6 +2,7 @@
 
 osStatus_t statusMutex;
 
+extern sSystemState SystemState;
 int currentMenuItem = 0;
 static uint8_t buttonUpper = 0;  	// Кнопка вверх нажата 1
 static uint8_t buttonEnable = 0; 	// Кнопка ввода нажата 1
@@ -430,9 +431,12 @@ uint8_t buttonEn(){
 	return buttonEnable;
 }
 void buttonEnSet(){
+	SystemState.ButtonsData.ButtonEN= BUTTON_ON;
+	SystemState.ButtonsData.ButtonENCounter++;
 	buttonEnable = 1;
 }
 void buttonEnReset(){
+	SystemState.ButtonsData.ButtonEN= BUTTON_OFF;
 	buttonEnable = 0;
 }
 
@@ -451,9 +455,12 @@ uint8_t buttonLong(){
 	return button_long;
 }
 void buttonLongSet(){
+	SystemState.ButtonsData.ButtonBACK = BUTTON_ON;
+	SystemState.ButtonsData.ButtonBACKCounter++;
 	button_long = 1;
 }
 void buttonLongReset(){
+	SystemState.ButtonsData.ButtonBACK = BUTTON_OFF;
 	button_long = 0;
 }
 
@@ -461,14 +468,20 @@ int8_t encoderData(){
 	return encoderAS56;
 }
 void encoderSetUp(){
+	SystemState.ButtonsData.EncoderPLUS = BUTTON_ON;
+	SystemState.ButtonsData.EncoderPLUSCounter++;
 	encoderAS56 = 1;
 }
 
 void encoderSetDown(){
+	SystemState.ButtonsData.EncoderMINUS = BUTTON_ON;
+	SystemState.ButtonsData.EncoderMINUSCounter++;
 	encoderAS56 = -1;
 }
 
 void encoderReset(){
+	SystemState.ButtonsData.EncoderMINUS = BUTTON_OFF;
+	SystemState.ButtonsData.EncoderPLUS = BUTTON_OFF;
 	encoderAS56 = 0;
 }
 extern uint16_t global_DAC;
