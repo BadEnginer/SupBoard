@@ -90,15 +90,19 @@ eDeviceState readyDISPLAY;
 } sDisplayState;
 
 typedef enum eStateButton{
-	BUTTON_ON,
-	BUTTON_OFF
+	BUTTON_OFF,
+	BUTTON_ON
 } StateButton;
 
 typedef struct{
 	StateButton ButtonEN;
+		uint8_t ButtonENCounter;
 	StateButton ButtonBACK;
+		uint8_t ButtonBACKCounter;
 	StateButton EncoderPLUS;
+		uint8_t EncoderPLUSCounter;
 	StateButton EncoderMINUS;
+		uint8_t EncoderMINUSCounter;
 } sButtonData;
 
 
@@ -128,15 +132,15 @@ typedef struct{
 
 typedef struct {
 	uint8_t dum:3;
-	uint8_t MH:1; // Magnit too strong
-	uint8_t ML:1; // Magnit too weak
-	uint8_t MD:1; // Magnit detected
+	uint8_t MH: 1; // Magnit too strong
+	uint8_t ML: 1; // Magnit too weak
+	uint8_t MD: 1; // Magnit detected
 	uint8_t num:2;
 } sEncoderState;
 
 typedef union{
-	sEncoderState EncoderState;
-	uint8_t hallState;
+	sEncoderState sMagnitState;
+	uint8_t u8MagnitState;
 }uEncoderState;
 
 typedef struct{
