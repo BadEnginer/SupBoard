@@ -71,6 +71,7 @@ const char* menuADC[3] = {
 #define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 2 + 2) // под надписью главное меню
 
 void drawMainMenu() {
+	SystemState.DisplayState.state = MAIN_CONFIG;
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
     int8_t  next_item_menu = 0;
@@ -125,6 +126,7 @@ void drawMainMenu() {
     		    	case 6: drawSettinMenu();	break;
     		    	default: current_item_menu = 0;
     		    }
+    		    SystemState.DisplayState.state = MAIN_CONFIG;
                 buttonEnReset();
                 buttonLongReset();
                 encoderReset();
@@ -142,7 +144,7 @@ void drawMainMenu() {
     		}
     	}
     }
-
+    SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 
 extern osMutexId_t BlockI2CHandle;
@@ -157,8 +159,8 @@ void udpateDisplay(){
 
 
 int8_t speed = 0;
-extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
-extern uint16_t global_DAC;
+//extern int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF];
+extern sSystemState SystemState;
 uint8_t start_callibr = 0;
 #define MAX_CALIBR 50
 int16_t current_speed;
@@ -174,6 +176,7 @@ int16_t current_Vout;
 uint16_t deadArea = 0;
 extern int16_t delta_encoder;
 void startDisplay(){
+	SystemState.DisplayState.state = START;
 	// todo сделать отдельную функцию для упрощения
 	    ssd1306_Fill(Black);
 	    ssd1306_Line(0, 1, 128, 1, White);
@@ -197,7 +200,7 @@ void startDisplay(){
 	 	while(1){
 	 		HAL_Delay(100);
 	 		if(buttonEn()){
-	 			//buttonEnReset();
+	 			buttonEnReset();
 	 			break;
 	 		}
 	 		if(encoderData() > 0){
@@ -216,11 +219,7 @@ void startDisplay(){
 	 			speed = 0;
 	 			buttonLongReset();
 	 		}
-	 		if(speed != 0)
-	 			deadArea = 400;
-	 		else
-	 			deadArea = 0;
-	 		global_DAC = STOP_MOTOR + (SPEED_STEP*speed) + deadArea;
+	 		SystemState.MotorData.current_speed = speed;
 
 	 		itoa(current_speed, symSpeed  , 	10);
 	 		itoa(mantisa,       symCurrent+3, 	10);
@@ -246,8 +245,8 @@ void startDisplay(){
 	 		if(start_callibr >= MAX_CALIBR)
 	 			calibr = ON;
 	 		//current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
-	 		current_current_raw = 		getAverADC(data_ch[2]);
-	 		current_voltage_battery = 	10*(getAverADC(data_ch[3]) * ADC_TO_V);
+	 		current_current_raw 	= 	SystemState.AdcData.chanel_2_voltage * 1000;//getAverADC(data_ch[2]);
+	 		current_voltage_battery = 	SystemState.AdcData.chanel_3_voltage * 1000;
 	 		current_current = 1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
 
 	 		if(calibr == ON){
@@ -275,11 +274,13 @@ void startDisplay(){
 	 			ssd1306_WriteString(symVout, Font_11x18, White);
 	 		udpateDisplay();
 	 	}
+	 	SystemState.DisplayState.state = UNKNOWN_PLACE;
   }
 
 
 // Тестовая функция для проверки кнопок  готова
 void drawButtonMenu(){
+	SystemState.DisplayState.state = BUTTON_CONFIG;
 	uint8_t butEn = 0;
 	uint8_t butLo = 0;
 	uint8_t encodP = 0;
@@ -343,6 +344,7 @@ void drawButtonMenu(){
 		if(butLo > 2)
 			break;
 	}
+	SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 
 void drawLEDMenu(){
@@ -355,6 +357,7 @@ void drawE_inkMenu(){
 }
 
 void drawADCMenu(){
+	SystemState.DisplayState.state = ADC_CONFIG;
 	uint8_t ch0 = 0;
 	uint8_t ch1 = 0;
 	uint8_t ch2 = 0;
@@ -382,10 +385,10 @@ void drawADCMenu(){
 	buttonLongReset();
 	encoderReset();
 	while(1){
-		ch0 = ((getAverADC(data_ch[0])) * ADC_TO_V)/10;
-		ch1 = ((getAverADC(data_ch[1])) * ADC_TO_V)/10;
-		ch2 = ((getAverADC(data_ch[2])) * ADC_TO_V)/10;
-		ch3 = ((getAverADC(data_ch[3])) * ADC_TO_V)/10;
+		ch0 = (SystemState.AdcData.chanel_0_voltage * 1000);
+		ch1 = (SystemState.AdcData.chanel_1_voltage * 1000);
+		ch2 = (SystemState.AdcData.chanel_2_voltage * 1000);
+		ch3 = (SystemState.AdcData.chanel_3_voltage * 1000);
 		itoa(ch0, sym_ch0, 10);
 		itoa(ch1, sym_ch1, 10);
 		itoa(ch2, sym_ch2, 10);
@@ -405,12 +408,12 @@ void drawADCMenu(){
 		}
 		HAL_Delay(50);
 	}
+	SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 void drawEncodMenu(){
 	uint8_t exit = 0;
 }
 void drawDACMenu(){
-
 	uint8_t exit = 0;
 }
 void drawSettinMenu(){
@@ -484,6 +487,5 @@ void encoderReset(){
 	SystemState.ButtonsData.EncoderPLUS = BUTTON_OFF;
 	encoderAS56 = 0;
 }
-extern uint16_t global_DAC;
 
 
