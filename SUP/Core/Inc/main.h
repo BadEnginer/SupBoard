@@ -74,6 +74,7 @@ typedef enum{
 	UNKNOWN_PLACE,
 	LOAD,
 	START,
+	MAIN_MENU,
 	MAIN_CONFIG,
 	LED_CONFIG,
 	BUTTON_CONFIG,
@@ -160,7 +161,8 @@ typedef enum {
 
 typedef enum {
 	DEVISE_OK,
-	DEVISE_ERROR
+	DEVISE_ERROR,
+	DEVISE_FATAL_ERROR
 } eStandartError;
 
 typedef struct{
@@ -171,6 +173,7 @@ typedef struct{
 	eStandartError error_DAC;
 	eStandartError error_ADC;
 	eStandartError error_LED;
+	eStandartError error_Motor;
 }sErrorState;
 
 typedef struct{
