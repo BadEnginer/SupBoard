@@ -14,13 +14,14 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
+
+
 #define STOP_MOTOR 1600
 #define MAX_FORVARD_SPEED 3000
 #define MAX_BACK_SPEED 200
 #define KOEFF_K_SLOW 0.1
 
-uint16_t expFiltrDAC(uint16_t newVal, float k);
+float expFiltrDAC(float newVal, float k);
 void StartMotorControlTask(void *argument);
-
 
 #endif /* INC_TASKS_MOTORCONTROL_H_ */
