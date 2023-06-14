@@ -33,8 +33,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-uint8_t global_color;
-uint16_t global_DAC;
+//uint16_t global_DAC;
 sSystemState SystemState = {};
 /* USER CODE END PTD */
 
