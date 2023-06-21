@@ -54,7 +54,7 @@ void drawEncodMenu();
 void drawDACMenu();
 void drawSettinMenu();
 void drawButtonMenu();
-
+void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, int8_t offset);
 void udpateDisplay();
 
 
