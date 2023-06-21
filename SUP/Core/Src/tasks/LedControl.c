@@ -8,28 +8,60 @@ extern int8_t speed;
 //сложная фигня получается функции говорится сколько светодиодов горит и с какой яркостью горит последний остальные обнуляем
 
 
+void setAllColor(uint8_t color,uint8_t bright, uint16_t delay){
+	for(uint8_t i = 0; i < MAX_LED; i++){ // Загрузка
+		switch(color){
+			case BLUE: 	  ARGB_SetRGB(i, 0, 0, bright); break;
+			case RED: 	  ARGB_SetRGB(i, bright, 0, 0); break;
+			case GREEN:   ARGB_SetRGB(i, 0, bright, 0); break;
+			case YELLOW:  ARGB_SetRGB(i, bright/2, bright/2, 0); break;
+			case MAGENTA: ARGB_SetRGB(i, bright/2, 0, bright/2); break;
+			case WHITE:   ARGB_SetRGB(i, bright/3, bright/3, bright/3); break;
+			case CYAN:    ARGB_SetRGB(i, 0, bright/2, bright/2); break;
+			default: 	  ARGB_SetRGB(i, bright/3, bright/3, bright/3);
+		}
+	if(delay > 0) HAL_Delay(delay);
+	}
+	while (ARGB_Show() != ARGB_OK);
+}
+
+void blink_led(uint8_t color,uint8_t times, uint8_t delay){
+	for(uint8_t i = 0; i < times; i++){
+		setAllColor(color, 255, 0);// Загрузка
+		HAL_Delay(delay);
+		ARGB_Clear();
+		while (ARGB_Show() != ARGB_OK);
+		HAL_Delay(delay);
+	}
+}
+
 void StartLedControlTask(void *argument){
+	uint8_t set_mode = 0;
 	ARGB_Init();  // Initialization
 	ARGB_Clear();
 	while (ARGB_Show() != ARGB_OK);
-	ARGB_SetBrightness(50);
+	ARGB_SetBrightness(80);
 	ARGB_Clear(); // Clear stirp
-	ARGB_SetRGB(0, 100, 0, 250);
-	while (ARGB_Show() != ARGB_OK);
-	HAL_Delay(3000);
-	SetZeroSpeed();
-	int8_t old_speed = 0;
-	for(;;){
-		if(old_speed != speed){ // если скорость изменится выполнить
-			ARGB_Clear(); // Clear stirp
-			SetColorSpeed(speed);
-			while (ARGB_Show() != ARGB_OK);
-			old_speed = speed;
-		}
-		HAL_Delay(200);
 
+	setAllColor(GREEN, 255, 300);// Загрузка
+	blink_led(GREEN, 3, 200);
+
+
+	for(;;){
+
+		HAL_Delay(200);
 	}
 }
+//SetZeroSpeed();
+//int8_t old_speed = 0;
+/*if(old_speed != speed){ // если скорость изменится выполнить
+	ARGB_Clear(); // Clear stirp
+	SetColorSpeed(speed);
+	while (ARGB_Show() != ARGB_OK);
+	old_speed = speed;
+}
+*/
+
 void SetZeroSpeed(){ // функция для установки нулевого значения сокрости
 	ARGB_Clear(); // Clear stirp
 	ARGB_SetRGB(0, 0, 255, 0);
