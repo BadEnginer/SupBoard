@@ -11,6 +11,7 @@
 #define ON 1
 #define MAX_DELTA (MAX_COUNTER_ANGLE-1)
 #define MAX_COUNT 2
+#define LONG_COUNT 15
 
 void trueButtonLB();
 void trueButtonEB();

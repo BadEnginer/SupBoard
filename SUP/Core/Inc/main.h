@@ -85,6 +85,7 @@ typedef enum{
 } eDisplayState;
 
 typedef struct{
+eDisplayState prevState;
 eDisplayState state;
 uint8_t i2c_addres;
 eDeviceState readyDISPLAY;
@@ -168,6 +169,7 @@ typedef enum {
 typedef struct{
 	uint8_t error_mismatch_current; // когда код управления 0 а ток не 0
 	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
+	uint8_t counterEncoderError;
 	eErrorEncoder error_encoder;
 	eStandartError error_DISPLAY;
 	eStandartError error_DAC;
@@ -192,6 +194,23 @@ typedef struct{
 	sAdcData AdcData;
 	sDacData DacData;
 } sSystemState;
+
+void ResetDacError(sSystemState* System);
+void ResetAdcError(sSystemState* System);
+void ResetLedError(sSystemState* System);
+void ResetMotorError(sSystemState* System);
+void ResetEncoderError(sSystemState* System);
+void ResetAllError(sSystemState* System);
+void ResetDisplayError(sSystemState* System);
+void SetMotorSpeed(sSystemState* System);
+
+float GetAdcDataVoltage(sSystemState* System, uint8_t channel_num);
+
+uint8_t GerError(sSystemState* System);
+uint8_t GetEncoderState(sSystemState* System);
+
+uint16_t GetAdcDataMiliVoltage(sSystemState* System, uint8_t channel_num);
+
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

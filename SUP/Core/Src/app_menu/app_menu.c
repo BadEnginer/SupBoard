@@ -70,15 +70,33 @@ const char* menuADC[3] = {
 
 #define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 2 + 2) // под надписью главное меню
 
+
+void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, int8_t offset){
+	ssd1306_SetCursor(START_POS_X, START_POS_Y+1); // 1 + 18 = 19 ( последний пиксель)
+		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5 - offset); // 26 + 18 = 44
+		ssd1306_WriteString(menuItems[menu_num_current], Font_11x18, White);
+	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
+		ssd1306_WriteString(">", Font_11x18, White);
+	ssd1306_SetCursor(114, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
+    	ssd1306_WriteString("<", Font_11x18, White);
+    if(offset == 0){
+    	ssd1306_SetCursor(START_POS_X, START_POS_Y + 2 * SIZE_FONT_Y + 6 + 2 + 2); // 18 + 18 = 46
+			ssd1306_WriteString(menuItems[menu_num_next], Font_11x18, White);
+    }
+}
+
 void drawMainMenu() {
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = MAIN_CONFIG;
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
     int8_t  next_item_menu = 0;
+    int8_t  znak = 0;
     while(exit){ // Вывод главного меню
         ssd1306_Fill(Black);
         // Рисует линию под словом меню 7 и 120 просто MN
-        ssd1306_Line(7, 21, 120, 21, White);
+
     	if(current_item_menu >= MENU_ITEMS_COUNT )
 			current_item_menu = 0;
     	if(current_item_menu < 0 )
@@ -86,19 +104,13 @@ void drawMainMenu() {
     	next_item_menu = current_item_menu + 1;
     	if(next_item_menu >= MENU_ITEMS_COUNT )
     		next_item_menu = 0;
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y+1); // 1 + 18 = 19 ( последний пиксель)
-    		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5); // 26 + 18 = 44
-    		ssd1306_WriteString(menuItems[current_item_menu], Font_11x18, White);
-    	ssd1306_Line(7, 21, 120, 21, White);
-        ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
-        	ssd1306_WriteString(">", Font_11x18, White);
-        ssd1306_SetCursor(114, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
-            ssd1306_WriteString("<", Font_11x18, White);
-        ssd1306_SetCursor(START_POS_X, START_POS_Y + 2 * SIZE_FONT_Y + 6 + 2 + 2); // 18 + 18 = 46
-        	ssd1306_WriteString(menuItems[next_item_menu], Font_11x18, White);
-    	udpateDisplay();
-    	HAL_Delay(50);
+    	for(uint8_t i = 18; i == 0; i++){
+    		drawCurrentMenu(current_item_menu, next_item_menu, i*znak);
+        	ssd1306_Line(7, 21, 120, 21, White);
+        	ssd1306_Line(7, 126, 120, 126, White);
+        	udpateDisplay();
+        	HAL_Delay(20);
+    	}
     	buttonEnReset();
         buttonLongReset();
         encoderReset();
@@ -126,6 +138,7 @@ void drawMainMenu() {
     		    	case 6: drawSettinMenu();	break;
     		    	default: current_item_menu = 0;
     		    }
+    		    SystemState.DisplayState.prevState = SystemState.DisplayState.state;
     		    SystemState.DisplayState.state = MAIN_CONFIG;
                 buttonEnReset();
                 buttonLongReset();
@@ -134,16 +147,19 @@ void drawMainMenu() {
     		}
     		if(encoderData() > 0){
     			current_item_menu++;
+    			znak = 1;
     			encoderReset();
     			break;
     		}
     		if(encoderData() < 0){
     			current_item_menu--;
+    			znak = -1;
     			encoderReset();
     			break;
     		}
     	}
     }
+    SystemState.DisplayState.prevState = SystemState.DisplayState.state;
     SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 
@@ -176,6 +192,7 @@ int16_t current_Vout;
 uint16_t deadArea = 0;
 extern int16_t delta_encoder;
 void startDisplay(){
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = START;
 	// todo сделать отдельную функцию для упрощения
 	    ssd1306_Fill(Black);
@@ -219,6 +236,7 @@ void startDisplay(){
 	 			speed = 0;
 	 			buttonLongReset();
 	 		}
+
 	 		SystemState.MotorData.current_speed = speed;
 
 	 		itoa(current_speed, symSpeed  , 	10);
@@ -274,12 +292,14 @@ void startDisplay(){
 	 			ssd1306_WriteString(symVout, Font_11x18, White);
 	 		udpateDisplay();
 	 	}
+	 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	 	SystemState.DisplayState.state = UNKNOWN_PLACE;
   }
 
 
 // Тестовая функция для проверки кнопок  готова
 void drawButtonMenu(){
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = BUTTON_CONFIG;
 	uint8_t butEn = 0;
 	uint8_t butLo = 0;
@@ -344,6 +364,7 @@ void drawButtonMenu(){
 		if(butLo > 2)
 			break;
 	}
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 
@@ -357,6 +378,7 @@ void drawE_inkMenu(){
 }
 
 void drawADCMenu(){
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = ADC_CONFIG;
 	uint8_t ch0 = 0;
 	uint8_t ch1 = 0;
@@ -408,6 +430,7 @@ void drawADCMenu(){
 		}
 		HAL_Delay(50);
 	}
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 void drawEncodMenu(){
