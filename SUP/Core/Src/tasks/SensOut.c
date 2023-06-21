@@ -35,7 +35,7 @@ void StartSensOutTask(void *argument){
 				case 4: encoderSetDown(); break;
 				case 5: calibr = ON;	  break;
 			}//todo добавить больше данных
-			test_data =command_CMD[0];
+			test_data = command_CMD[0];
 			command_CMD[0] = 0;
 		    itoa((test_data-48),symData+5,10);
 		    symData[7] = '\r';
@@ -81,28 +81,41 @@ void trueButtonEB(){
 
 void trueButtonEP(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
+	static uint8_t counterLong = OFF;
 		if(pinState == GPIO_PIN_RESET){
 			countEP++;
 		}
 		else{
 			countEP = 0;
+			counterLong = OFF;
 		}
-		if(countEP > MAX_COUNT){
+		if((countEP > MAX_COUNT) && (counterLong == OFF)){
 			encoderSetUp();
+			countEP = 0;
+		}
+		if((countEP > LONG_COUNT) && (counterLong == ON)){
+			encoderSetUp();// Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать увеличивать
 			countEP = 0;
 		}
 }
 
 void trueButtonEM(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8);
+	static uint8_t counterLong = OFF;
 		if(pinState == GPIO_PIN_RESET){
 			countEM++;
 		}
 		else{
 			countEM = 0;
+			counterLong = OFF;
 		}
-		if(countEM > MAX_COUNT){
+		if((countEM > MAX_COUNT) && (counterLong == OFF)){
+			counterLong = ON;
 			encoderSetDown();
+			countEM = 0;
+		}
+		if((countEM > LONG_COUNT) && (counterLong == ON)){
+			encoderSetDown(); // Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать уменьшать
 			countEM = 0;
 		}
 }
