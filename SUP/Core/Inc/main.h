@@ -82,6 +82,8 @@ typedef enum{
 	DAC_CONFIG,
 	SYSTEM_CONFIG,
 	ERROR_STATE,
+	ERROR_STATE_I2C,
+	WAIT_COMMAND
 } eDisplayState;
 
 typedef struct{
@@ -170,6 +172,7 @@ typedef struct{
 	uint8_t error_mismatch_current; // когда код управления 0 а ток не 0
 	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
 	uint8_t counterEncoderError;
+	uint8_t errorCounter;
 	eErrorEncoder error_encoder;
 	eStandartError error_DISPLAY;
 	eStandartError error_DAC;
@@ -203,7 +206,7 @@ void ResetEncoderError(sSystemState* System);
 void ResetAllError(sSystemState* System);
 void ResetDisplayError(sSystemState* System);
 void SetMotorSpeed(sSystemState* System);
-
+void OutputErrorI2C();
 float GetAdcDataVoltage(sSystemState* System, uint8_t channel_num);
 
 uint8_t GerError(sSystemState* System);

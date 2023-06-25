@@ -43,7 +43,7 @@ void setDAC(MCP4725 myMCP4725, float Vout){
 
 #define KOEFF_K_SLOW 0.1
 float expFiltrDAC(float newVal, float k) {
-	  static float filVal = STOP_MOTOR;
+	  static float filVal = 0;
 	  filVal += (newVal - filVal) * k;
 	  return filVal;
 }
