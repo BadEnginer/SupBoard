@@ -159,8 +159,6 @@ void drawMainMenu() {
     		}
     	}
     }
-    SystemState.DisplayState.prevState = SystemState.DisplayState.state;
-    SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 
 extern osMutexId_t BlockI2CHandle;
