@@ -82,8 +82,6 @@ typedef enum{
 	DAC_CONFIG,
 	SYSTEM_CONFIG,
 	ERROR_STATE,
-	ERROR_STATE_I2C,
-	WAIT_COMMAND
 } eDisplayState;
 
 typedef struct{
@@ -92,6 +90,7 @@ eDisplayState state;
 uint8_t i2c_addres;
 eDeviceState readyDISPLAY;
 } sDisplayState;
+
 
 typedef enum eStateButton{
 	BUTTON_OFF,
@@ -129,6 +128,19 @@ typedef struct{
 	float chanel_2_voltage;
 	float chanel_3_voltage;
 } sAdcData;
+
+typedef struct{
+	eDeviceState readyBattary;
+	uint8_t percentCharge;
+	uint8_t MaxCellVoltage;
+	uint8_t MinCellVoltage;
+	uint8_t numCell;
+	uint16_t voltage;
+	uint16_t current; // mA
+	uint16_t sumCharge;
+	uint16_t workTime;
+	uint16_t estimatedTime;
+} sBattaryData;
 
 typedef struct{
 
@@ -172,7 +184,6 @@ typedef struct{
 	uint8_t error_mismatch_current; // когда код управления 0 а ток не 0
 	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
 	uint8_t counterEncoderError;
-	uint8_t errorCounter;
 	eErrorEncoder error_encoder;
 	eStandartError error_DISPLAY;
 	eStandartError error_DAC;
@@ -186,9 +197,11 @@ typedef struct{
 	float current;
 	float control_voltage;
 	int8_t current_speed;
+	uint8_t max_speed;
 } sMotorData;
 
 typedef struct{
+	sBattaryData BattaryData;
 	sDisplayState DisplayState;
 	sButtonData ButtonsData;
 	sMotorData MotorData;
@@ -206,7 +219,7 @@ void ResetEncoderError(sSystemState* System);
 void ResetAllError(sSystemState* System);
 void ResetDisplayError(sSystemState* System);
 void SetMotorSpeed(sSystemState* System);
-void OutputErrorI2C();
+
 float GetAdcDataVoltage(sSystemState* System, uint8_t channel_num);
 
 uint8_t GerError(sSystemState* System);

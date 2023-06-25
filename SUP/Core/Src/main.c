@@ -121,11 +121,17 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  test_i2c_dev(); // Определяем что все устройства на линии i2c подключены
+
   ssd1306_Init();
+
   ssd1306_Fill(Black);
   ssd1306_UpdateScreen();
+  errorOut();
 
-  SystemState.DisplayState.state = LOAD;
+  HAL_Delay(1000);
+  ssd1306_Fill(Black);
+
   ssd1306_SetCursor(5, 10);
   ssd1306_WriteString("JetPro,Bro!", Font_11x18, White);
   ssd1306_SetCursor(3, 40);
@@ -474,7 +480,6 @@ void test_i2c_dev(){
 		else {
 			SystemState.MagnitEncoderData.readyENCODER = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_encoder = DEVISE_NO_ANSWER;
-			SystemState.ErrorState.errorCounter++;
 		}
 		if(stateI2cADC == HAL_OK){
 			SystemState.AdcData.readyADC = DEVICE_READY;
@@ -483,7 +488,6 @@ void test_i2c_dev(){
 		else {
 			SystemState.AdcData.readyADC = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_ADC = DEVISE_ERROR;
-			SystemState.ErrorState.errorCounter++;
 		}
 
 		if(stateI2cDAC == HAL_OK){
@@ -493,7 +497,6 @@ void test_i2c_dev(){
 		else {
 			SystemState.DacData.readyDAC = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_DAC = DEVISE_ERROR;
-			SystemState.ErrorState.errorCounter++;
 		}
 
 		if(stateI2cDIS == HAL_OK){
@@ -503,12 +506,11 @@ void test_i2c_dev(){
 		else {
 			SystemState.DisplayState.readyDISPLAY = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_DISPLAY = DEVISE_NO_ANSWER;
-			SystemState.ErrorState.errorCounter++;
 		}
     }
 }
 
-void OutputErrorI2C(){
+void errorOut(){
 	  ssd1306_Fill(Black);
 	  ssd1306_SetCursor(2, 22);
 	  if(SystemState.DacData.readyDAC == DEVICE_READY)
@@ -552,9 +554,8 @@ void StartInitTask(void *argument)
   /* Infinite loop */
 	  for(;;)
 	  {
-		test_i2c_dev();
 	    osDelay(1000);
-
+	    test_i2c_dev();
 	  }
   /* USER CODE END 5 */
 }

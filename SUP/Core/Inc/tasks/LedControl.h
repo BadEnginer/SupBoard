@@ -13,6 +13,12 @@
 #define CYAN 6
 #define MAX_LED 8
 
+#define START_LED_PLUS 4
+#define FINISH_LED_PLUS 7
+
+#define START_LED_MINUS 1
+#define FINISH_LED_MINUS 0
+
 #define PRE_FOR_ONE_LED (100/MAX_LED)
 #define MAX_BRIGHT 250
 #define STEP_BRIGHT (MAX_BRIGHT/PRE_FOR_ONE_LED)
