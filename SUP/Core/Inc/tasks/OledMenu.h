@@ -4,7 +4,6 @@
 
 #include "app_menu/app_menu.h"
 
-
 void StartOledMenuTask(void *argument);
 
 
