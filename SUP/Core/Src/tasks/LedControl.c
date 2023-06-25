@@ -40,27 +40,45 @@ void StartLedControlTask(void *argument){
 	ARGB_Init();  // Initialization
 	ARGB_Clear();
 	while (ARGB_Show() != ARGB_OK);
-	ARGB_SetBrightness(80);
+	ARGB_SetBrightness(100); // Максимальная яркость 255
 	ARGB_Clear(); // Clear stirp
 
 	setAllColor(GREEN, 255, 300);// Загрузка
 	blink_led(GREEN, 3, 200);
 
-
 	for(;;){
-
+		SetChargeLed(SystemState.BattaryData.percentCharge);
+		SetSpeedLed(SystemState.MotorData.current_speed);
 		HAL_Delay(200);
 	}
 }
-//SetZeroSpeed();
-//int8_t old_speed = 0;
-/*if(old_speed != speed){ // если скорость изменится выполнить
-	ARGB_Clear(); // Clear stirp
-	SetColorSpeed(speed);
-	while (ARGB_Show() != ARGB_OK);
-	old_speed = speed;
+
+void SetChargeLed(uint8_t charge_proc){
+
 }
-*/
+void SetSpeedLed(int8_t speed){
+	if(speed == 0){
+		SetSpeedLedPlus(0);
+		SetSpeedLedMinus(0);
+		return;
+	}
+	if(speed > 0){
+		SetSpeedLedPlus(speed);
+		SetSpeedLedMinus(0);
+		return;
+	}
+	if(speed < 0){
+		SetSpeedLedPlus(0);
+		SetSpeedLedMinus(speed);
+		return;
+	}
+}
+void SetSpeedLedPlus(int8_t speed){
+	SetColorSpeed(speed, SystemState.MotorData.max_speed, START_LED_PLUS, FINISH_LED_PLUS);
+}
+void SetSpeedLedMinus(speed){
+	SetColorSpeed(speed, SystemState.MotorData.max_speed, START_LED_MINUS, FINISH_LED_MINUS);
+}
 
 void SetZeroSpeed(){ // функция для установки нулевого значения сокрости
 	ARGB_Clear(); // Clear stirp
@@ -68,31 +86,46 @@ void SetZeroSpeed(){ // функция для установки нулевог�
 	while (ARGB_Show() != ARGB_OK);
 }
 
-void SetColorSpeed(int8_t currentSpeed){
-	uint8_t curretn_color = BLUE;
-	uint8_t percentSpeed = 0;
-	if(currentSpeed < 0)
-		curretn_color = YELLOW;
-	if(currentSpeed == 0){
-		SetZeroSpeed();
-		return;
+
+
+void SetColorSpeed(int8_t currentSpeed, uint8_t max_speed, uint8_t start, uint8_t finish ){
+	uint8_t curretn_color;
+	if(currentSpeed = 0)
+		curretn_color = WHITE;
+	if(currentSpeed > 0){
+		curretn_color = GREEN;
 	}
-	percentSpeed = ((abs(currentSpeed)) * 100.0)/MAX_SPEED;
+	else if(currentSpeed < 0){
+		curretn_color = BLUE;
+	}
+	percentSpeed = ((abs(currentSpeed)) * 100.0)/max_speed;
 	// Зажигает количество диодов пропорционалное скорости
-	step_color(curretn_color, percentSpeed);
+	step_color(curretn_color, percentSpeed, start, finish);
 }
 
-void step_color(uint8_t color, uint8_t percent){
-	uint8_t num_led = (percent / PRE_FOR_ONE_LED);
-	// Зажигаем все предыдущие диоды максимальной яркостью кроме последнего
-	for(uint8_t i = 0; i < num_led; i++){
-		set_color_led(i, color, MAX_BRIGHT);
+void step_color(uint8_t color, uint8_t percent, uint8_t start, uint8_t finish){
+	uint8_t all_diod_ready = (abs(finish - start))+1;
+	uint8_t i = start;
+	uint16_t lenght_for_per = (all_diod_ready * 250)/100;// количество диодов умножаем на максимальную яркость и делим на 100 процентов будет яркость на 1 процент
+	int16_t lenght = percent * lenght_for_per;
+	uint8_t bright = 0;
+	// хочу сделать инверсию красивую для перевернутых чисел
+	//for(uint8_t i = start; i <= finish; i++){
+	while(all_diod_ready){
+		if(lenght > 250){
+			set_color_led(i, color, MAX_BRIGHT);
+			lenght-=250;
+		}
+		else if( lenght > 0)
+				set_color_led(i, color, lenght);
+			else
+				set_color_led(i, color, 0);
+		if((finish - start) > 0)
+			i++;
+		else
+			i--;
+		all_diod_ready--;
 	}
-	if(percent == 100){
-		set_color_led(7, RED, MAX_BRIGHT);
-		return;
-	}
-	set_color_led((num_led), color, STEP_BRIGHT *(percent%PRE_FOR_ONE_LED));
 }
 
 void set_color_led(uint8_t numLed, uint8_t color, uint8_t bright){
@@ -128,98 +161,4 @@ void set_color_led(uint8_t numLed, uint8_t color, uint8_t bright){
 	return;
 }
 
-/*
- * 	 // uint8_t old_data;
-	 // uint8_t numOnLed;
-	//  ARGB_Init();  // Initialization
-	//  ARGB_Clear();
-	//  while (ARGB_Show() != ARGB_OK);
-	//  ARGB_SetBrightness(100);
-	//  ARGB_Clear(); // Clear stirp
-	/*  while (ARGB_Show() != ARGB_OK);
-		ARGB_SetRGB(1, 0, 50, 0); // Set LED №1 with 255 Green
-		ARGB_SetRGB(2, 50, 0, 0); // Set LED №2 with 255 Green
-		ARGB_SetRGB(3, 0, 0, 50); // Set LED №3 with 255 Green
-	  while (ARGB_Show() != ARGB_OK);
 
-// todo  сделать хорошо
-		// если значение цвета изменилось то
-		//определить сколько стало и попытаться зажечь нужноче число диодов
-		/*
-		if(global_color != old_data && global_color != 0 ){
-			old_data = global_color;
-			if(old_data > 80)
-				red = 80;
-			else
-				red = old_data;
-			if(old_data > 160)
-				green = 80;
-			else if(old_data > 80)
-				green = old_data - 80;
-			if(old_data >= 239)
-				blue = 80;
-			else if(old_data > 160)
-				blue = old_data - 160;
-			if(red > 0)
-				setRedLed(red/10, red%10);
-			if(green > 0)
-				setGreenLed(green/10, green%10);
-			if(blue > 0)
-				setBlueLed(blue/10, blue%10);
-			while (ARGB_Show() != ARGB_OK);
-		}
-
-
-void setRedLed(uint8_t num, uint8_t last){
-	uint8_t i;
-	if(num > MAX_LED)
-		num = MAX_LED;
-	for(i = 0; i < num; i++){
-		ARGB_SetRGB(i, 255, 0, 0);
-	}
-	if(i < (MAX_LED)){
-		i++;
-		ARGB_SetRGB(i, 25*last, 0, 0);
-	}
-	if(i < (MAX_LED)){
-		while(i < (MAX_LED)){
-			ARGB_SetRGB(i, 0, 0, 0);
-			i++;
-		}
-	}
-}
-
-void setGreenLed(uint8_t num, uint8_t last){
-	uint8_t i;
-	for(i = 0; i < num; i++){
-		ARGB_SetRGB(i, 0, 250, 0);
-	}
-	if(i < (MAX_LED)){
-		i++;
-		ARGB_SetRGB(i, 0, 25*last, 0);
-	}
-	if(i < (MAX_LED)){
-		while(i < (MAX_LED)){
-			ARGB_SetRGB(i, 0, 0, 0);
-			i++;
-		}
-	}
-}
-
-void setBlueLed(uint8_t num, uint8_t last){
-	uint8_t i;
-	for(i = 0; i < num; i++){
-		ARGB_SetRGB(i, 0, 0, 250);
-	}
-	if(i < (MAX_LED)){
-		i++;
-		ARGB_SetRGB(i, 0, 0, 25*last);
-	}
-	if(i < (MAX_LED)){
-		while(i < (MAX_LED)){
-			ARGB_SetRGB(i, 0, 0, 0);
-			i++;
-		}
-	}
-}
-*/
