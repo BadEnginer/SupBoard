@@ -1,7 +1,6 @@
 
 #include "tasks/LedControl.h"
-extern uint8_t global_color;
-extern int8_t speed;
+extern sSystemState SystemState;
 /*диодов допустим 3*8 = 24 , разрядов 240 то есть если разделить число на /10 будет 24 это количество горящих диодов */
 
 
@@ -20,16 +19,20 @@ void setAllColor(uint8_t color,uint8_t bright, uint16_t delay){
 			case CYAN:    ARGB_SetRGB(i, 0, bright/2, bright/2); break;
 			default: 	  ARGB_SetRGB(i, bright/3, bright/3, bright/3);
 		}
-	if(delay > 0) HAL_Delay(delay);
+	if(delay > 0) {
+		HAL_Delay(delay);
+		while (ARGB_Show() != ARGB_OK);
 	}
-	while (ARGB_Show() != ARGB_OK);
 }
 
-void blink_led(uint8_t color,uint8_t times, uint8_t delay){
+}
+
+void blink_led(uint8_t color,uint8_t times, uint16_t delay){
 	for(uint8_t i = 0; i < times; i++){
-		setAllColor(color, 255, 0);// Загрузка
-		HAL_Delay(delay);
-		ARGB_Clear();
+		setAllColor(color, 120/4, 0);// Загрузка
+		while (ARGB_Show() != ARGB_OK);
+			HAL_Delay(delay);
+			ARGB_Clear();
 		while (ARGB_Show() != ARGB_OK);
 		HAL_Delay(delay);
 	}
@@ -40,17 +43,20 @@ void StartLedControlTask(void *argument){
 	ARGB_Init();  // Initialization
 	ARGB_Clear();
 	while (ARGB_Show() != ARGB_OK);
-	ARGB_SetBrightness(100); // Максимальная яркость 255
+	ARGB_SetBrightness(80); // Максимальная яркость 255
 	ARGB_Clear(); // Clear stirp
-
-	setAllColor(GREEN, 255, 300);// Загрузка
-	blink_led(GREEN, 3, 200);
+	inlineBright();
+	blink_led(GREEN, 3, 500);
 
 	for(;;){
 		SetChargeLed(SystemState.BattaryData.percentCharge);
 		SetSpeedLed(SystemState.MotorData.current_speed);
 		HAL_Delay(200);
 	}
+}
+
+void inlineBright(){
+		setAllColor(GREEN, (255/(4)), 400);// Загрузка
 }
 
 void SetChargeLed(uint8_t charge_proc){
@@ -90,7 +96,8 @@ void SetZeroSpeed(){ // функция для установки нулевог�
 
 void SetColorSpeed(int8_t currentSpeed, uint8_t max_speed, uint8_t start, uint8_t finish ){
 	uint8_t curretn_color;
-	if(currentSpeed = 0)
+	uint8_t percentSpeed;
+	if(currentSpeed == 0)
 		curretn_color = WHITE;
 	if(currentSpeed > 0){
 		curretn_color = GREEN;
@@ -106,8 +113,8 @@ void SetColorSpeed(int8_t currentSpeed, uint8_t max_speed, uint8_t start, uint8_
 void step_color(uint8_t color, uint8_t percent, uint8_t start, uint8_t finish){
 	uint8_t all_diod_ready = (abs(finish - start))+1;
 	uint8_t i = start;
-	uint16_t lenght_for_per = (all_diod_ready * 250)/100;// количество диодов умножаем на максимальную яркость и делим на 100 процентов будет яркость на 1 процент
-	int16_t lenght = percent * lenght_for_per;
+	uint16_t lenght_for_per = (all_diod_ready * 250);// количество диодов умножаем на максимальную яркость и делим на 100 процентов будет яркость на 1 процент
+	int16_t lenght = lenght_for_per * (percent/100.0);
 	uint8_t bright = 0;
 	// хочу сделать инверсию красивую для перевернутых чисел
 	//for(uint8_t i = start; i <= finish; i++){
@@ -116,14 +123,17 @@ void step_color(uint8_t color, uint8_t percent, uint8_t start, uint8_t finish){
 			set_color_led(i, color, MAX_BRIGHT);
 			lenght-=250;
 		}
-		else if( lenght > 0)
+		else if( lenght > 0){
 				set_color_led(i, color, lenght);
+				lenght = 0;
+		}
 			else
 				set_color_led(i, color, 0);
 		if((finish - start) > 0)
 			i++;
 		else
 			i--;
+		while (ARGB_Show() != ARGB_OK);
 		all_diod_ready--;
 	}
 }
