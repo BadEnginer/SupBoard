@@ -23,8 +23,8 @@
 #define MAX_BRIGHT 250
 #define STEP_BRIGHT (MAX_BRIGHT/PRE_FOR_ONE_LED)
 
-void SetColorSpeed(int8_t);
-void step_color(uint8_t color, uint8_t percent);
+void SetColorSpeed(int8_t currentSpeed, uint8_t max_speed, uint8_t start, uint8_t finish);
+void step_color(uint8_t color, uint8_t percent, uint8_t start, uint8_t finish);
 void set_color_led(uint8_t numLed, uint8_t color, uint8_t bright);
 
 void StartLedControlTask(void *argument);

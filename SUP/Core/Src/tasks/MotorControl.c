@@ -21,6 +21,7 @@ void StartMotorControlTask(void *argument){
 	SystemState.MotorData.motorState = DEVICE_READY;
 	SystemState.MotorData.current_speed = 0;
 	MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.20);
+	SystemState.MotorData.max_speed = MAX_SPEED;
 	for(;;){
 		if(SystemState.ErrorState.error_Motor == DEVISE_FATAL_ERROR)
 			setDAC(myMCP4725, STOP_ENGINE);
