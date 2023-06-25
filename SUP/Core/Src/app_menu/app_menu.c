@@ -104,12 +104,12 @@ void drawMainMenu() {
     	next_item_menu = current_item_menu + 1;
     	if(next_item_menu >= MENU_ITEMS_COUNT )
     		next_item_menu = 0;
-    	for(uint8_t i = 18; i == 0; i++){
+    	for(int8_t i = 10; i >= 0; i--){
     		drawCurrentMenu(current_item_menu, next_item_menu, i*znak);
         	ssd1306_Line(7, 21, 120, 21, White);
         	ssd1306_Line(7, 126, 120, 126, White);
         	udpateDisplay();
-        	HAL_Delay(20);
+        	HAL_Delay(10);
     	}
     	buttonEnReset();
         buttonLongReset();
@@ -217,7 +217,7 @@ void startDisplay(){
 	 	while(1){
 	 		HAL_Delay(100);
 	 		if(buttonEn()){
-	 			buttonEnReset();
+	 			//buttonEnReset();
 	 			break;
 	 		}
 	 		if(encoderData() > 0){
