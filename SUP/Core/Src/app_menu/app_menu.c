@@ -290,8 +290,6 @@ void startDisplay(){
 	 			ssd1306_WriteString(symVout, Font_11x18, White);
 	 		udpateDisplay();
 	 	}
-	 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
-	 	SystemState.DisplayState.state = UNKNOWN_PLACE;
   }
 
 
@@ -362,8 +360,6 @@ void drawButtonMenu(){
 		if(butLo > 2)
 			break;
 	}
-	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
-	SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 
 void drawLEDMenu(){
@@ -428,8 +424,6 @@ void drawADCMenu(){
 		}
 		HAL_Delay(50);
 	}
-	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
-	SystemState.DisplayState.state = UNKNOWN_PLACE;
 }
 void drawEncodMenu(){
 	uint8_t exit = 0;
