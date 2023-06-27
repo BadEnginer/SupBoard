@@ -70,20 +70,32 @@ const char* menuADC[3] = {
 
 #define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 2 + 2) // под надписью главное меню
 
+#define START_FIRST_STRING_Y (START_POS_Y + SIZE_FONT_Y + 4)
+#define START_SECOND_STRING_Y (START_FIRST_STRING_Y + 2)
 
-void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, int8_t offset){
-	ssd1306_SetCursor(START_POS_X, START_POS_Y+1); // 1 + 18 = 19 ( последний пиксель)
-		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 5 - offset); // 26 + 18 = 44
-		ssd1306_WriteString(menuItems[menu_num_current], Font_11x18, White);
-	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
-		ssd1306_WriteString(">", Font_11x18, White);
-	ssd1306_SetCursor(114, START_POS_Y + SIZE_FONT_Y + 6 + 2); // 26 + 18 = 44
-    	ssd1306_WriteString("<", Font_11x18, White);
-    if(offset == 0){
+void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t menu_prev_num, int8_t mode){
+    if(mode == 1){
     	ssd1306_SetCursor(START_POS_X, START_POS_Y + 2 * SIZE_FONT_Y + 6 + 2 + 2); // 18 + 18 = 46
-			ssd1306_WriteString(menuItems[menu_num_next], Font_11x18, White);
+			ssd1306_WriteString(menuItems[menu_num_next], Font_6x8, White);
     }
+    if(mode == 2){
+       	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y); // 18 + 18 = 46
+    	ssd1306_WriteString(menuItems[menu_prev_num], Font_6x8, White);
+
+    	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + 10); //  18 + 4
+    		ssd1306_WriteString(menuItems[menu_num_current], Font_16x24, White);
+    	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y );
+    		ssd1306_WriteString(">         <", Font_11x18, White);
+
+        ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y); // 18 + 18 = 46
+        	ssd1306_WriteString(menuItems[menu_num_next], Font_6x8, White);
+
+
+    }
+
+
+	ssd1306_SetCursor(START_POS_X, START_POS_Y+1); // 1 + 18 = 19 ( последний пиксель) + линия
+		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White); // В конце мы пишим название меню для вывода поверх
 }
 
 void drawMainMenu() {
@@ -92,6 +104,7 @@ void drawMainMenu() {
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
     int8_t  next_item_menu = 0;
+    int8_t prev_item = 0;
     int8_t  znak = 0;
     while(exit){ // Вывод главного меню
         ssd1306_Fill(Black);
@@ -105,9 +118,9 @@ void drawMainMenu() {
     	if(next_item_menu >= MENU_ITEMS_COUNT )
     		next_item_menu = 0;
     	for(int8_t i = 10; i >= 0; i--){
-    		drawCurrentMenu(current_item_menu, next_item_menu, i*znak);
-        	ssd1306_Line(7, 21, 120, 21, White);
-        	ssd1306_Line(7, 126, 120, 126, White);
+    		drawCurrentMenu(current_item_menu, next_item_menu, prev_item, i);
+        	ssd1306_Line(7, 2, 120, 20, White);
+        	ssd1306_Line(7, 125, 120, 125, White);
         	udpateDisplay();
         	HAL_Delay(10);
     	}
@@ -136,7 +149,7 @@ void drawMainMenu() {
     		    	case 4: drawEncodMenu();	break;
     		    	case 5: drawDACMenu();		break;
     		    	case 6: drawSettinMenu();	break;
-    		    	default: current_item_menu = 0;
+    		    	//default: current_item_menu = 0;
     		    }
     		    SystemState.DisplayState.prevState = SystemState.DisplayState.state;
     		    SystemState.DisplayState.state = MAIN_CONFIG;
@@ -146,14 +159,14 @@ void drawMainMenu() {
                 break;
     		}
     		if(encoderData() > 0){
+    			prev_item = current_item_menu;
     			current_item_menu++;
-    			znak = 1;
     			encoderReset();
     			break;
     		}
     		if(encoderData() < 0){
-    			current_item_menu--;
-    			znak = -1;
+    			prev_item = current_item_menu;
+    			current_item_menu++;
     			encoderReset();
     			break;
     		}
