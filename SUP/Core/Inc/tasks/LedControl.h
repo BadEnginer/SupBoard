@@ -26,6 +26,7 @@
 void SetColorSpeed(int8_t currentSpeed, uint8_t max_speed, uint8_t start, uint8_t finish);
 void step_color(uint8_t color, uint8_t percent, uint8_t start, uint8_t finish);
 void set_color_led(uint8_t numLed, uint8_t color, uint8_t bright);
+void inlineBright();
 
 void StartLedControlTask(void *argument);
 void setRedLed(uint8_t num, uint8_t last);
