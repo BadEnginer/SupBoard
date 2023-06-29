@@ -13,7 +13,8 @@ void setDAC(MCP4725, float);
 #define STOP_ENGINE 1.20F
 #define KOEFF_INLINE_DAC 37 // Убераем рассолгасовние между ацп и дак
 
-uint8_t speed_arr[] = {0,200,50,60,70,80,90,100,120,130}; // step mV for lean speed
+//uint8_t speed_arr[] = {0,200,50,60,70,80,90,100,120,130}; // step mV for lean speed
+uint16_t speed_arr[] = {0,200,250,310,380,460,550,650,770,900}; // step mV for lean speed
 /// Функция управления мотором через дак + сложные условия остановки
 void StartMotorControlTask(void *argument){
 	SystemState.MotorData.motorState = DEVICE_NO_INIT;
@@ -22,10 +23,17 @@ void StartMotorControlTask(void *argument){
 	SystemState.MotorData.current_speed = 0;
 	MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.20);
 	SystemState.MotorData.max_speed = MAX_SPEED;
+	int16_t offset = 0;
 	for(;;){
-		if(SystemState.ErrorState.error_Motor == DEVISE_FATAL_ERROR)
+		while(SystemState.ErrorState.error_Motor == DEVISE_FATAL_ERROR){
 			setDAC(myMCP4725, STOP_ENGINE);
-		SystemState.MotorData.control_voltage = STOP_ENGINE + (speed_arr[SystemState.MotorData.current_speed]/1000);
+			HAL_Delay(100);
+		}
+		offset = (speed_arr[abs(SystemState.MotorData.current_speed)]);
+		if(SystemState.MotorData.current_speed < 0)
+			SystemState.MotorData.control_voltage = STOP_ENGINE - (offset / 1000.0);
+		else
+			SystemState.MotorData.control_voltage = STOP_ENGINE + (offset / 1000.0);
 		setDAC(myMCP4725,  expFiltrDAC(SystemState.MotorData.control_voltage, KOEFF_K_SLOW));
 		HAL_Delay(50);
 	}

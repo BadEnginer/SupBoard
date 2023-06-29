@@ -102,12 +102,14 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
     	//if(menu_num_current - menu_prev_num > 0)
 
     	for(uint8_t i = 0; i < LEGHT_MAX_STRING ; i++ ){
-    	ssd1306_SetCursor(START_POS_X + i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y ); //
-			ssd1306_WriteString(menuItems[menu_prev_num], Font_16x24, White);
-	    ssd1306_SetCursor(START_POS_X + (LEGHT_MAX_STRING*LEGHT_MAX_CHAR_MID) - i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y ); //
-	    	ssd1306_WriteString(menuItems[menu_num_current], Font_16x24, White);
-		ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y ); //
-			ssd1306_WriteString(">         <", Font_11x18, White);
+    		ssd1306_SetCursor(START_POS_X + i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y ); //
+				ssd1306_WriteString(menuItems[menu_prev_num], Font_16x24, White);
+			ssd1306_SetCursor(START_POS_X + (LEGHT_MAX_STRING*LEGHT_MAX_CHAR_MID) - i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y ); //
+				ssd1306_WriteString(menuItems[menu_num_current], Font_16x24, White);
+			ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y ); //
+				ssd1306_WriteString(">         <", Font_11x18, White);
+			udpateDisplay();
+			HAL_Delay(10);
     	}
     }
 
