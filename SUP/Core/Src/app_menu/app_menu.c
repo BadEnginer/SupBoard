@@ -74,7 +74,7 @@ const char* menuADC[3] = {
 #define START_SECOND_STRING_Y (START_FIRST_STRING_Y + 2)
 
 void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t menu_prev_num, int8_t mode){
-    if(mode == 1){
+    if(mode == 1){ // Эксперементальные режимы вывода на дисплей разных шрифтов и анимации
     	ssd1306_SetCursor(START_POS_X, START_POS_Y + 2 * SIZE_FONT_Y + 6 + 2 + 2); // 18 + 18 = 46
 			ssd1306_WriteString(menuItems[menu_num_next], Font_6x8, White);
     }

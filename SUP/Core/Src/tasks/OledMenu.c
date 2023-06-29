@@ -3,8 +3,10 @@
 extern sSystemState SystemState;
 
 void StartOledMenuTask(void *argument){
+	// Меню для переключения между меню настроек и стартовым дисплеем
 	HAL_Delay(200);
 	if (SystemState.ErrorState.errorCounter > 0){
+		// Если есть ошибки перед нажатием будет дисплей с ошибками
 		SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 		SystemState.DisplayState.state = ERROR_STATE_I2C;
 		ssd1306_Fill(Black);
