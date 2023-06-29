@@ -70,37 +70,56 @@ const char* menuADC[3] = {
 
 #define LST_MENU_POINT (START_POS_Y + SIZE_FONT_Y + 2 + 2) // под надписью главное меню
 
-#define START_FIRST_STRING_Y (START_POS_Y + SIZE_FONT_Y + 4)
-#define START_SECOND_STRING_Y (START_FIRST_STRING_Y + 2)
+#define START_FIRST_STRING_Y (22)
+#define WITH_STIRNG_MID 18
+#define WITH_STIRNG_BIG 24
+#define WITH_STIRNG_MIN 8
+#define LEGHT_MAX_STRING 11
+#define LEGHT_MAX_CHAR_MID 11
+#define SPACE_PLACE 1
+#define START_SECOND_STRING_Y (START_FIRST_STRING_Y + SPACE_PLACE + WITH_STIRNG)
 
 void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t menu_prev_num, int8_t mode){
-    if(mode == 1){ // Эксперементальные режимы вывода на дисплей разных шрифтов и анимации
-    	ssd1306_SetCursor(START_POS_X, START_POS_Y + 2 * SIZE_FONT_Y + 6 + 2 + 2); // 18 + 18 = 46
-			ssd1306_WriteString(menuItems[menu_num_next], Font_6x8, White);
+	// Эксперементальные режимы вывода на дисплей разных шрифтов и анимации
+	if(mode == 0){
+		// Единственная большая строчка с текущим меню
+    	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y ); // 18 + 18 = 46
+			ssd1306_WriteString(menuItems[menu_num_current], Font_16x24, White);
     }
-    if(mode == 2){
-       	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y); // 18 + 18 = 46
-    	ssd1306_WriteString(menuItems[menu_prev_num], Font_6x8, White);
-
-    	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + 10); //  18 + 4
-    		ssd1306_WriteString(menuItems[menu_num_current], Font_16x24, White);
-    	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y );
+    else if(mode == 1){
+    	// средняя строчка по центру с сверху и снизу мелкие следующий и предыдущий пункт
+       	ssd1306_SetCursor(START_POS_X + WITH_STIRNG_MIN, START_FIRST_STRING_Y); //
+    		ssd1306_WriteString(menuItems[menu_prev_num], Font_6x8, White);
+    	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + WITH_STIRNG_MIN + SPACE_PLACE);
+    		ssd1306_WriteString(menuItems[menu_num_current], Font_11x18, White);
+        ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + WITH_STIRNG_MIN + SPACE_PLACE);
     		ssd1306_WriteString(">         <", Font_11x18, White);
-
-        ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y); // 18 + 18 = 46
+        ssd1306_SetCursor(START_POS_X + WITH_STIRNG_MIN, START_FIRST_STRING_Y + WITH_STIRNG_MIN + SPACE_PLACE + WITH_STIRNG_MID );
         	ssd1306_WriteString(menuItems[menu_num_next], Font_6x8, White);
+    }
+    else if(mode == 2){
+    	// попытка в анимацию ))
+    	//if(menu_num_current - menu_prev_num > 0)
 
-
+    	for(uint8_t i = 0; i < LEGHT_MAX_STRING ; i++ ){
+    	ssd1306_SetCursor(START_POS_X + i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y ); //
+			ssd1306_WriteString(menuItems[menu_prev_num], Font_16x24, White);
+	    ssd1306_SetCursor(START_POS_X + (LEGHT_MAX_STRING*LEGHT_MAX_CHAR_MID) - i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y ); //
+	    	ssd1306_WriteString(menuItems[menu_num_current], Font_16x24, White);
+		ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y ); //
+			ssd1306_WriteString(">         <", Font_11x18, White);
+    	}
     }
 
 
-	ssd1306_SetCursor(START_POS_X, START_POS_Y+1); // 1 + 18 = 19 ( последний пиксель) + линия
+	ssd1306_SetCursor(START_POS_X, START_POS_Y); // 18 = 19 ( последний пиксель) + линия ( 20 )
 		ssd1306_WriteString(menuItems[MENU_ITEMS_COUNT], Font_11x18, White); // В конце мы пишим название меню для вывода поверх
 }
 
 void drawMainMenu() {
 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = MAIN_CONFIG;
+	SystemState.DisplayState.mode = 0;
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
     int8_t  next_item_menu = 0;
@@ -117,13 +136,10 @@ void drawMainMenu() {
     	next_item_menu = current_item_menu + 1;
     	if(next_item_menu >= MENU_ITEMS_COUNT )
     		next_item_menu = 0;
-    	for(int8_t i = 10; i >= 0; i--){
-    		drawCurrentMenu(current_item_menu, next_item_menu, prev_item, i);
+    	drawCurrentMenu(current_item_menu, next_item_menu, prev_item, SystemState.DisplayState.mode);
         	ssd1306_Line(7, 2, 120, 20, White);
         	ssd1306_Line(7, 125, 120, 125, White);
-        	udpateDisplay();
-        	HAL_Delay(10);
-    	}
+        udpateDisplay();
     	buttonEnReset();
         buttonLongReset();
         encoderReset();
@@ -370,8 +386,13 @@ void drawButtonMenu(){
 
 		udpateDisplay();
 		HAL_Delay(50);
-		if(butLo > 2)
+
+		if(butLo > 2){
+			if (butEn > 2)
+				butEn = 0;
+			SystemState.DisplayState.mode = butEn;
 			break;
+		}
 	}
 }
 
