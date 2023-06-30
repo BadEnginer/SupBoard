@@ -93,6 +93,7 @@ eDisplayState state;
 uint8_t i2c_addres;
 eDeviceState readyDISPLAY;
 uint8_t mode;
+int8_t CurrentMenu;
 } sDisplayState;
 
 
