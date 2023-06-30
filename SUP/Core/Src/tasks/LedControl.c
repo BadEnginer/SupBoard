@@ -43,7 +43,8 @@ void blink_same_led(uint8_t color, uint16_t delay, uint8_t start, uint8_t finish
 		set_color_led(i, color, 50);
 		while (ARGB_Show() != ARGB_OK);
 		HAL_Delay(delay);
-		ARGB_Clear();
+	for(uint8_t i = start; i <= finish; i++)
+		set_color_led(i, color, 0);
 		while (ARGB_Show() != ARGB_OK);
 		HAL_Delay(delay);
 }
