@@ -1,6 +1,11 @@
 #include "tasks/SensOut.h"
 
 //
+#define RES_TOP 9.92f
+#define RES_BOT 1.001f
+#define BATTERY_DEVIDER (1.0 + (RES_TOP/RES_BOT))
+
+
 volatile uint16_t temp_counter_plus = 0;
 volatile uint16_t temp_counter_min = 0;
 uint16_t old_raw_angle = 0;
@@ -16,6 +21,7 @@ uint8_t countEB = 0;
 uint8_t countEP = 0;
 uint8_t countEM = 0;
 
+extern sSystemState SystemState;
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 extern uint16_t current_angle;
 extern uint16_t arr_angle[MAX_COUNTER_ANGLE];
@@ -30,6 +36,10 @@ void error_processing(){
 	//SystemState.ErrorState.
 
 }
+#define CELL_4 4
+#define CELL_3 3
+#define BATTARY_TYPE_FE  1
+#define BATTARY_TYPE_LIPO  2
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
 	for(;;){
@@ -54,10 +64,40 @@ void StartSensOutTask(void *argument){
 		trueButtonEB();
 		trueButtonEP();
 		trueButtonEM();
+		SystemState.BattaryData.current = SystemState.AdcData.chanel_1_voltage;
+		SystemState.BattaryData.voltage =expFiltrVbat(( 1000 * (1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)),0.1);
+		SystemState.BattaryData.percentCharge = battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage);
 		osDelay(100);
 	}
 }
 
+int16_t expFiltrVbat(int16_t newVal, float k) {
+	  static uint16_t filVal = 0;
+	  filVal += (newVal - filVal) * k;
+	  return filVal;
+}
+
+
+
+uint16_t charge_proc_LIPO[] = {3000, 3300, 3600, 3700, 3750, 3790, 3830, 3870, 3920, 3970, 4100, 4200};
+uint16_t charge_proc_FE[]   = {3183, 3191, 3218, 3257, 3272, 3277, 3282, 3302, 3318, 3322, 3324, 3558};
+
+uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_voltage){
+	uint16_t* arr = charge_proc_LIPO + 2 ;
+	if(num_cell == 0)
+		num_cell = 1;
+	uint16_t battery_1C = battary_voltage/num_cell;
+	if(battryType == BATTARY_TYPE_FE)
+		arr = charge_proc_FE + 2;
+	if(battery_1C < arr[0])
+		return 0;
+	for(uint8_t i = 0; i < 10; i++){
+		if(battery_1C > arr[i])
+			continue;
+		else
+			return i*10;
+	}
+}
 void trueButtonLB(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
 		if(pinState == GPIO_PIN_RESET){

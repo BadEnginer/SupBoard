@@ -7,14 +7,17 @@
 #define ADS1115_ADR 72
 #define ADC_CHANEL_1 0 // Test ADC GDN
 #define ADC_CHANEL_2 1 // DAC
+#define ADC_DAC 1
 #define ADC_CHANEL_3 2 // Current
+#define ADC_CURRENT 2
 #define ADC_CHANEL_4 3 // Voltage
+#define ADC_BATT 3
 #define SIZE_ADC_BUFF 30
 #define NUM_ADC_CH 4
 #define NUM_ADC 16
 #define MAX_ADC_RANGE_FLOTA (4.096 * 2)
 #define MAX_ADC_RANGE (4096 * 2) // Расчёт для режима 4 вольта
-#define MAX_DATA_ADC 65536.0
+#define MAX_DATA_ADC 65535.0
 #define ADC_TO_V    	 (MAX_ADC_RANGE/MAX_DATA_ADC)
 #define ADC_TO_VOLTAGE_F (MAX_ADC_RANGE_FLOTA/MAX_DATA_ADC)
 
