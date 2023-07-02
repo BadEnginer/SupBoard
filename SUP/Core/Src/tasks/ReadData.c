@@ -37,7 +37,7 @@ void StartReadDataTask(void *argument){
 			SystemState.AdcData.chanel_0_voltage = (getAverADC(data_ch[0])* ADC_TO_VOLTAGE_F);
 			SystemState.AdcData.chanel_1_voltage = (getAverADC(data_ch[1])* ADC_TO_VOLTAGE_F);
 			SystemState.AdcData.chanel_2_voltage = (getAverADC(data_ch[2])* ADC_TO_VOLTAGE_F);
-			SystemState.AdcData.chanel_3_voltage = (getAverADC(data_ch[3])* ADC_TO_VOLTAGE_F);
+			SystemState.AdcData.chanel_3_voltage = 0.04 + (getAverADC(data_ch[3])* ADC_TO_VOLTAGE_F);
 		}
 		while(osMutexAcquire(BlockI2CHandle, 1000) != osOK){};
 			ADS1115_updateConfig(pADS, configChanel[currentChanel]);
