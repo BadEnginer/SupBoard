@@ -34,10 +34,10 @@ void StartReadDataTask(void *argument){
 		currentChanel++;
 		if(currentChanel > 3){
 			currentChanel = 0;
-			SystemState.AdcData.chanel_0_voltage = (getAverADC(data_ch[0])* ADC_TO_VOLTAGE_F);
-			SystemState.AdcData.chanel_1_voltage = (getAverADC(data_ch[1])* ADC_TO_VOLTAGE_F);
-			SystemState.AdcData.chanel_2_voltage = (getAverADC(data_ch[2])* ADC_TO_VOLTAGE_F);
-			SystemState.AdcData.chanel_3_voltage = 0.04 + (getAverADC(data_ch[3])* ADC_TO_VOLTAGE_F);
+			SystemState.AdcData.chanel_0_voltage = (getAverADC(data_ch[0])* ADC_TO_V);
+			SystemState.AdcData.chanel_1_voltage = (getAverADC(data_ch[1])* ADC_TO_V);
+			SystemState.AdcData.chanel_2_voltage = (getAverADC(data_ch[2])* ADC_TO_V);
+			SystemState.AdcData.chanel_3_voltage = (getAverADC(data_ch[3])* ADC_TO_V);
 		}
 		while(osMutexAcquire(BlockI2CHandle, 1000) != osOK){};
 			ADS1115_updateConfig(pADS, configChanel[currentChanel]);
@@ -82,10 +82,10 @@ void initADC(ADS1115_Config_t* configReg){
 	configReg->pgaConfig 		= PGA_4_096;
 	configReg->operatingMode 	= MODE_CONTINOUS;
 	configReg->dataRate 		= DRATE_250;
-	configReg->compareMode 		= COMP_HYSTERESIS;
+	configReg->compareMode 		= COMP_WINDOW;
 	configReg->polarityMode 	= POLARITY_ACTIVE_LOW;
 	configReg->latchingMode  	= LATCHING_NONE;
-	configReg->queueComparator 	= QUEUE_ONE; 			// ПОднять флаг через сколько измерений
+	configReg->queueComparator 	= QUEUE_FOUR; 			// ПОднять флаг через сколько измерений
 }
 
 void initChanelADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel){

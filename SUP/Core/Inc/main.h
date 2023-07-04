@@ -128,10 +128,10 @@ typedef struct{
 typedef struct{
 	eDeviceState readyADC;
 	uint8_t i2c_addres;
-	float chanel_0_voltage;
-	float chanel_1_voltage;
-	float chanel_2_voltage;
-	float chanel_3_voltage;
+	int16_t chanel_0_voltage;
+	int16_t chanel_1_voltage;
+	int16_t chanel_2_voltage;
+	int16_t chanel_3_voltage;
 } sAdcData;
 
 typedef struct{
