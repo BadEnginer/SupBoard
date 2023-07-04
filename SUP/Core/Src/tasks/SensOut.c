@@ -65,7 +65,7 @@ void StartSensOutTask(void *argument){
 		trueButtonEP();
 		trueButtonEM();
 		SystemState.BattaryData.current = SystemState.AdcData.chanel_1_voltage;
-		SystemState.BattaryData.voltage =expFiltrVbat(( 1000 * (1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)),0.1);
+		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)),0.1);
 		SystemState.BattaryData.percentCharge = battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage);
 		osDelay(100);
 	}

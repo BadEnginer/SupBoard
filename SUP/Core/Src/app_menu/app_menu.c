@@ -450,10 +450,10 @@ void drawADCMenu(){
 	buttonLongReset();
 	encoderReset();
 	while(1){
-		ch0 = (SystemState.AdcData.chanel_0_voltage * 1000);
-		ch1 = (SystemState.AdcData.chanel_1_voltage * 1000);
-		ch2 = (SystemState.AdcData.chanel_2_voltage * 1000);
-		ch3 = (SystemState.AdcData.chanel_3_voltage * 1000);
+		ch0 = (SystemState.AdcData.chanel_0_voltage );
+		ch1 = (SystemState.AdcData.chanel_1_voltage );
+		ch2 = (SystemState.AdcData.chanel_2_voltage );
+		ch3 = (SystemState.AdcData.chanel_3_voltage );
 		itoa(ch0, sym_ch0, 10);
 		itoa(ch1, sym_ch1, 10);
 		itoa(ch2, sym_ch2, 10);
