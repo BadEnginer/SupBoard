@@ -12,7 +12,7 @@ void setDAC(MCP4725, float);
 #define FULL_BACK 2.1F
 #define STOP_ENGINE 1.20F
 #define KOEFF_INLINE_DAC 37 // Убераем рассолгасовние между ацп и дак
-
+int16_t test_ofsett[30] = {};
 //uint8_t speed_arr[] = {0,200,50,60,70,80,90,100,120,130}; // step mV for lean speed
 uint16_t speed_arr[] = {0,200,250,310,380,460,550,650,770,900}; // step mV for lean speed
 /// Функция управления мотором через дак + сложные условия остановки
@@ -24,8 +24,7 @@ void StartMotorControlTask(void *argument){
 	MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.20);
 	SystemState.MotorData.max_speed = MAX_SPEED;
 	int16_t offset = 0;
-	int16_t test_ofsett[30] = {};
-	float TEST = 0.5;
+	float TEST = 1.0;
 	uint8_t i = 0;
 	for(;;){
 
@@ -36,7 +35,7 @@ void StartMotorControlTask(void *argument){
 			i++;
 			if(i > 29)
 				i = 0;
-			TEST = TEST + 0.1;
+			//TEST = TEST + 0.1;
 			if(TEST > 2.0)
 				TEST = 0.5;
 		}

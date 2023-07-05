@@ -64,15 +64,21 @@ void StartSensOutTask(void *argument){
 		trueButtonEB();
 		trueButtonEP();
 		trueButtonEM();
+
 		SystemState.BattaryData.current = SystemState.AdcData.chanel_1_voltage;
-		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)),0.1);
-		SystemState.BattaryData.percentCharge = battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage);
+		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)), 0.1);
+		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage), 0.2);
 		osDelay(100);
 	}
 }
 
 int16_t expFiltrVbat(int16_t newVal, float k) {
-	  static uint16_t filVal = 0;
+	  static int16_t filVal = 0;
+	  filVal += (newVal - filVal) * k;
+	  return filVal;
+}
+int16_t expFiltrCharge(int16_t newVal, float k) {
+	  static int16_t filVal = 0;
 	  filVal += (newVal - filVal) * k;
 	  return filVal;
 }
@@ -82,20 +88,32 @@ int16_t expFiltrVbat(int16_t newVal, float k) {
 uint16_t charge_proc_LIPO[] = {3000, 3300, 3600, 3700, 3750, 3790, 3830, 3870, 3920, 3970, 4100, 4200};
 uint16_t charge_proc_FE[]   = {3183, 3191, 3218, 3257, 3272, 3277, 3282, 3302, 3318, 3322, 3324, 3558};
 
+float proc = 0;
+uint16_t raznica1 = 0;
+uint16_t raznica2 = 0;
+uint8_t decides = 0;
+
 uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_voltage){
 	uint16_t* arr = charge_proc_LIPO + 2 ;
 	if(num_cell == 0)
 		num_cell = 1;
-	uint16_t battery_1C = battary_voltage/num_cell;
+	//uint16_t battery_1C = battary_voltage/num_cell;
 	if(battryType == BATTARY_TYPE_FE)
 		arr = charge_proc_FE + 2;
-	if(battery_1C < arr[0])
+	if(battary_voltage < (arr[0]*num_cell)) // Минимальное значение и меньше будет 0
 		return 0;
-	for(uint8_t i = 0; i < 10; i++){
-		if(battery_1C > arr[i])
+	if(battary_voltage >= (arr[9]*num_cell)) // Максимальное значение и выше будет 1
+		return 100;
+	for(uint8_t i = 1; i < 9; i++){
+		if(battary_voltage > (arr[i]*num_cell))
 			continue;
-		else
-			return i*10;
+		else{
+			decides =  i*10;
+			raznica1 = (battary_voltage-(arr[i-1]*num_cell));
+			raznica2 = ((arr[i]*num_cell) - (arr[i-1]*num_cell));
+			proc = ((float)raznica1/(float)raznica2)*100.0;
+			return (decides+ proc/10);
+		}
 	}
 }
 void trueButtonLB(){
