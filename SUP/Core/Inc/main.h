@@ -185,6 +185,11 @@ typedef enum {
 	DEVISE_FATAL_ERROR
 } eStandartError;
 
+typedef enum {
+	ZERO_OK,
+	ZERO_MIGRATE
+} eErrorMigrationZero;
+
 typedef struct{
 	uint8_t error_mismatch_current; // когда код управления 0 а ток не 0
 	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
@@ -194,6 +199,7 @@ typedef struct{
 	eStandartError error_DISPLAY;
 	eStandartError error_DAC;
 	eStandartError error_ADC;
+	eErrorMigrationZero ErrorMigrationZero;
 	eStandartError error_LED;
 	eStandartError error_Motor;
 }sErrorState;

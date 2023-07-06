@@ -29,12 +29,29 @@ char* tr_data;
 char symData[8] = {'L','a','s','t','-'};
 uint8_t time;
 extern uint8_t calibr;
+#define WAIT_ERROR_ADC_DAC 20
+
 void error_processing(){
 	// проверить все ли устройства на месте
 	// Сравнить заданную скорость и какое напряжение на выходе (если рассоглосание то ошибка)
 	// Если скорость 0 а ток не 0 ошибка + реакция
 	//SystemState.ErrorState.
+	// Проверка Достоврености работы АЦП
+	static uint8_t iterErrorADC_DAC = 0;
+	int16_t difADC_DAC = SystemState.AdcData.chanel_1_voltage - SystemState.MotorData.control_voltage;
+	if(abs(SystemState.AdcData.chanel_0_voltage > 10))
+		SystemState.ErrorState.ErrorMigrationZero = ZERO_MIGRATE;
+	else
+		SystemState.ErrorState.ErrorMigrationZero = ZERO_OK;
 
+	if(abs(difADC_DAC) > 50)
+		iterErrorADC_DAC++;
+	else
+		iterErrorADC_DAC = 0;
+	if(iterErrorADC_DAC > WAIT_ERROR_ADC_DAC){
+		SystemState.ErrorState.error_DAC = DEVISE_ERROR;
+		iterErrorADC_DAC = 0;
+	}
 }
 #define CELL_4 4
 #define CELL_3 3
@@ -43,7 +60,6 @@ void error_processing(){
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
 	for(;;){
-		//data_right++;
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
 			switch(command_CMD[0] - 48){ // преобразуем символ в число
 				case 1: buttonEnSet();    break;
@@ -64,11 +80,11 @@ void StartSensOutTask(void *argument){
 		trueButtonEB();
 		trueButtonEP();
 		trueButtonEM();
-
-		SystemState.BattaryData.current = SystemState.AdcData.chanel_1_voltage;
+		SystemState.BattaryData.current = SystemState.AdcData.chanel_2_voltage;
 		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)), 0.1);
 		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage), 0.2);
 		osDelay(100);
+		error_processing();
 	}
 }
 

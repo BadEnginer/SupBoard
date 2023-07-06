@@ -470,7 +470,6 @@ void test_i2c_dev(){
 			SystemState.ErrorState.error_encoder = DEVISE_WORK;
 		}
 		else {
-			SystemState.ErrorState.errorCounter++;
 			SystemState.MagnitEncoderData.readyENCODER = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_encoder = DEVISE_NO_ANSWER;
 		}
@@ -479,7 +478,6 @@ void test_i2c_dev(){
 			SystemState.ErrorState.error_ADC = DEVISE_OK;
 		}
 		else {
-			SystemState.ErrorState.errorCounter++;
 			SystemState.AdcData.readyADC = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_ADC = DEVISE_ERROR;
 		}
@@ -489,7 +487,6 @@ void test_i2c_dev(){
 			SystemState.ErrorState.error_DAC = DEVISE_OK;
 		}
 		else {
-			SystemState.ErrorState.errorCounter++;
 			SystemState.DacData.readyDAC = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_DAC = DEVISE_ERROR;
 		}
@@ -499,7 +496,6 @@ void test_i2c_dev(){
 			SystemState.ErrorState.error_DISPLAY = DEVISE_OK;
 		}
 		else {
-			SystemState.ErrorState.errorCounter++;
 			SystemState.DisplayState.readyDISPLAY = DEVICE_NO_ANSWER;
 			SystemState.ErrorState.error_DISPLAY = DEVISE_NO_ANSWER;
 		}

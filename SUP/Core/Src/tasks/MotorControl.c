@@ -24,22 +24,7 @@ void StartMotorControlTask(void *argument){
 	MCP4725 myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.20);
 	SystemState.MotorData.max_speed = MAX_SPEED;
 	int16_t offset = 0;
-	float TEST = 1.0;
-	uint8_t i = 0;
 	for(;;){
-
-		while(1){
-			MCP4725_setVoltage(&myMCP4725, TEST, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
-			HAL_Delay(3000);
-			test_ofsett[i] = (1000 * TEST) - SystemState.AdcData.chanel_1_voltage;
-			i++;
-			if(i > 29)
-				i = 0;
-			//TEST = TEST + 0.1;
-			if(TEST > 2.0)
-				TEST = 0.5;
-		}
-
 		while(SystemState.ErrorState.error_Motor == DEVISE_FATAL_ERROR){
 			setDAC(myMCP4725, STOP_ENGINE);
 			HAL_Delay(100);
