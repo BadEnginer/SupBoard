@@ -35,12 +35,14 @@ const char* menuEncoder[3] = {
 	"  Encoder  "
 };
 const char* menuSettings[7] = {
-    "Default:   ",
-    "Сell:      ",
-	"Сell min:  ",
+    "BatType:   ",
+    "Num Cell:  ",
     "Max.V:     ",
 	"Mix.V:     ",
 	"Capacity:  ",
+	"Err.MOT    ",
+	"Err.ADC    ",
+	"Err.DAC    ",
 	" Settings  "
 };
 
@@ -243,7 +245,7 @@ void startDisplay(){
 	    ssd1306_WriteString("SPEED:", Font_11x18, White);
 	    // х-отступ для линии у-отступ линии плюс ширина текста
 	 	ssd1306_SetCursor(STD_WHITESPACE, STD_WHITESPACE+SIZE_FONT_Y);
-	 	ssd1306_WriteString("CUR:", Font_11x18, White);
+	 	ssd1306_WriteString("Bat:", Font_11x18, White);
 	 	ssd1306_SetCursor(STD_WHITESPACE, STD_WHITESPACE+SIZE_FONT_Y*2); //
 	 	ssd1306_WriteString("Vout:", Font_11x18, White);
 	 	ssd1306_Line(0, 63, 128, 63, White);
@@ -258,11 +260,13 @@ void startDisplay(){
 		encoderReset();
 	 	while(1){
 	 		HAL_Delay(100);
+	 		// Блок реакции на кнопки
 	 		if(buttonEn()){
-	 			//buttonEnReset();
+	 			// Если кнопка Enter On прервать текущий цикл
 	 			break;
 	 		}
 	 		if(encoderData() > 0){
+	 			// Если энкодер + повысить скорость.
 	 			encoderReset();
 	 		 	speed++;
 	 		 	if(speed >= MAX_SPEED)
@@ -275,63 +279,46 @@ void startDisplay(){
 	 		 		speed = MIN_SPEED;
 	 		}
 	 		if(buttonLong()){
+	 			// Если Back включен скорость обноляем
 	 			speed = 0;
 	 			buttonLongReset();
 	 		}
 
 	 		SystemState.MotorData.current_speed = speed;
-
-	 		itoa(current_speed, symSpeed  , 	10);
-	 		itoa(mantisa,       symCurrent+3, 	10);
-	 		if(expter > 9)
-	 			itoa(expter,	symCurrent, 	10);
-	 		else {
-	 			symCurrent[0] = ' ';
-	 			if(current_current < -90)
-	 				symCurrent[0] = '-';
-	 			itoa(expter,     symCurrent+1,	10);
-	 		}
-	 		itoa(current_Vout,  symVout   , 10);
-	 		symCurrent[2] = '.';
-	 		symCurrent[4] = ' ';
-	 		symCurrent[5] = 'A';
-	 		symVout[5] = 'V';
 	 		current_speed = speed;
-	 		if(speed == 0 ){
-	 			start_callibr++;
-	 		}
-	 		else
-	 			start_callibr = 0;
-	 		if(start_callibr >= MAX_CALIBR)
-	 			calibr = ON;
-	 		//current_current_raw = (((getAverADC(data_ch[2]) * ADC_TO_V) - 1500)); // 1500 MI_DIS
-	 		current_current_raw 	= 	SystemState.AdcData.chanel_2_voltage * 1000;//getAverADC(data_ch[2]);
-	 		current_voltage_battery = 	SystemState.AdcData.chanel_3_voltage * 1000;
-	 		current_current = 1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
 
-	 		if(calibr == ON){
-	 			calibr = 0;// todo добавить условие что движетель должен остановлен быть
-	 			set_zero = current_current;
-	 		}
-	 		current_current -= set_zero;
-	 		mantisa = abs((current_current%1000)/100);
-	 		expter = abs((current_current/1000));
-	 		current_Vout = current_voltage_battery;//getAverADC(data_ch[1]) * ADC_TO_V;
+	 		current_current = SystemState.BattaryData.percentCharge; //1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
+	 		current_Vout = SystemState.BattaryData.voltage; // Убераем последний знак.
+
+	 		itoa(current_speed, 	symSpeed, 10);
+	 		itoa(current_Vout,		symVout,  10);
+	 		itoa(current_current,	symCurrent,  10);
+
+	 		symCurrent[3] = ' ';
+	 		symCurrent[4] = '%';
+
+	 		symVout[3] = symVout[2];
+	 		symVout[2] = '.';
+	 		symVout[4] = 'V';
+
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
 	 			ssd1306_WriteString("       ", Font_11x18, White);
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
 	 			ssd1306_WriteString(symSpeed, Font_11x18, White);
-	 		// х-линейный отступ плюс слово cur: 4 символов+1символ для знака : Вывод тока
+
+	 		// х-линейный отступ плюс слово cur: 4 символов+1символ для знака : Вывод заряда
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 4, STD_WHITESPACE + SIZE_FONT_Y);
 	 			ssd1306_WriteString("       ", Font_11x18, White);
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 4, STD_WHITESPACE + SIZE_FONT_Y);
 	 			ssd1306_WriteString(symCurrent, Font_11x18, White);
-	 		// х-линейный отступ плюс слово Vout: 5 символов : Вывод напряжения управления
+
+	 		// х-линейный отступ плюс слово Vout: 5 символов : Вывод напряжения питания
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
 	 			ssd1306_WriteString("       ", Font_11x18, White);
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
 	 			ssd1306_WriteString(symVout, Font_11x18, White);
+
 	 		udpateDisplay();
 	 	}
   }
