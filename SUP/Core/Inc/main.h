@@ -137,8 +137,9 @@ typedef struct{
 typedef struct{
 	eDeviceState readyBattary;
 	uint8_t percentCharge;
-	uint8_t MaxCellVoltage;
-	uint8_t MinCellVoltage;
+	uint16_t MaxCellVoltage;
+	uint16_t MinCellVoltage;
+	uint8_t BatteryType;
 	uint8_t numCell;
 	uint16_t voltage;
 	uint16_t current; // mA
@@ -190,11 +191,18 @@ typedef enum {
 	ZERO_MIGRATE
 } eErrorMigrationZero;
 
+typedef enum {
+	BATTARY_OK,
+	VOLTAGE_IS_HIGH,
+	VOLTAGE_IS_LOW,
+} eErrorBattary;
+
 typedef struct{
 	uint8_t error_mismatch_current; // когда код управления 0 а ток не 0
 	uint8_t error_DAC_ADC; // DAC has one state but ADC have other state;
 	uint8_t counterEncoderError;
 	uint8_t errorCounter;
+	eErrorBattary ErrorBattary;
 	eErrorEncoder error_encoder;
 	eStandartError error_DISPLAY;
 	eStandartError error_DAC;
