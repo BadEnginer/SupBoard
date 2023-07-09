@@ -29,7 +29,7 @@ char* tr_data;
 char symData[8] = {'L','a','s','t','-'};
 uint8_t time;
 extern uint8_t calibr;
-#define WAIT_ERROR_ADC_DAC 20
+#define WAIT_ERROR_ADC_DAC 50
 
 void error_processing(){
 	// проверить все ли устройства на месте
@@ -38,13 +38,17 @@ void error_processing(){
 	//SystemState.ErrorState.
 	// Проверка Достоврености работы АЦП
 	static uint8_t iterErrorADC_DAC = 0;
-	int16_t difADC_DAC = SystemState.AdcData.chanel_1_voltage - SystemState.MotorData.control_voltage;
+	int16_t battary_voltage = SystemState.BattaryData.voltage;
+	int16_t max_bat_voltage = SystemState.BattaryData.MaxCellVoltage * SystemState.BattaryData.numCell;
+	int16_t min_bat_voltage = SystemState.BattaryData.MinCellVoltage * SystemState.BattaryData.numCell;
+	int16_t difADC_DAC = SystemState.AdcData.chanel_1_voltage - (SystemState.MotorData.control_voltage * 1000);
+
 	if(abs(SystemState.AdcData.chanel_0_voltage > 10))
 		SystemState.ErrorState.ErrorMigrationZero = ZERO_MIGRATE;
 	else
 		SystemState.ErrorState.ErrorMigrationZero = ZERO_OK;
 
-	if(abs(difADC_DAC) > 50)
+	if(abs(difADC_DAC) > 100)
 		iterErrorADC_DAC++;
 	else
 		iterErrorADC_DAC = 0;
@@ -52,13 +56,37 @@ void error_processing(){
 		SystemState.ErrorState.error_DAC = DEVISE_ERROR;
 		iterErrorADC_DAC = 0;
 	}
+
+	if(battary_voltage >= max_bat_voltage)
+			SystemState.ErrorState.ErrorBattary = VOLTAGE_IS_HIGH;
+	else if(battary_voltage < min_bat_voltage)
+			SystemState.ErrorState.ErrorBattary = VOLTAGE_IS_LOW;
+	else
+		SystemState.ErrorState.ErrorBattary  = BATTARY_OK;
+
 }
 #define CELL_4 4
 #define CELL_3 3
 #define BATTARY_TYPE_FE  1
 #define BATTARY_TYPE_LIPO  2
+
+#define CURREN_NUM_CELL CELL_4
+#define CURRENT_BAT_TYPE BATTARY_TYPE_LIPO
+
+
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
+
+	SystemState.BattaryData.BatteryType = CURRENT_BAT_TYPE;
+	SystemState.BattaryData.MaxCellVoltage = 4200;
+	SystemState.BattaryData.MinCellVoltage = 3000;
+
+	if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_FE){
+		SystemState.BattaryData.MaxCellVoltage = 3558;
+		SystemState.BattaryData.MinCellVoltage = 3182;
+	}
+	SystemState.BattaryData.numCell = CURREN_NUM_CELL;
+
 	for(;;){
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
 			switch(command_CMD[0] - 48){ // преобразуем символ в число
@@ -80,23 +108,27 @@ void StartSensOutTask(void *argument){
 		trueButtonEB();
 		trueButtonEP();
 		trueButtonEM();
+
 		SystemState.BattaryData.current = SystemState.AdcData.chanel_2_voltage;
 		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)), 0.1);
 		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage), 0.2);
-		osDelay(100);
+		if(SystemState.ErrorState.ErrorBattary == VOLTAGE_IS_HIGH)
+			SystemState.BattaryData.percentCharge = 100;
 		error_processing();
+
+		osDelay(100);
 	}
 }
 
-int16_t expFiltrVbat(int16_t newVal, float k) {
-	  static int16_t filVal = 0;
+int16_t expFiltrVbat(float newVal, float k) {
+	  static float filVal = 0;
 	  filVal += (newVal - filVal) * k;
-	  return filVal;
+	  return (int16_t)filVal;
 }
-int16_t expFiltrCharge(int16_t newVal, float k) {
-	  static int16_t filVal = 0;
+int16_t expFiltrCharge(float newVal, float k) {
+	  static float filVal = 0;
 	  filVal += (newVal - filVal) * k;
-	  return filVal;
+	  return (int16_t)filVal;
 }
 
 
@@ -111,6 +143,7 @@ uint8_t decides = 0;
 
 uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_voltage){
 	uint16_t* arr = charge_proc_LIPO + 2 ;
+	int16_t rez_mid;
 	if(num_cell == 0)
 		num_cell = 1;
 	//uint16_t battery_1C = battary_voltage/num_cell;
@@ -120,7 +153,7 @@ uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_vo
 		return 0;
 	if(battary_voltage >= (arr[9]*num_cell)) // Максимальное значение и выше будет 1
 		return 100;
-	for(uint8_t i = 1; i < 9; i++){
+	for(uint8_t i = 1; i <= 9; i++){
 		if(battary_voltage > (arr[i]*num_cell))
 			continue;
 		else{
@@ -128,7 +161,8 @@ uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_vo
 			raznica1 = (battary_voltage-(arr[i-1]*num_cell));
 			raznica2 = ((arr[i]*num_cell) - (arr[i-1]*num_cell));
 			proc = ((float)raznica1/(float)raznica2)*100.0;
-			return (decides+ proc/10);
+			rez_mid = (decides+ (proc/10));
+			return rez_mid;
 		}
 	}
 }
