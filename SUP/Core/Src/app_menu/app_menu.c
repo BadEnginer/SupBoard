@@ -12,13 +12,13 @@ static int8_t  encoderAS56 = 0;		// Положение энкодера 1 кру
 uint8_t calibr = 1;
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT+1] = {
-    "  Buttons  ",
-    "    LED    ",
-    "   Error   ",
-	"    ADC    ",
-	"  Encoder  ",
-	"    DAC    ",
-	"  Setting  ",
+    " 1:Buttons ",
+    "   2:LED   ",
+    "  3:Error  ",
+	"   4:ADC   ",
+	" 5:Encoder ",
+	"   6:DAC   ",
+	" 7:Setting ",
 	" Conf Menu "
 };
 
@@ -34,15 +34,19 @@ const char* menuEncoder[3] = {
     "ANG:   MN: ",
 	"  Encoder  "
 };
-const char* menuSettings[7] = {
+#define MAX_ERROR_CONF_MENU 11
+const char* menuSettings[MAX_ERROR_CONF_MENU+1] = {
+	"Currt:     ",
+	"Bat.V:     ",
     "BatType:   ",
     "Num Cell:  ",
     "Max.V:     ",
 	"Mix.V:     ",
 	"Capacity:  ",
-	"Err.MOT    ",
-	"Err.ADC    ",
-	"Err.DAC    ",
+	"Err.MZ:    ",
+	"Err.ADC:   ",
+	"Err.Bat:   ",
+	"Err.DAC:   ",
 	" Settings  "
 };
 
@@ -152,7 +156,7 @@ void drawMainMenu() {
     	next_item_menu = current_item_menu + 1;
     	if(next_item_menu >= MENU_ITEMS_COUNT )
     		next_item_menu = 0;
-    	SystemState.DisplayState.CurrentMenu = current_item_menu;
+    	SystemState.DisplayState.CurrentMenu = 2;
     	drawCurrentMenu(current_item_menu, next_item_menu, prev_item, SystemState.DisplayState.mode);
     	ssd1306_Line(7, 21, 120, 21, White);
         ssd1306_Line(7, 63, 120, 63, White);
@@ -177,11 +181,11 @@ void drawMainMenu() {
     		    switch(current_item_menu){
     		    	case 0: drawButtonMenu();	break;
     		    	case 1: drawLEDMenu(); 		break;
-    		    	case 2: drawE_inkMenu();	break;
+    		    	case 2: drawSettinMenu();	break;
     		    	case 3: drawADCMenu();		break;
     		    	case 4: drawEncodMenu();	break;
     		    	case 5: drawDACMenu();		break;
-    		    	case 6: drawSettinMenu();	break;
+    		    	case 6: drawE_inkMenu();	break;
     		    	//default: current_item_menu = 0;
     		    }
     		    SystemState.DisplayState.prevState = SystemState.DisplayState.state;
@@ -441,10 +445,12 @@ void drawADCMenu(){
 		ch1 = (SystemState.AdcData.chanel_1_voltage );
 		ch2 = (SystemState.AdcData.chanel_2_voltage );
 		ch3 = (SystemState.AdcData.chanel_3_voltage );
+
 		itoa(ch0, sym_ch0, 10);
 		itoa(ch1, sym_ch1, 10);
 		itoa(ch2, sym_ch2, 10);
 		itoa(ch3, sym_ch3, 10);
+
 		ssd1306_SetCursor(SIZE_FONT_X * 3, START_POS_Y + SIZE_FONT_Y);
 			ssd1306_WriteString(sym_ch0, Font_11x18, White);
 		ssd1306_SetCursor(SIZE_FONT_X * 9, START_POS_Y + SIZE_FONT_Y);
@@ -454,6 +460,7 @@ void drawADCMenu(){
 		ssd1306_SetCursor(SIZE_FONT_X * 9, START_POS_Y + SIZE_FONT_Y*2);
 			ssd1306_WriteString(sym_ch3, Font_11x18, White);
 		udpateDisplay();
+
 		if(buttonLong() == ON){
 			buttonLongReset();
 			break;
@@ -468,7 +475,87 @@ void drawDACMenu(){
 	uint8_t exit = 0;
 }
 void drawSettinMenu(){
-	uint8_t exit = 0;
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
+	SystemState.DisplayState.state = ERROR_CONFIG;
+
+	int8_t current_menu = 1;
+	char sym_current [4];
+	char sym_vbat    [5];
+	char sym_battType[3];
+	char sym_numCell [2];
+	char sym_maxVbat [4];
+	char sym_minVbat [4];
+	char sym_capacity[2];
+	char sym_ErrMigZ [3];
+	char sym_ErrADC  [3];
+	char sym_ErrBAT  [3];
+	char sym_ErrDAC  [3];
+
+
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+
+	HAL_Delay(50);
+
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+	while(1){
+		itoa(SystemState.BattaryData.current, sym_current,	10);
+		itoa(SystemState.BattaryData.voltage, sym_vbat, 	10);
+		itoa(SystemState.BattaryData.numCell, sym_numCell,	10);
+
+		itoa(SystemState.BattaryData.MaxCellVoltage, sym_maxVbat, 10);
+		itoa(SystemState.BattaryData.MinCellVoltage, sym_minVbat, 10);
+
+		strcpy(sym_capacity,"00");
+
+		if(CURRENT_BAT_TYPE == BATTARY_TYPE_LIPO)
+			strcpy(sym_battType,"Li");
+		else
+			strcpy(sym_battType, "Fe");
+
+		if(SystemState.ErrorState.ErrorMigrationZero == ZERO_OK)
+			strcpy(sym_ErrMigZ, "OFF");
+		else
+			strcpy(sym_ErrMigZ, "ON");
+
+		if(SystemState.ErrorState.error_ADC == DEVISE_OK)
+			strcpy(sym_ErrADC,"OK");
+		else if (SystemState.ErrorState.error_ADC == DEVISE_ERROR)
+			strcpy(sym_ErrADC,"Err");
+		else
+			strcpy(sym_ErrADC,"FE!");
+		if(SystemState.ErrorState.error_DAC_ADC )
+		sym_ErrBAT  [3];
+		sym_ErrDAC  [3];
+
+		ssd1306_Fill(Black);
+		ssd1306_SetCursor(START_POS_X, START_POS_Y);
+			ssd1306_WriteString(menuSettings[current_menu-1], Font_11x18, White);
+		ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y);
+			ssd1306_WriteString(menuSettings[current_menu], Font_11x18, White);
+		ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
+			ssd1306_WriteString(menuSettings[current_menu+1], Font_11x18, White);
+		udpateDisplay();
+
+		if(encoderData > 0){
+			current_menu ++;
+			if(current_menu > MAX_ERROR_CONF_MENU - 1)
+				current_menu = 1;
+		}
+		if(encoderData < 0){
+			current_menu --;
+			if(current_menu < 1)
+				current_menu = MAX_ERROR_CONF_MENU - 1;
+		}
+		if(buttonLong() == ON){
+			buttonLongReset();
+			break;
+		}
+		HAL_Delay(50);
+	}
 }
 
 uint8_t buttonUp(){

@@ -13,6 +13,14 @@
 #define MAX_COUNT 2
 #define LONG_COUNT 15
 
+#define CELL_4 4
+#define CELL_3 3
+#define BATTARY_TYPE_FE  1
+#define BATTARY_TYPE_LIPO  2
+
+#define CURREN_NUM_CELL CELL_4
+#define CURRENT_BAT_TYPE BATTARY_TYPE_LIPO
+
 void trueButtonLB();
 void trueButtonEB();
 void trueButtonEP();

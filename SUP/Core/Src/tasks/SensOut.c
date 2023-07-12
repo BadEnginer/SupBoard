@@ -65,13 +65,6 @@ void error_processing(){
 		SystemState.ErrorState.ErrorBattary  = BATTARY_OK;
 
 }
-#define CELL_4 4
-#define CELL_3 3
-#define BATTARY_TYPE_FE  1
-#define BATTARY_TYPE_LIPO  2
-
-#define CURREN_NUM_CELL CELL_4
-#define CURRENT_BAT_TYPE BATTARY_TYPE_LIPO
 
 
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
@@ -86,7 +79,6 @@ void StartSensOutTask(void *argument){
 		SystemState.BattaryData.MinCellVoltage = 3182;
 	}
 	SystemState.BattaryData.numCell = CURREN_NUM_CELL;
-
 	for(;;){
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
 			switch(command_CMD[0] - 48){ // преобразуем символ в число
@@ -111,7 +103,7 @@ void StartSensOutTask(void *argument){
 
 		SystemState.BattaryData.current = SystemState.AdcData.chanel_2_voltage;
 		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)), 0.1);
-		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(BATTARY_TYPE_LIPO, CELL_4, SystemState.BattaryData.voltage), 0.2);
+		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(CURRENT_BAT_TYPE, CELL_4, SystemState.BattaryData.voltage), 0.2);
 		if(SystemState.ErrorState.ErrorBattary == VOLTAGE_IS_HIGH)
 			SystemState.BattaryData.percentCharge = 100;
 		error_processing();

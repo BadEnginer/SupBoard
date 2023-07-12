@@ -81,10 +81,10 @@ typedef enum{
 	ADC_CONFIG,
 	DAC_CONFIG,
 	SYSTEM_CONFIG,
+	ERROR_CONFIG,
 	ERROR_STATE,
 	ERROR_STATE_I2C,
 	WAIT_COMMAND
-
 } eDisplayState;
 
 typedef struct{
