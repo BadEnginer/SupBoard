@@ -142,7 +142,9 @@ typedef struct{
 	uint8_t BatteryType;
 	uint8_t numCell;
 	uint16_t voltage;
-	uint16_t current; // mA
+	int32_t current; // mA
+	uint16_t zeroCurrentReal;
+	uint16_t zeroCurrentImg;
 	uint16_t sumCharge;
 	uint16_t workTime;
 	uint16_t estimatedTime;

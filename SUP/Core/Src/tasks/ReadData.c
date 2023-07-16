@@ -62,7 +62,6 @@ uint16_t getEncoderData(){
 	SystemState.MagnitEncoderData.EncoderState.u8MagnitState = AS5600_GetStatus();
 	if(SystemState.MagnitEncoderData.EncoderState.sMagnitState.MD == ON)
 		raw_angle = AS5600_GetRawAngle();
-	SystemState.MagnitEncoderData.curretn_raw_angle = raw_angle;
 	return 	raw_angle;
 }
 

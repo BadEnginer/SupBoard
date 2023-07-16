@@ -165,7 +165,7 @@ void drawMainMenu() {
         buttonLongReset();
         encoderReset();
     	while(1){
-    		HAL_Delay(10); // Даёт время для других задач
+    		HAL_Delay(300); // Даёт время для других задач
     		if(buttonLong()){
     		// Вернуться на стартовый дисплей
     			exit = 0;
@@ -263,7 +263,7 @@ void startDisplay(){
 		buttonEnReset();
 		encoderReset();
 	 	while(1){
-	 		HAL_Delay(100);
+	 		HAL_Delay(300);
 	 		// Блок реакции на кнопки
 	 		if(buttonEn()){
 	 			// Если кнопка Enter On прервать текущий цикл

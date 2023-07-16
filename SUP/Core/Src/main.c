@@ -43,7 +43,8 @@ sSystemState SystemState = {};
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+uint8_t devises_list[10] = {};
+HAL_StatusTypeDef stateDevise;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -121,6 +122,14 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  uint8_t j = 0;
+  for(uint8_t i = 1; i < 127; i ++){
+	  stateDevise = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 5);
+	  if(stateDevise == HAL_OK){
+		  devises_list[j] = i;
+		  j++;
+	  }
+  }
   ssd1306_Init();
   ssd1306_Fill(Black);
   SystemState.DisplayState.state = LOAD;
@@ -497,7 +506,7 @@ void test_i2c_dev(){
 		}
 		else {
 			SystemState.DisplayState.readyDISPLAY = DEVICE_NO_ANSWER;
-			SystemState.ErrorState.error_DISPLAY = DEVISE_NO_ANSWER;
+			SystemState.ErrorState.error_DISPLAY = DEVISE_ERROR;
 		}
     }
 }

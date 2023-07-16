@@ -1,8 +1,8 @@
 #include "tasks/SensOut.h"
 
 //
-#define RES_TOP 9.92f
-#define RES_BOT 1.001f
+#define RES_TOP 9.84f
+#define RES_BOT 1.002f
 #define BATTERY_DEVIDER (1.0 + (RES_TOP/RES_BOT))
 
 
@@ -66,7 +66,7 @@ void error_processing(){
 
 }
 
-
+int16_t dif_current;
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
 
@@ -79,6 +79,9 @@ void StartSensOutTask(void *argument){
 		SystemState.BattaryData.MinCellVoltage = 3182;
 	}
 	SystemState.BattaryData.numCell = CURREN_NUM_CELL;
+	HAL_Delay(3000);
+	SystemState.BattaryData.zeroCurrentReal = SystemState.AdcData.chanel_3_voltage;
+	SystemState.BattaryData.zeroCurrentImg = 3300 / 2;
 	for(;;){
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
 			switch(command_CMD[0] - 48){ // преобразуем символ в число
@@ -101,8 +104,12 @@ void StartSensOutTask(void *argument){
 		trueButtonEP();
 		trueButtonEM();
 
-		SystemState.BattaryData.current = SystemState.AdcData.chanel_2_voltage;
-		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_3_voltage * 1.0 * BATTERY_DEVIDER)), 0.1);
+#define CUR_PARAM_1 37174,7
+#define CUR_PARAM_2 (1,7317 * CUR_PARAM_1)
+		dif_current = (SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentReal);
+		SystemState.BattaryData.current =dif_current *42.553;
+		//SystemState.BattaryData.current = (float)((SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg)/0.0235);
+		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_2_voltage * 1.0 * BATTERY_DEVIDER)), 0.2);
 		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(CURRENT_BAT_TYPE, CELL_4, SystemState.BattaryData.voltage), 0.2);
 		if(SystemState.ErrorState.ErrorBattary == VOLTAGE_IS_HIGH)
 			SystemState.BattaryData.percentCharge = 100;
