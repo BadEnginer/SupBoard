@@ -29,6 +29,7 @@ void trueButtonEM();
 uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_voltage);
 int16_t expFiltrCharge(float newVal, float k);
 int16_t expFiltrVbat(float newVal, float k);
+int16_t expFiltrIcurrnt(float newVal, float k);
 void error_processing();
 void longButton();
 void StartSensOutTask(void *argument);

@@ -111,6 +111,8 @@ typedef struct{
 		uint8_t EncoderPLUSCounter;
 	StateButton EncoderMINUS;
 		uint8_t EncoderMINUSCounter;
+	StateButton SetMaxSpeed;
+		int8_t setMaxSpeed;
 } sButtonData;
 
 
@@ -145,6 +147,7 @@ typedef struct{
 	int32_t current; // mA
 	uint16_t zeroCurrentReal;
 	uint16_t zeroCurrentImg;
+	uint8_t calibraty;
 	uint16_t sumCharge;
 	uint16_t workTime;
 	uint16_t estimatedTime;

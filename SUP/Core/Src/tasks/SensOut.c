@@ -67,6 +67,7 @@ void error_processing(){
 }
 
 int16_t dif_current;
+int16_t calibrate;
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
 
@@ -79,7 +80,8 @@ void StartSensOutTask(void *argument){
 		SystemState.BattaryData.MinCellVoltage = 3182;
 	}
 	SystemState.BattaryData.numCell = CURREN_NUM_CELL;
-	HAL_Delay(3000);
+	osDelay(3000);
+	SystemState.BattaryData.calibraty = 1;
 	SystemState.BattaryData.zeroCurrentReal = SystemState.AdcData.chanel_3_voltage;
 	SystemState.BattaryData.zeroCurrentImg = 3300 / 2;
 	for(;;){
@@ -89,7 +91,10 @@ void StartSensOutTask(void *argument){
 				case 2: buttonLongSet();  break;
 				case 3: encoderSetUp();   break;
 				case 4: encoderSetDown(); break;
-				case 5: calibr = ON;	  break;
+				case 5: SystemState.BattaryData.calibraty = 1;	  break;
+				case 6: setMaxSpeed(1);	  break;
+				case 7: setMaxSpeed(-1);  break;
+
 			}//todo добавить больше данных
 			test_data = command_CMD[0];
 			command_CMD[0] = 0;
@@ -106,8 +111,12 @@ void StartSensOutTask(void *argument){
 
 #define CUR_PARAM_1 37174,7
 #define CUR_PARAM_2 (1,7317 * CUR_PARAM_1)
-		dif_current = (SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentReal);
-		SystemState.BattaryData.current =dif_current *42.553;
+		dif_current = (SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg);
+		if(SystemState.BattaryData.calibraty == 1){
+			SystemState.BattaryData.calibraty = 0;
+			calibrate = dif_current;
+		}
+		SystemState.BattaryData.current =expFiltrIcurrnt(((dif_current-calibrate) *42.553), 0.5);
 		//SystemState.BattaryData.current = (float)((SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg)/0.0235);
 		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_2_voltage * 1.0 * BATTERY_DEVIDER)), 0.2);
 		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(CURRENT_BAT_TYPE, CELL_4, SystemState.BattaryData.voltage), 0.2);
@@ -117,6 +126,12 @@ void StartSensOutTask(void *argument){
 
 		osDelay(100);
 	}
+}
+
+int16_t expFiltrIcurrnt(float newVal, float k) {
+	  static float filVal = 0;
+	  filVal += (newVal - filVal) * k;
+	  return (int16_t)filVal;
 }
 
 int16_t expFiltrVbat(float newVal, float k) {
@@ -204,12 +219,14 @@ void trueButtonEP(){
 			counterLong = OFF;
 		}
 		if((countEP > MAX_COUNT) && (counterLong == OFF)){
+			//counterLong = ON;
 			encoderSetUp();
 			countEP = 0;
 		}
 		if((countEP > LONG_COUNT) && (counterLong == ON)){
-			encoderSetUp();// Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать увеличивать
+			setMaxSpeed(1);// Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать увеличивать
 			countEP = 0;
+			counterLong = OFF;
 		}
 }
 
@@ -224,13 +241,13 @@ void trueButtonEM(){
 			counterLong = OFF;
 		}
 		if((countEM > MAX_COUNT) && (counterLong == OFF)){
-			counterLong = ON;
 			encoderSetDown();
 			countEM = 0;
 		}
 		if((countEM > LONG_COUNT) && (counterLong == ON)){
-			encoderSetDown(); // Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать уменьшать
+			setMaxSpeed(-1); // Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать уменьшать
 			countEM = 0;
+			counterLong = OFF;
 		}
 }
 
