@@ -72,6 +72,6 @@ int8_t encoderData();
 void encoderSetUp();
 void encoderSetDown();
 void encoderReset();
-
+void setMaxSpeed(int8_t znak);
 
 #endif /* INC_APP_MENU_H_ */

@@ -127,7 +127,7 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
 			ssd1306_SetCursor(LAST_POS_X - WITH_STIRNG_MID, START_FIRST_STRING_Y + 10 ); //
 				ssd1306_WriteString("<", Font_11x18, White);
 			udpateDisplay();
-			HAL_Delay(10);
+			osDelay(10);
     	}
     }
 
@@ -165,7 +165,7 @@ void drawMainMenu() {
         buttonLongReset();
         encoderReset();
     	while(1){
-    		HAL_Delay(300); // Даёт время для других задач
+    		osDelay(300); // Даёт время для других задач
     		if(buttonLong()){
     		// Вернуться на стартовый дисплей
     			exit = 0;
@@ -240,6 +240,7 @@ int16_t current_Vout;
 uint16_t deadArea = 0;
 extern int16_t delta_encoder;
 void startDisplay(){
+	uint8_t calibrateData = 0;
 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = START;
 	// todo сделать отдельную функцию для упрощения
@@ -258,18 +259,20 @@ void startDisplay(){
 	 	char symSpeed[6];
 	 	char symCurrent[6];
 	 	char symVout[6];
-	 	HAL_Delay(500);
+	 	osDelay(500);
 		buttonLongReset();
 		buttonEnReset();
 		encoderReset();
 	 	while(1){
-	 		HAL_Delay(300);
+	 		osDelay(300);
 	 		// Блок реакции на кнопки
 	 		if(buttonEn()){
+	 			calibrateData = 0;
 	 			// Если кнопка Enter On прервать текущий цикл
 	 			break;
 	 		}
 	 		if(encoderData() > 0){
+	 			calibrateData = 0;
 	 			// Если энкодер + повысить скорость.
 	 			encoderReset();
 	 		 	speed++;
@@ -277,15 +280,31 @@ void startDisplay(){
 	 		 		speed = MAX_SPEED;
 	 		}
 	 		if(encoderData() < 0){
+	 			calibrateData = 0;
 	 			encoderReset();
 	 		 	speed--;
 	 		 	if(speed <= MIN_SPEED)
 	 		 		speed = MIN_SPEED;
 	 		}
+
+	 		if(SystemState.ButtonsData.SetMaxSpeed == BUTTON_ON){
+	 			SystemState.ButtonsData.SetMaxSpeed = BUTTON_OFF;
+	 			if(SystemState.ButtonsData.setMaxSpeed > 0)
+	 				speed = MAX_SPEED;
+	 			else
+	 				speed = MIN_SPEED;
+	 		}
+
 	 		if(buttonLong()){
 	 			// Если Back включен скорость обноляем
 	 			speed = 0;
+	 			calibrateData++;
 	 			buttonLongReset();
+	 		}
+
+	 		if(calibrateData >= 4){
+	 			calibrateData = 0;
+	 			SystemState.BattaryData.calibraty = 1;
 	 		}
 
 	 		SystemState.MotorData.current_speed = speed;
@@ -391,7 +410,7 @@ void drawButtonMenu(){
 			ssd1306_WriteString(sym_encP, Font_11x18, White);
 
 		udpateDisplay();
-		HAL_Delay(50);
+		osDelay(50);
 
 		if(butLo > 2){
 			if (butEn > 2)
@@ -436,7 +455,7 @@ void drawADCMenu(){
 	ssd1306_SetCursor(START_POS_X, START_POS_Y + SIZE_FONT_Y*2);
 		ssd1306_WriteString(menuADC[1], Font_11x18, White);
 	udpateDisplay();
-	HAL_Delay(50);
+	osDelay(50);
 	buttonEnReset();
 	buttonLongReset();
 	encoderReset();
@@ -465,7 +484,7 @@ void drawADCMenu(){
 			buttonLongReset();
 			break;
 		}
-		HAL_Delay(50);
+		osDelay(50);
 	}
 }
 void drawEncodMenu(){
@@ -496,7 +515,7 @@ void drawSettinMenu(){
 	buttonLongReset();
 	encoderReset();
 
-	HAL_Delay(50);
+	osDelay(50);
 
 	buttonEnReset();
 	buttonLongReset();
@@ -554,7 +573,7 @@ void drawSettinMenu(){
 			buttonLongReset();
 			break;
 		}
-		HAL_Delay(50);
+		osDelay(50);
 	}
 }
 
@@ -608,10 +627,15 @@ void buttonLongReset(){
 int8_t encoderData(){
 	return encoderAS56;
 }
+
 void encoderSetUp(){
 	SystemState.ButtonsData.EncoderPLUS = BUTTON_ON;
 	SystemState.ButtonsData.EncoderPLUSCounter++;
 	encoderAS56 = 1;
+}
+void setMaxSpeed(int8_t znak){
+	SystemState.ButtonsData.SetMaxSpeed = BUTTON_ON;
+	SystemState.ButtonsData.setMaxSpeed = znak;
 }
 
 void encoderSetDown(){
