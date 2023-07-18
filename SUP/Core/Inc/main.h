@@ -81,6 +81,7 @@ typedef enum{
 	ADC_CONFIG,
 	DAC_CONFIG,
 	SYSTEM_CONFIG,
+	BATTARY_CONFIG,
 	ERROR_CONFIG,
 	ERROR_STATE,
 	ERROR_STATE_I2C,
@@ -136,13 +137,29 @@ typedef struct{
 	int16_t chanel_3_voltage;
 } sAdcData;
 
+typedef enum eTypeBattary{
+	BATTARY_NO_INIT,
+	BATTARY_TYPE_LIFE,
+	BATTARY_TYPE_LIPO
+} TypeBattary;
+
+typedef enum eNumCell{
+	NUM_CELL_NO_INIT,
+	NUM_CELL_1S,
+	NUM_CELL_2S,
+	NUM_CELL_3S,
+	NUM_CELL_4S,
+	NUM_CELL_5S,
+	NUM_CELL_6S,
+} NumCell;
+
 typedef struct{
 	eDeviceState readyBattary;
 	uint8_t percentCharge;
 	uint16_t MaxCellVoltage;
 	uint16_t MinCellVoltage;
-	uint8_t BatteryType;
-	uint8_t numCell;
+	TypeBattary BatteryType;
+	NumCell numCell;
 	uint16_t voltage;
 	int32_t current; // mA
 	uint16_t zeroCurrentReal;

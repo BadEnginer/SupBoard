@@ -138,6 +138,7 @@ int main(void)
   ssd1306_SetCursor(3, 40);
   ssd1306_WriteString(" Tap Start ", Font_11x18, White);
   ssd1306_UpdateScreen();
+  HAL_Delay(1000);
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
   //osMutexRelease (BlockI2CHandle);
@@ -460,6 +461,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 			buttonEnSet();
 	}
 }
+
 
 
 void test_i2c_dev(){
