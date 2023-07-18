@@ -92,9 +92,9 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
     	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + 10); // 18 + 18 = 46
 			ssd1306_WriteString(menuItems[menu_num_current], Font_11x18, White);
 		ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + 10 ); // 18 + 18 = 46
-			ssd1306_WriteString(">", Font_11x18, White);
+			ssd1306_WriteString("", Font_11x18, White);
 		ssd1306_SetCursor(LAST_POS_X - WITH_STIRNG_MID, START_FIRST_STRING_Y + 10 ); // 18 + 18 = 46
-			ssd1306_WriteString("<", Font_11x18, White);
+			ssd1306_WriteString("", Font_11x18, White);
     }
     else if(mode == 1){
     	// средняя строчка по центру с сверху и снизу мелкие следующий и предыдущий пункт
@@ -103,9 +103,9 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
     	ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + WITH_STIRNG_MIN + SPACE_PLACE);
     		ssd1306_WriteString(menuItems[menu_num_current], Font_11x18, White);
         ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + WITH_STIRNG_MIN + SPACE_PLACE);
-        	ssd1306_WriteString(">", Font_11x18, White);
+        	ssd1306_WriteString("", Font_11x18, White);
         ssd1306_SetCursor(LAST_POS_X - WITH_STIRNG_MID, START_FIRST_STRING_Y + WITH_STIRNG_MIN + SPACE_PLACE);
-        	  ssd1306_WriteString("<", Font_11x18, White);
+        	  ssd1306_WriteString("", Font_11x18, White);
         ssd1306_SetCursor(START_POS_X + WITH_STIRNG_MIN * 4, START_FIRST_STRING_Y + WITH_STIRNG_MIN * 2 + SPACE_PLACE * 2);
         	ssd1306_WriteString(menuItems[menu_num_next], Font_6x8, White);
     }
@@ -123,9 +123,9 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
 			ssd1306_SetCursor(START_POS_X + (LEGHT_MAX_STRING*LEGHT_MAX_CHAR_MID) - i * LEGHT_MAX_CHAR_MID, START_FIRST_STRING_Y + 10 ); //
 				ssd1306_WriteString(menuItems[menu_num_current], Font_11x18, White);
 			ssd1306_SetCursor(START_POS_X, START_FIRST_STRING_Y + 10 ); //
-				ssd1306_WriteString(">", Font_11x18, White);
+				ssd1306_WriteString("", Font_11x18, White);
 			ssd1306_SetCursor(LAST_POS_X - WITH_STIRNG_MID, START_FIRST_STRING_Y + 10 ); //
-				ssd1306_WriteString("<", Font_11x18, White);
+				ssd1306_WriteString("", Font_11x18, White);
 			udpateDisplay();
 			osDelay(10);
     	}
@@ -139,7 +139,7 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
 void drawMainMenu() {
 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = MAIN_CONFIG;
-	SystemState.DisplayState.mode = 0;
+	SystemState.DisplayState.mode = 2;
     uint8_t exit = 1;
     int8_t  current_item_menu = 0;
     int8_t  next_item_menu = 0;
@@ -318,11 +318,11 @@ void startDisplay(){
 	 		itoa(current_current,	symCurrent,  10);
 
 	 		symCurrent[3] = ' ';
-	 		symCurrent[4] = '%';
+	 		symCurrent[3] = '%';
 
 	 		symVout[3] = symVout[2];
 	 		symVout[2] = '.';
-	 		symVout[4] = 'V';
+	 		symVout[5] = 'V';
 
 	 		// х-линейный отступ плюс слово speed: 6 символов+1символ для знака : Вывод скорости
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 6, STD_WHITESPACE );
@@ -335,6 +335,8 @@ void startDisplay(){
 	 			ssd1306_WriteString("       ", Font_11x18, White);
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 4, STD_WHITESPACE + SIZE_FONT_Y);
 	 			ssd1306_WriteString(symCurrent, Font_11x18, White);
+	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 7, STD_WHITESPACE + SIZE_FONT_Y);
+	 			ssd1306_WriteString("%", Font_11x18, White);
 
 	 		// х-линейный отступ плюс слово Vout: 5 символов : Вывод напряжения питания
 	 		ssd1306_SetCursor(STD_WHITESPACE + SIZE_FONT_X * 5, STD_WHITESPACE + SIZE_FONT_Y*2);
@@ -530,7 +532,7 @@ void drawSettinMenu(){
 
 		strcpy(sym_capacity,"00");
 
-		if(CURRENT_BAT_TYPE == BATTARY_TYPE_LIPO)
+		if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_LIPO)
 			strcpy(sym_battType,"Li");
 		else
 			strcpy(sym_battType, "Fe");
@@ -576,6 +578,9 @@ void drawSettinMenu(){
 		osDelay(50);
 	}
 }
+
+
+
 
 uint8_t buttonUp(){
 	return buttonUpper;

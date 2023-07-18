@@ -70,16 +70,6 @@ int16_t dif_current;
 int16_t calibrate;
 // Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
-
-	SystemState.BattaryData.BatteryType = CURRENT_BAT_TYPE;
-	SystemState.BattaryData.MaxCellVoltage = 4200;
-	SystemState.BattaryData.MinCellVoltage = 3000;
-
-	if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_FE){
-		SystemState.BattaryData.MaxCellVoltage = 3558;
-		SystemState.BattaryData.MinCellVoltage = 3182;
-	}
-	SystemState.BattaryData.numCell = CURREN_NUM_CELL;
 	osDelay(3000);
 	SystemState.BattaryData.calibraty = 1;
 	SystemState.BattaryData.zeroCurrentReal = SystemState.AdcData.chanel_3_voltage;
@@ -119,11 +109,10 @@ void StartSensOutTask(void *argument){
 		SystemState.BattaryData.current =expFiltrIcurrnt(((dif_current-calibrate) *42.553), 0.5);
 		//SystemState.BattaryData.current = (float)((SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg)/0.0235);
 		SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_2_voltage * 1.0 * BATTERY_DEVIDER)), 0.2);
-		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(CURRENT_BAT_TYPE, CELL_4, SystemState.BattaryData.voltage), 0.2);
+		SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(SystemState.BattaryData.BatteryType, SystemState.BattaryData.numCell, SystemState.BattaryData.voltage), 0.2);
 		if(SystemState.ErrorState.ErrorBattary == VOLTAGE_IS_HIGH)
 			SystemState.BattaryData.percentCharge = 100;
 		error_processing();
-
 		osDelay(100);
 	}
 }
@@ -155,13 +144,17 @@ uint16_t raznica1 = 0;
 uint16_t raznica2 = 0;
 uint8_t decides = 0;
 
-uint8_t  battaryCharge(uint8_t battryType, uint8_t num_cell, uint16_t battary_voltage){
+uint8_t  battaryCharge(){
 	uint16_t* arr = charge_proc_LIPO + 2 ;
+	uint8_t num_cell = (uint8_t) SystemState.BattaryData.numCell;
 	int16_t rez_mid;
+	uint16_t battary_voltage = SystemState.BattaryData.voltage;
 	if(num_cell == 0)
-		num_cell = 1;
+		return 0;
+	if(SystemState.BattaryData.BatteryType == BATTARY_NO_INIT)
+		return 0;
 	//uint16_t battery_1C = battary_voltage/num_cell;
-	if(battryType == BATTARY_TYPE_FE)
+	if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_LIFE)
 		arr = charge_proc_FE + 2;
 	if(battary_voltage < (arr[0]*num_cell)) // Минимальное значение и меньше будет 0
 		return 0;
