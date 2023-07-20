@@ -1,70 +1,63 @@
-/*
-Icon Set Name: IoT Icon set 16x16 bi color
-Version: 1.0.0
-Origin URL:  http://engsta.com/iot-icon-set-for-i2c-oled-displays/
-Author: Artur Funk
-License: GNU General Public License v3
-*/
-
 #ifndef __icon_set_H__
 #define __icon_set_H__
-
-		const unsigned char home_icon16x16;
-		const unsigned char arrow_up_icon16x16;
-		const unsigned char arrow_down_icon16x16;
-		const unsigned char arrow_left_icon16x16;
-		const unsigned char arrow_right_icon16x16;
-		const unsigned char bat0_icon16x16;
-		const unsigned char bat1_icon16x16;
-		const unsigned char bat2_icon16x16;
-		const unsigned char bat3_icon16x16;
-		const unsigned char bat4_icon16x16;
-		const unsigned char bluetooth_icon16x16;
-		const unsigned char bulb_icon16x16;
-		const unsigned char bulb_on_icon16x16;
-		const unsigned char bulb_off_icon16x16;
-		const unsigned char bullet_icon16x16;
-		const unsigned char cancel_icon16x16;
-		const unsigned char check_icon16x16;
-		const unsigned char fillstate1_icon16x16;
-		const unsigned char fillstate2_icon16x16;
-		const unsigned char fillstate3_icon16x16;
-		const unsigned char fillstate4_icon16x16;
-		const unsigned char speak_icon16x16;
-		const unsigned char heart_icon16x16;
-		const unsigned char nocon_icon16x16;
-		const unsigned char tool_icon16x16;
-		const unsigned char plug_icon16x16;
-		const unsigned char powerbutton_icon16x16;
-		const unsigned char tool_icon16x16;
-		const unsigned char plug_icon16x16;
-		const unsigned char powerbutton_icon16x16;
-		const unsigned char wallplug_icon16x16;
-		const unsigned char wifi1_icon16x16;
-		const unsigned char wifi2_icon16x16;
-		const unsigned char clock_icon16x16;
-		const unsigned char timer_icon16x16;
-		const unsigned char water_tap_icon16x16;
-		const unsigned char humidity_icon16x16;
-		const unsigned char humidity2_icon16x16;
-		const unsigned char sun_icon16x16;
-		const unsigned char temperature_icon16x16;
-		const unsigned char noninverted_icon16x16;
-		const unsigned char inverted_icon16x16;
-		const unsigned char lock_closed_icon16x16;
-		const unsigned char lock_open_icon16x16;
-		const unsigned char person_icon16x16;
-		const unsigned char window_icon16x16;
-		const unsigned char door_icon16x16;
-		const unsigned char face_icon16x16;
-		const unsigned char siren_icon16x16;
-		const unsigned char warning_icon16x16;
-		const unsigned char plus_icon16x16;
-		const unsigned char minus_icon16x16;
-		const unsigned char mobile_icon16x16;
-		const unsigned char signal1_icon16x16;
-		const unsigned char signal2_icon16x16;
-		const unsigned char signal3_icon16x16;
-		const unsigned char signal4_icon16x16;
-
+#include "stm32f4xx_hal.h"
+/*
+		uint8_t home_icon16x16[];
+		uint8_t arrow_up_icon16x16[];
+		uint8_t arrow_down_icon16x16[];
+		uint8_t  arrow_left_icon16x16[];
+		uint8_t  arrow_right_icon16x16[];
+		uint8_t  bat0_icon16x16[];
+		uint8_t  bat1_icon16x16[];
+		uint8_t  bat2_icon16x16[];
+		uint8_t  bat3_icon16x16[];
+		uint8_t  bat4_icon16x16[];
+		uint8_t  bluetooth_icon16x16[];
+		uint8_t  bulb_icon16x16[];
+		uint8_t  bulb_on_icon16x16[];
+		uint8_t  bulb_off_icon16x16[];
+		uint8_t  bullet_icon16x16[];
+		uint8_t  cancel_icon16x16[];
+		uint8_t  check_icon16x16[];
+		uint8_t  fillstate1_icon16x16[];
+		uint8_t  fillstate2_icon16x16[];
+		uint8_t  fillstate3_icon16x16[];
+		uint8_t  fillstate4_icon16x16[];
+		uint8_t  speak_icon16x16[];
+		uint8_t  heart_icon16x16[];
+		uint8_t  nocon_icon16x16[];
+		uint8_t  tool_icon16x16[];
+		uint8_t  plug_icon16x16[];
+		uint8_t  powerbutton_icon16x16[];
+		uint8_t  tool_icon16x16[];
+		uint8_t  plug_icon16x16[];
+		uint8_t  powerbutton_icon16x16[];
+		uint8_t  wallplug_icon16x16[];
+		uint8_t  wifi1_icon16x16[];
+		uint8_t  wifi2_icon16x16[];
+		uint8_t  clock_icon16x16[];
+		uint8_t  timer_icon16x16[];
+		uint8_t  water_tap_icon16x16[];
+		uint8_t  humidity_icon16x16[];
+		uint8_t  humidity2_icon16x16[];
+		uint8_t  sun_icon16x16[];
+		uint8_t  temperature_icon16x16[];
+		uint8_t  noninverted_icon16x16[];
+		uint8_t  inverted_icon16x16[];
+		uint8_t  lock_closed_icon16x16[];
+		uint8_t  lock_open_icon16x16[];
+		uint8_t  person_icon16x16[];
+		uint8_t  window_icon16x16[];
+		uint8_t  door_icon16x16[];
+		uint8_t  face_icon16x16[];
+		uint8_t  siren_icon16x16[];
+		uint8_t  warning_icon16x16[];
+		uint8_t  plus_icon16x16[];
+		uint8_t  minus_icon16x16[];
+		uint8_t  mobile_icon16x16[];
+		uint8_t  signal1_icon16x16[];
+		uint8_t  signal2_icon16x16[];
+		uint8_t  signal3_icon16x16[];
+		uint8_t  signal4_icon16x16[];
+*/
 #endif

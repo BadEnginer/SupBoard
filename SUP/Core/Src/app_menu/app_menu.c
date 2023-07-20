@@ -18,7 +18,7 @@ const char* menuItems[MENU_ITEMS_COUNT+1] = {
 	"   4:ADC   ",
 	" 5:Encoder ",
 	"   6:DAC   ",
-	" 7:Setting ",
+	" 7:Battery ",
 	" Conf Menu "
 };
 
@@ -96,7 +96,7 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
 		ssd1306_SetCursor(LAST_POS_X - WITH_STIRNG_MID, START_FIRST_STRING_Y + 10 ); // 18 + 18 = 46
 			ssd1306_WriteString("", Font_11x18, White);
     }
-    else if(mode == 1){
+    else if(mode == 9){
     	// средняя строчка по центру с сверху и снизу мелкие следующий и предыдущий пункт
        	ssd1306_SetCursor(START_POS_X + WITH_STIRNG_MIN*4, START_FIRST_STRING_Y); //
     		ssd1306_WriteString(menuItems[menu_prev_num], Font_6x8, White);
@@ -127,9 +127,9 @@ void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t me
 			ssd1306_SetCursor(LAST_POS_X - WITH_STIRNG_MID, START_FIRST_STRING_Y + 10 ); //
 				ssd1306_WriteString("", Font_11x18, White);
 			udpateDisplay();
-			osDelay(10);
     	}
     }
+
 
 
 	ssd1306_SetCursor(START_POS_X, START_POS_Y); // 18 = 19 ( последний пиксель) + линия ( 20 )
@@ -167,10 +167,10 @@ void drawMainMenu() {
     	while(1){
     		osDelay(300); // Даёт время для других задач
     		if(buttonLong()){
-    		// Вернуться на стартовый дисплей
-    			exit = 0;
-    			break;
-    		}
+        		// Вернуться на стартовый дисплей
+        			exit = 0;
+        			break;
+        		}
 
     		if(buttonLong()){
     			// Вернуться на стартовый дисплей
@@ -185,7 +185,7 @@ void drawMainMenu() {
     		    	case 3: drawADCMenu();		break;
     		    	case 4: drawEncodMenu();	break;
     		    	case 5: drawDACMenu();		break;
-    		    	case 6: drawE_inkMenu();	break;
+    		    	case 6: drawBattaryMenu();	break;
     		    	//default: current_item_menu = 0;
     		    }
     		    SystemState.DisplayState.prevState = SystemState.DisplayState.state;
@@ -203,7 +203,7 @@ void drawMainMenu() {
     		}
     		if(encoderData() < 0){
     			prev_item = current_item_menu;
-    			current_item_menu++;
+    			current_item_menu--;
     			encoderReset();
     			break;
     		}
@@ -428,8 +428,8 @@ void drawLEDMenu(){
 	uint8_t red,grn,blu;
 }
 
-void drawE_inkMenu(){
-	uint8_t exit = 0;
+void drawBattaryMenu(){
+	OutputBattaryParam();
 }
 
 void drawADCMenu(){
@@ -563,11 +563,13 @@ void drawSettinMenu(){
 
 		if(encoderData > 0){
 			current_menu ++;
+			encoderReset();
 			if(current_menu > MAX_ERROR_CONF_MENU - 1)
 				current_menu = 1;
 		}
 		if(encoderData < 0){
 			current_menu --;
+			encoderReset();
 			if(current_menu < 1)
 				current_menu = MAX_ERROR_CONF_MENU - 1;
 		}
@@ -580,6 +582,127 @@ void drawSettinMenu(){
 }
 
 
+void OutputBattaryParam(){
+
+	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
+	SystemState.DisplayState.state = BATTARY_CONFIG;
+	char* battTypeLip = {"Batt.T:LiPo"};
+	char* battTypeFeP = {"Batt.T:LiFe"};
+	char* numCell1s =   {"NumCell: 1s"};
+	char* numCell2s =   {"NumCell: 2s"};
+	char* numCell3s =   {"NumCell: 3s"};
+	char* numCell4s =   {"NumCell: 4s"};
+	char* numCell5s =   {"NumCell: 5s"};
+	char* numCell6s =   {"NumCell: 6s"};
+	char* currentNumCells = numCell4s;
+	char* currentTypeBatt = battTypeFeP;
+	if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_LIPO)
+		currentTypeBatt = battTypeLip;
+	switch(SystemState.BattaryData.numCell){
+	   case NUM_CELL_1S: currentNumCells = numCell1s; break;
+	   case NUM_CELL_2S: currentNumCells = numCell2s; break;
+	   case NUM_CELL_3S: currentNumCells = numCell3s; break;
+	   case NUM_CELL_4S: currentNumCells = numCell4s; break;
+	   case NUM_CELL_5S: currentNumCells = numCell5s; break;
+	   case NUM_CELL_6S: currentNumCells = numCell6s; break;
+	   default: currentNumCells = numCell4s;
+	}
+	buttonEnReset();
+	buttonLongReset();
+	encoderReset();
+	ssd1306_Fill(Black);
+	 while(1){
+		ssd1306_SetCursor(2, 1);
+				ssd1306_WriteString("Batt.Option", Font_11x18, White);
+			ssd1306_Line(10, 21, 120, 21, White);
+		 ssd1306_SetCursor(2, 25);
+		 	 ssd1306_WriteString(currentTypeBatt, Font_11x18, White);
+		 ssd1306_SetCursor(2,45);
+			 ssd1306_WriteString(currentNumCells, Font_11x18, White);
+		 ssd1306_UpdateScreen();
+		 osDelay(100);
+		 if(buttonEn()){
+		 	 // Если кнопка Enter On прервать текущий цикл
+			 buttonEnReset();
+			 break;
+		 }
+		if(buttonLong() == ON){
+			buttonLongReset();
+			break;
+		}
+		if(encoderData() > 0){
+		 	 // Если энкодер + повысить скорость.
+			 encoderReset();
+			 if(currentTypeBatt == battTypeLip){
+				 currentTypeBatt = battTypeFeP;
+				 SystemState.BattaryData.BatteryType = BATTARY_TYPE_LIFE;
+			 }
+			 else{
+				 currentTypeBatt = battTypeLip;
+				 SystemState.BattaryData.BatteryType = BATTARY_TYPE_LIPO;
+			 }
+		 }
+		 if(encoderData() < 0){
+			 encoderReset();
+			 if(currentNumCells == numCell1s){
+				 currentNumCells = numCell2s;
+				 SystemState.BattaryData.numCell = NUM_CELL_2S;
+			 }
+			 else if (currentNumCells == numCell2s){
+				 currentNumCells = numCell3s;
+				 SystemState.BattaryData.numCell = NUM_CELL_3S;
+			 }
+			 else if (currentNumCells == numCell3s){
+				 SystemState.BattaryData.numCell = NUM_CELL_4S;
+			 	 currentNumCells = numCell4s;
+			 }
+			 else if (currentNumCells == numCell4s){
+				 SystemState.BattaryData.numCell = NUM_CELL_5S;
+			 	 currentNumCells = numCell5s;
+			 }
+			 else if (currentNumCells == numCell5s){
+			 	 currentNumCells = numCell6s;
+			 	 SystemState.BattaryData.numCell = NUM_CELL_6S;
+			 }
+			 else if (currentNumCells == numCell6s){
+			 	currentNumCells = numCell1s;
+			 	SystemState.BattaryData.numCell = NUM_CELL_1S;
+			 }
+		 }
+	 }
+
+		if(currentNumCells == numCell1s)
+			SystemState.BattaryData.numCell == NUM_CELL_1S;
+		else if(currentNumCells = numCell2s)
+			SystemState.BattaryData.numCell == NUM_CELL_2S;
+		else if(currentNumCells = numCell3s)
+			SystemState.BattaryData.numCell == NUM_CELL_3S;
+		else if(currentNumCells = numCell4s)
+			SystemState.BattaryData.numCell == NUM_CELL_4S;
+		else if(currentNumCells = numCell5s)
+			SystemState.BattaryData.numCell == NUM_CELL_5S;
+		else if(currentNumCells = numCell1s)
+			SystemState.BattaryData.numCell == NUM_CELL_6S;
+		if(currentTypeBatt == battTypeLip){
+			SystemState.BattaryData.BatteryType = BATTARY_TYPE_LIPO;
+
+		}
+		else{
+			SystemState.BattaryData.BatteryType = BATTARY_TYPE_LIFE;
+		 }
+
+
+
+		if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_LIPO){
+			SystemState.BattaryData.MaxCellVoltage = 4200;
+			SystemState.BattaryData.MinCellVoltage = 3000;
+		}
+
+		if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_LIFE){
+			SystemState.BattaryData.MaxCellVoltage = 3558;
+			SystemState.BattaryData.MinCellVoltage = 3182;
+		}
+}
 
 
 uint8_t buttonUp(){

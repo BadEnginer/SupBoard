@@ -73,5 +73,6 @@ void encoderSetUp();
 void encoderSetDown();
 void encoderReset();
 void setMaxSpeed(int8_t znak);
+void OutputBattaryParam();
 
 #endif /* INC_APP_MENU_H_ */

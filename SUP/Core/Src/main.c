@@ -138,7 +138,11 @@ int main(void)
   ssd1306_SetCursor(3, 40);
   ssd1306_WriteString(" Tap Start ", Font_11x18, White);
   ssd1306_UpdateScreen();
-  HAL_Delay(1000);
+	SystemState.BattaryData.BatteryType = BATTARY_TYPE_LIPO;
+	SystemState.BattaryData.numCell = NUM_CELL_4S;
+	SystemState.BattaryData.MaxCellVoltage = 4200;
+	SystemState.BattaryData.MinCellVoltage = 3000;
+  HAL_Delay(2500);
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
   //osMutexRelease (BlockI2CHandle);
