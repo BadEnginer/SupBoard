@@ -224,7 +224,7 @@ void trueButtonEP(){
 }
 
 void trueButtonEM(){
-	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8);
+	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15);
 	static uint8_t counterLong = OFF;
 		if(pinState == GPIO_PIN_RESET){
 			countEM++;

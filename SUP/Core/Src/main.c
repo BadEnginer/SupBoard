@@ -188,10 +188,6 @@ int main(void)
   /* creation of InitTask */
   InitTaskHandle = osThreadNew(StartInitTask, NULL, &InitTask_attributes);
 
-  SystemState.AdcData.i2c_addres = ADC_ADRESS;
-  SystemState.DacData.i2c_addres = DAC_ADRESS;
-  SystemState.DisplayState.i2c_addres = DIS_ADRESS;
-  SystemState.MagnitEncoderData.i2c_adres = ENC_ADRESS;
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   initUserTasks();
@@ -433,11 +429,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : EPD_Busy_Pin */
-  GPIO_InitStruct.Pin = EPD_Busy_Pin;
+  /*Configure GPIO pins : EPD_Busy_Pin PB3_LB_Pin PB4_EB_Pin PB5_EP_Pin */
+  GPIO_InitStruct.Pin = EPD_Busy_Pin|PB3_LB_Pin|PB4_EB_Pin|PB5_EP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(EPD_Busy_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : EXT_button_on_Pin */
   GPIO_InitStruct.Pin = EXT_button_on_Pin;
@@ -445,11 +441,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(EXT_button_on_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB3_LB_Pin PB4_EB_Pin PB5_EP_Pin PB8_EM_Pin */
-  GPIO_InitStruct.Pin = PB3_LB_Pin|PB4_EB_Pin|PB5_EP_Pin|PB8_EM_Pin;
+  /*Configure GPIO pin : PA15_EM_Pin */
+  GPIO_InitStruct.Pin = PA15_EM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(PA15_EM_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB8_EM_Pin */
+  GPIO_InitStruct.Pin = PB8_EM_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(PB8_EM_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
