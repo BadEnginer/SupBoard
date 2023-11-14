@@ -175,7 +175,7 @@ uint8_t  battaryCharge(){
 }
 void trueButtonLB(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
-		if(pinState == GPIO_PIN_RESET){
+		if(pinState == GPIO_PIN_SET){
 			countLB++;
 		}
 		else{
@@ -189,7 +189,7 @@ void trueButtonLB(){
 
 void trueButtonEB(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);
-		if(pinState == GPIO_PIN_RESET){
+		if(pinState == GPIO_PIN_SET){
 			countEB++;
 		}
 		else{
@@ -204,7 +204,7 @@ void trueButtonEB(){
 void trueButtonEP(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
 	static uint8_t counterLong = OFF;
-		if(pinState == GPIO_PIN_RESET){
+		if(pinState == GPIO_PIN_SET){
 			countEP++;
 		}
 		else{
@@ -225,8 +225,9 @@ void trueButtonEP(){
 
 void trueButtonEM(){
 	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15);
+
 	static uint8_t counterLong = OFF;
-		if(pinState == GPIO_PIN_RESET){
+		if(pinState == GPIO_PIN_SET){
 			countEM++;
 		}
 		else{
@@ -245,7 +246,24 @@ void trueButtonEM(){
 }
 
 void calcDeltaAngle(uint16_t* data){
-	int16_t deltaAngle = 0;
+	static int32_t currentAngle = 0;
+	int32_t temp = currentAngle - data[15];
+	if(temp > 2000 || temp < -2000){
+		currentAngle = data[15];
+		return;
+	}
+	if(currentAngle)
+	if(temp > 500 ){
+		currentAngle = data[15];
+		encoderSetUp();
+		temp_counter_plus++;
+	}
+	if(temp < -500){
+		currentAngle = data[15];
+		encoderSetDown();
+		temp_counter_min++;
+	}
+	/*int16_t deltaAngle = 0;
 	int8_t plus = 0;
 	counter = 0;
 	for(uint8_t i = 0; i < MAX_DELTA; i++){
@@ -274,6 +292,7 @@ void calcDeltaAngle(uint16_t* data){
 		encoderSetDown();
 		temp_counter_min++;
 	}
+	*/
 }
 
 void longButton(){
