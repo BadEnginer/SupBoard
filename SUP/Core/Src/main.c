@@ -62,6 +62,11 @@ const osThreadAttr_t InitTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for TestTimer */
+osTimerId_t TestTimerHandle;
+const osTimerAttr_t TestTimer_attributes = {
+  .name = "TestTimer"
+};
 /* Definitions for BlockI2C */
 osMutexId_t BlockI2CHandle;
 const osMutexAttr_t BlockI2C_attributes = {
@@ -79,6 +84,7 @@ static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM2_Init(void);
 void StartInitTask(void *argument);
+void CallbackTT(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -178,6 +184,10 @@ int main(void)
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
+  /* Create the timer(s) */
+  /* creation of TestTimer */
+  TestTimerHandle = osTimerNew(CallbackTT, osTimerPeriodic, NULL, &TestTimer_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
@@ -201,6 +211,7 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
+
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -569,6 +580,14 @@ void StartInitTask(void *argument)
 	    osDelay(1000);
 	  }
   /* USER CODE END 5 */
+}
+
+/* CallbackTT function */
+void CallbackTT(void *argument)
+{
+  /* USER CODE BEGIN CallbackTT */
+
+  /* USER CODE END CallbackTT */
 }
 
 /**
