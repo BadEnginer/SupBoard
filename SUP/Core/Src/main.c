@@ -131,6 +131,8 @@ int main(void)
 	  }
   }
   ssd1306_Init();
+  ssd1306_Fill(White);
+  HAL_Delay(500);
   ssd1306_Fill(Black);
   SystemState.DisplayState.state = LOAD;
   ssd1306_SetCursor(5, 10);
@@ -142,7 +144,7 @@ int main(void)
 	SystemState.BattaryData.numCell = NUM_CELL_4S;
 	SystemState.BattaryData.MaxCellVoltage = 4200;
 	SystemState.BattaryData.MinCellVoltage = 3000;
-  HAL_Delay(2500);
+  HAL_Delay(1500);
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
   //osStatus_t status = osMutexAcquire(BlockI2CHandle, 1000);
   //osMutexRelease (BlockI2CHandle);

@@ -247,19 +247,19 @@ void trueButtonEM(){
 
 void calcDeltaAngle(uint16_t* data){
 	static int32_t currentAngle = 0;
-	int32_t temp = currentAngle - data[15];
-	if(temp > 2000 || temp < -2000){
-		currentAngle = data[15];
+	int32_t temp = currentAngle - data[28];
+	if(temp > 1000 || temp < -1000){
+		currentAngle = data[28];
 		return;
 	}
 	if(currentAngle)
 	if(temp > 500 ){
-		currentAngle = data[15];
+		currentAngle = data[28];
 		encoderSetUp();
 		temp_counter_plus++;
 	}
 	if(temp < -500){
-		currentAngle = data[15];
+		currentAngle = data[28];
 		encoderSetDown();
 		temp_counter_min++;
 	}
