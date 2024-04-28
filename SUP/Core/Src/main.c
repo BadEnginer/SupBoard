@@ -20,7 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usb_device.h"
-
+#include "Display/LCM2004A/LCD.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Display/e-ink/picture.h"
@@ -45,6 +45,7 @@ sSystemState SystemState = {};
 /* USER CODE BEGIN PM */
 uint8_t devises_list[10] = {};
 HAL_StatusTypeDef stateDevise;
+HAL_StatusTypeDef stateEXP_GPIO;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -136,6 +137,27 @@ int main(void)
 		  j++;
 	  }
   }
+
+  uint8_t tr[] = {64,255};
+  uint8_t rx[] = {99,99};
+  stateEXP_GPIO = HAL_I2C_Master_Transmit(&hi2c1, (32 << 1), (uint8_t*)tr, 2, 5);
+  stateEXP_GPIO = HAL_I2C_Master_Receive (&hi2c1, (32 << 1), (uint8_t*)rx, 2, 5);
+ HAL_Delay(1000);
+ PCF_GPIO_Init();
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_0, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_1, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_2, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_3, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_4, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_5, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_6, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_7, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_0, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_1, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_2, PIN_SET);
+ PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_3, PIN_SET);
+  LCD_Init();
+   LCD_Puts(0,0,"TEST");
   ssd1306_Init();
   ssd1306_Fill(White);
   HAL_Delay(500);
