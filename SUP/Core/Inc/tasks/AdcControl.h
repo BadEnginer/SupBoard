@@ -1,5 +1,5 @@
-#ifndef INC_TASKS_READDATA_H_
-#define INC_TASKS_READDATA_H_
+#ifndef INC_TASKS_ADCCONTROL_H_
+#define INC_TASKS_ADCCONTROL_H_
 
 #include <main.h>
 #include "stm32f4xx_hal.h"
@@ -46,4 +46,4 @@ typedef union{
 	uint8_t data;
 }u_magnituda;
 
-#endif /* INC_TASKS_READDATA_H_ */
+#endif /* INC_TASKS_ADCCONTROL_H_ */

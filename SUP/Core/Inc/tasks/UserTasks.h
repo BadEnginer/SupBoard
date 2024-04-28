@@ -1,11 +1,11 @@
 #ifndef INC_TASKS_H_
 #define INC_TASKS_H_
 
+#include <tasks/AdcControl.h>
+#include <tasks/SensControl.h>
 #include "cmsis_os.h"
 #include "tasks/OledMenu.h"
-#include "tasks/SensOut.h"
 #include "tasks/LedControl.h"
-#include "tasks/ReadData.h"
 #include "tasks/MotorControl.h"
 
 /**

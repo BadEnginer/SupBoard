@@ -313,9 +313,9 @@ void startDisplay(){
 	 		current_current = SystemState.BattaryData.percentCharge; //1.0*(current_current_raw * LIN_CURR_K) - LIN_CURR_B;//(current_current_raw) * multi_speed;
 	 		current_Vout = SystemState.BattaryData.voltage; // Убераем последний знак.
 
-	 		itoa(current_speed, 	symSpeed, 10);
-	 		itoa(current_Vout,		symVout,  10);
-	 		itoa(current_current,	symCurrent,  10);
+	 		itoa(current_speed, 	symSpeed, 	10);
+	 		itoa(current_Vout,		symVout,  	10);
+	 		itoa(current_current,	symCurrent, 10);
 
 	 		symCurrent[3] = ' ';
 	 		symCurrent[3] = '%';
@@ -399,8 +399,8 @@ void drawButtonMenu(){
 
 		itoa(butEn,  sym_butEn, 10);
 		itoa(butLo,  sym_butLo, 10);
-		itoa(encodM, sym_encM, 10);
-		itoa(encodP, sym_encP, 10);
+		itoa(encodM, sym_encM,  10);
+		itoa(encodP, sym_encP,  10);
 
 		ssd1306_SetCursor(SIZE_FONT_X * 4, START_POS_Y + SIZE_FONT_Y);
 			ssd1306_WriteString(sym_butLo, Font_11x18, White);

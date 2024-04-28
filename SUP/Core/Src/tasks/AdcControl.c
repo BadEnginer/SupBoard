@@ -1,5 +1,6 @@
-#include "tasks/ReadData.h"
+#include <tasks/AdcControl.h>
 
+//перенести данную задачу через таймеры в sensor control
 
 extern sSystemState SystemState;
 extern osMutexId_t BlockI2CHandle; //Блокировка чтения i2c
@@ -11,6 +12,7 @@ uint16_t current_angle;
 uint16_t arr_angle[MAX_COUNTER_ANGLE];
 uint8_t counterAngle = 0;
 // задача для чтения данных с ацп и магнитного энкодера
+
 void StartReadDataTask(void *argument){
 	initAllChanelADC();
 	uint8_t currentChanel = 0;

@@ -1,6 +1,6 @@
 
-#ifndef INC_TASKS_SENSOUT_H_
-#define INC_TASKS_SENSOUT_H_
+#ifndef INC_TASKS_SENSCONTROL_H_
+#define INC_TASKS_SENSCONTROL_H_
 
 #include <main.h>
 #include <stdlib.h>
@@ -27,4 +27,4 @@ void longButton();
 void StartSensOutTask(void *argument);
 void calcDeltaAngle(uint16_t*);
 
-#endif /* INC_TASKS_SENSOUT_H_ */
+#endif /* INC_TASKS_SENSCONTROL_H_ */

@@ -64,14 +64,15 @@
 #define PWMF_920HZ			0xC0
 
 void AS5600_WriteReg(uint8_t Reg, uint8_t Data);
-uint8_t AS5600_ReadReg(uint8_t Reg);
 
+uint8_t  AS5600_ReadReg(uint8_t Reg);
 uint16_t AS5600_GetAngle(void);
 uint16_t AS5600_GetRawAngle(void);
-uint8_t AS5600_GetStatus(void);
-void AS5600_SetHystheresis(uint8_t Hyst);
-void AS5600_SetOutputStage(uint8_t OutStage);
-void AS5600_SetPWMFreq(uint8_t Freq);
+uint8_t  AS5600_GetStatus(void);
+
+void AS5600_SetHystheresis (uint8_t Hyst);
+void AS5600_SetOutputStage (uint8_t OutStage);
+void AS5600_SetPWMFreq (uint8_t Freq);
 
 
 

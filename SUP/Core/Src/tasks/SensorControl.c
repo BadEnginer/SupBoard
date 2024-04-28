@@ -1,10 +1,20 @@
-#include "tasks/SensOut.h"
+#include <tasks/SensControl.h>
 
-//
+// описание делителя для точного расчета напряжения
 #define RES_TOP 9.84f
 #define RES_BOT 1.002f
 #define BATTERY_DEVIDER (1.0 + (RES_TOP/RES_BOT))
 
+/* Definitions for TestTimer */
+osTimerId_t TimerReadButtonHandle;
+const osTimerAttr_t ReadButtonTimer_attributes = {
+  .name = "TimerReadButton"
+};
+
+osTimerId_t TimerReadDataHandle;
+const osTimerAttr_t ReadDataTimer_attributes = {
+  .name = "TimerReadButton"
+};
 
 volatile uint16_t temp_counter_plus = 0;
 volatile uint16_t temp_counter_min = 0;
@@ -263,36 +273,6 @@ void calcDeltaAngle(uint16_t* data){
 		encoderSetDown();
 		temp_counter_min++;
 	}
-	/*int16_t deltaAngle = 0;
-	int8_t plus = 0;
-	counter = 0;
-	for(uint8_t i = 0; i < MAX_DELTA; i++){
-		deltaAngle = data[i+1] - data[i];
-		// логика простая если число в нужном диапазоне то добавить его в массив
-		if( (abs(deltaAngle) > MIN_ANGLE) && (abs(deltaAngle) < MAX_ANGLE)){
-			arr_delta_angle[counter] = 	deltaAngle;
-			counter++;
-			if(counter >=MAX_DELTA)
-				counter = 0;
-		}
-	}
-	if(counter < 20)
-		return;
-	for(uint8_t i = 0; i < MAX_DELTA; i++){
-		if(arr_delta_angle[i] > 0)
-			plus++;
-		if(arr_delta_angle[i] < 0)
-			plus--;
-	}
-	if(plus > 16){
-		encoderSetUp();
-		temp_counter_plus++;
-	}
-	if(plus < -16){
-		encoderSetDown();
-		temp_counter_min++;
-	}
-	*/
 }
 
 void longButton(){
