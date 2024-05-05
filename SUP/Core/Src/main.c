@@ -20,7 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usb_device.h"
-#include "Display/LCM2004A/LCD.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Display/e-ink/picture.h"
@@ -50,6 +50,8 @@ HAL_StatusTypeDef stateEXP_GPIO;
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
+DMA_HandleTypeDef hdma_i2c1_tx;
+DMA_HandleTypeDef hdma_i2c1_rx;
 
 SPI_HandleTypeDef hspi1;
 
@@ -137,27 +139,7 @@ int main(void)
 		  j++;
 	  }
   }
-
-  uint8_t tr[] = {64,255};
-  uint8_t rx[] = {99,99};
-  stateEXP_GPIO = HAL_I2C_Master_Transmit(&hi2c1, (32 << 1), (uint8_t*)tr, 2, 5);
-  stateEXP_GPIO = HAL_I2C_Master_Receive (&hi2c1, (32 << 1), (uint8_t*)rx, 2, 5);
- HAL_Delay(1000);
- PCF_GPIO_Init();
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_0, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_1, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_2, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_3, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_4, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_5, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_6, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_0, PCF_PIN_7, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_0, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_1, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_2, PIN_SET);
- PCF_GPIO_WritePin(PCF_PORT_1, PCF_PIN_3, PIN_SET);
-  LCD_Init();
-   LCD_Puts(0,0,"TEST");
+  HAL_Delay(1000);
   ssd1306_Init();
   ssd1306_Fill(White);
   HAL_Delay(500);
@@ -307,7 +289,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 400000;
+  hi2c1.Init.ClockSpeed = 100000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -432,6 +414,12 @@ static void MX_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
+  /* DMA1_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+  /* DMA1_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
   /* DMA1_Stream6_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
@@ -450,12 +438,23 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, EPD_CS_Pin|EPD_Reset_Pin|EPD_Data_Control_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC14 */
+  GPIO_InitStruct.Pin = GPIO_PIN_14;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : EPD_CS_Pin EPD_Reset_Pin EPD_Data_Control_Pin */
   GPIO_InitStruct.Pin = EPD_CS_Pin|EPD_Reset_Pin|EPD_Data_Control_Pin;

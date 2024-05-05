@@ -38,7 +38,7 @@ extern "C" {
 #include "DAC_out/MCP4725.h"
 #include "Encoder/as5600.h"
 #include "tasks/UserTasks.h"
-#include "Display/LCM2004A/LCD.h"
+#include "Display/LCM2004A/lcd_hd44780_i2c.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
