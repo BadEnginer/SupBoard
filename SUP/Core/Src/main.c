@@ -23,9 +23,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Display/e-ink/picture.h"
+//#include "Display/e-ink/picture.h"
 #include "app_menu/app_menu.h"
 #include <stdlib.h>
+
+//EPD
+#include "Display/e-ink/EPD/Display_EPD_W21_spi.h"
+#include "Display/e-ink/EPD/Display_EPD_W21.h"
+#include "Display/e-ink/EPD/Ap_29demo.h"
+//GUI
+#include "Display/e-ink/GUI/GUI_Paint.h"
+#include "Display/e-ink/Fonts/fonts.h"
+
+unsigned char BlackImage[5000];//Define canvas space
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -131,6 +141,60 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+  //(Perform a full-screen refresh operation after 5 partial refreshes, otherwise the residual image may not be removed.)
+  //////////////////////////partial display 0~9////////////////////////////////////////////
+
+
+  /*After the partial refresh, you need to use OTP to clean the screen, otherwise the screen of the electronic paper may not be removed.*/
+  	/******Clear screen after Partial refresh*****/
+  	EPD_init(); //EPD init
+  	EPD_full_display_Clear();//EPD Clear
+  	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+  	HAL_Delay(2000); //2s
+
+  	/*After the display is completed, wait for about 10 seconds before turning off the power,
+  	  otherwise the electronic paper may display abnormally */
+
+    ///////////////////////////GUI///////////////////////////////////////////////////////////////////////////////////
+     //Data initialization settings
+     Paint_NewImage(BlackImage, EPD_WIDTH, EPD_HEIGHT, 270, WHITE); //Set screen size and display orientation
+     Paint_SelectImage(BlackImage);//Set the virtual canvas data storage location
+
+      /***********String***************************/
+  	uint8_t start_x = 0;
+  	uint8_t end_x = 24;
+  	uint8_t start_y = 0;
+  	uint8_t end_y = 24;
+  	for(uint8_t i = 0; i < 1; i++){
+  		EPD_init(); //EPD init
+  		Paint_Clear(WHITE);
+  		Paint_DrawString_EN(0, 0, "Speed:", &Font24, WHITE, BLACK); //17*24
+  		Paint_DrawString_EN(0, 25, "Battery:", &Font24, WHITE, BLACK); //17*24
+  		Paint_DrawLine(10, 51, 190, 51, BLACK, LINE_STYLE_SOLID, DOT_PIXEL_1X1);
+  		EPD_Display(BlackImage); //display image
+  		//EPD_full_display_Clear();//EPD Clear
+		HAL_Delay(300);
+		for(uint8_t i = 0; i < 3; i++){
+			EPD_init(); //EPD init
+		    EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_Z, gImage_num_Z, 0);
+			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_Z, gImage_num_3, 1);
+			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
+			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_3, gImage_num_4, 1);
+			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
+			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_4, gImage_num_5, 1);
+			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
+			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_5, gImage_num_6, 1);
+			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
+			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_6, gImage_num_7, 1);
+			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
+			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_7, gImage_num_8, 1);
+			EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+			HAL_Delay(300);
+			start_y+=24;
+			end_y+=24;
+		}
+     }
   uint8_t j = 0;
   for(uint8_t i = 1; i < 127; i ++){
 	  stateDevise = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 5);
@@ -447,7 +511,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, EPD_CS_Pin|EPD_Reset_Pin|EPD_Data_Control_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, EPD_CS_Pin|EPD_Reset_Pin|EPD_Data_Control_Pin|SSPI_SCK_Pin
+                          |SSPI_MISO_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC14 */
   GPIO_InitStruct.Pin = GPIO_PIN_14;
@@ -456,8 +521,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EPD_CS_Pin EPD_Reset_Pin EPD_Data_Control_Pin */
-  GPIO_InitStruct.Pin = EPD_CS_Pin|EPD_Reset_Pin|EPD_Data_Control_Pin;
+  /*Configure GPIO pins : EPD_CS_Pin EPD_Reset_Pin EPD_Data_Control_Pin SSPI_SCK_Pin
+                           SSPI_MISO_Pin */
+  GPIO_InitStruct.Pin = EPD_CS_Pin|EPD_Reset_Pin|EPD_Data_Control_Pin|SSPI_SCK_Pin
+                          |SSPI_MISO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

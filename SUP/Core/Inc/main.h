@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Display/e-ink/epaper.h"
+//#include "Display/e-ink/epaper.h"
 #include "Display/ws2812/ARGB.h"
 #include "Display/ssd1306/ssd1306.h"
 #include "ADC_out/ADS1115.h"
@@ -295,6 +295,10 @@ void Error_Handler(void);
 #define EPD_Data_Control_GPIO_Port GPIOB
 #define EPD_Busy_Pin GPIO_PIN_10
 #define EPD_Busy_GPIO_Port GPIOB
+#define SSPI_SCK_Pin GPIO_PIN_12
+#define SSPI_SCK_GPIO_Port GPIOB
+#define SSPI_MISO_Pin GPIO_PIN_13
+#define SSPI_MISO_GPIO_Port GPIOB
 #define EXT_button_on_Pin GPIO_PIN_14
 #define EXT_button_on_GPIO_Port GPIOB
 #define EXT_button_on_EXTI_IRQn EXTI15_10_IRQn

@@ -79,10 +79,6 @@ bool lcdInit(I2C_HandleTypeDef *hi2c, uint8_t address, uint8_t lines, uint8_t co
 
         xLastWakeTime = xTaskGetTickCount();
 
-        while (HAL_I2C_GetState(lcdParams.hi2c) != HAL_I2C_STATE_READY) {
-            vTaskDelay(1);
-        }
-
         if (i == 2) {
             // For the last cycle delay is less then 1 ms (100us by datasheet)
             vTaskDelayUntil(&xLastWakeTime, (TickType_t)1);
@@ -99,10 +95,6 @@ bool lcdInit(I2C_HandleTypeDef *hi2c, uint8_t address, uint8_t lines, uint8_t co
 
     if (HAL_I2C_Master_Transmit(lcdParams.hi2c, lcdParams.address, (uint8_t*)lcdCommandBuffer, 3, 5) != HAL_OK) {
         return false;
-    }
-
-    while (HAL_I2C_GetState(lcdParams.hi2c) != HAL_I2C_STATE_READY) {
-        vTaskDelay(1);
     }
 
     /* Lets set display params */
@@ -260,11 +252,6 @@ bool lcdBacklight(uint8_t command) {
     if (HAL_I2C_Master_Transmit(lcdParams.hi2c, lcdParams.address, &lcdParams.backlight, 1, 5) != HAL_OK) {
         return false;
     }
-
-    while (HAL_I2C_GetState(lcdParams.hi2c) != HAL_I2C_STATE_READY) {
-        vTaskDelay(1);
-    }
-
     return true;
 }
 
@@ -368,10 +355,7 @@ static bool lcdWriteByte(uint8_t rsRwBits, uint8_t * data) {
     if (HAL_I2C_Master_Transmit(lcdParams.hi2c, lcdParams.address, (uint8_t*)lcdCommandBuffer, 6, 5) != HAL_OK) {
         return false;
     }
-
-    while (HAL_I2C_GetState(lcdParams.hi2c) != HAL_I2C_STATE_READY) {
-        vTaskDelay(1);
-    }
+    osDelay(1);
 
     return true;
 }
