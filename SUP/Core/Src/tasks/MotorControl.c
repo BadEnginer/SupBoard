@@ -5,9 +5,11 @@ extern osMutexId_t BlockI2CHandle;
 extern sSystemState SystemState;
 osStatus_t statusMutexMotor;
 void setDAC(MCP4725, float);
+
 // 1.21v напржяние остановки
 // 2.2v полный назад
 // 0.4 полный вперёд
+
 #define FULL_FORWARD 0.3F
 #define FULL_BACK 2.1F
 #define STOP_ENGINE 1.20F
@@ -16,6 +18,7 @@ int16_t test_ofsett[30] = {};
 //uint8_t speed_arr[] = {0,200,50,60,70,80,90,100,120,130}; // step mV for lean speed
 uint16_t speed_arr_plus[] =  {0,250,300,330,380,460,550,650,770,900}; // step mV for lean speed
 uint16_t speed_arr_minus[] = {0,180,250,310,380,460,550,650,770,900}; // step mV for lean speed
+
 /// Функция управления мотором через дак + сложные условия остановки
 void StartMotorControlTask(void *argument){
 	SystemState.MotorData.motorState = DEVICE_NO_INIT;

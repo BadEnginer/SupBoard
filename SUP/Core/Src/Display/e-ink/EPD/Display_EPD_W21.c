@@ -1,6 +1,33 @@
 #include "Display/e-ink/EPD/Display_EPD_W21_spi.h"
 #include "Display/e-ink/EPD/Display_EPD_W21.h"
 
+#include "Display/e-ink/pic/num_16x24.h"
+const unsigned char* images[] = {
+        gImage_16x24_num_0,
+        gImage_16x24_num_1,
+        gImage_16x24_num_2,
+        gImage_16x24_num_3,
+        gImage_16x24_num_4,
+        gImage_16x24_num_5,
+        gImage_16x24_num_6,
+        gImage_16x24_num_7,
+        gImage_16x24_num_8,
+        gImage_16x24_num_9
+};
+
+void display_number(unsigned int x_start, unsigned int x_end, unsigned int y_start, unsigned int y_end,
+                    uint8_t current_num, uint8_t previous_num, uint8_t mode) {
+    // Проверка на допустимые значения current_num и previous_num
+    if (current_num > 9 || previous_num > 9) {
+        // Вывести сообщение об ошибке, если значения выходят за пределы допустимых
+        return;
+    }
+	EPD_init(); //EPD init
+    // Вызов функции EPD_partial_display с соответствующими аргументами
+    EPD_partial_display(x_start, x_end, y_start, y_end, images[previous_num], images[current_num], mode);
+    EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+}
+
 void delay_xms(unsigned int xms)
 {
 	HAL_Delay(xms);

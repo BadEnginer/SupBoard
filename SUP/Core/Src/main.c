@@ -30,7 +30,11 @@
 //EPD
 #include "Display/e-ink/EPD/Display_EPD_W21_spi.h"
 #include "Display/e-ink/EPD/Display_EPD_W21.h"
-#include "Display/e-ink/EPD/Ap_29demo.h"
+#include "Display/e-ink/pic/logo_v2.h"
+#include "Display/e-ink/pic/butt_ok.h"
+#include "Display/e-ink/pic/butt_stop.h"
+#include "Display/e-ink/pic/logo_v1.h"
+#include "Display/e-ink/pic/main_display.h"
 //GUI
 #include "Display/e-ink/GUI/GUI_Paint.h"
 #include "Display/e-ink/Fonts/fonts.h"
@@ -148,53 +152,76 @@ int main(void)
 
   /*After the partial refresh, you need to use OTP to clean the screen, otherwise the screen of the electronic paper may not be removed.*/
   	/******Clear screen after Partial refresh*****/
-  	EPD_init(); //EPD init
+ 	EPD_init(); //EPD init
   	EPD_full_display_Clear();//EPD Clear
   	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
-  	HAL_Delay(2000); //2s
+  	HAL_Delay(100); //2s
 
   	/*After the display is completed, wait for about 10 seconds before turning off the power,
   	  otherwise the electronic paper may display abnormally */
 
     ///////////////////////////GUI///////////////////////////////////////////////////////////////////////////////////
      //Data initialization settings
-     Paint_NewImage(BlackImage, EPD_WIDTH, EPD_HEIGHT, 270, WHITE); //Set screen size and display orientation
-     Paint_SelectImage(BlackImage);//Set the virtual canvas data storage location
+     //Paint_NewImage(BlackImage, EPD_WIDTH, EPD_HEIGHT, 270, WHITE); //Set screen size and display orientation
+     //Paint_SelectImage(BlackImage);//Set the virtual canvas data storage location
 
       /***********String***************************/
-  	uint8_t start_x = 0;
-  	uint8_t end_x = 24;
-  	uint8_t start_y = 0;
-  	uint8_t end_y = 24;
-  	for(uint8_t i = 0; i < 1; i++){
-  		EPD_init(); //EPD init
-  		Paint_Clear(WHITE);
-  		Paint_DrawString_EN(0, 0, "Speed:", &Font24, WHITE, BLACK); //17*24
-  		Paint_DrawString_EN(0, 25, "Battery:", &Font24, WHITE, BLACK); //17*24
-  		Paint_DrawLine(10, 51, 190, 51, BLACK, LINE_STYLE_SOLID, DOT_PIXEL_1X1);
-  		EPD_Display(BlackImage); //display image
-  		//EPD_full_display_Clear();//EPD Clear
-		HAL_Delay(300);
-		for(uint8_t i = 0; i < 3; i++){
-			EPD_init(); //EPD init
-		    EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_Z, gImage_num_Z, 0);
-			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_Z, gImage_num_3, 1);
-			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
-			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_3, gImage_num_4, 1);
-			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
-			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_4, gImage_num_5, 1);
-			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
-			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_5, gImage_num_6, 1);
-			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
-			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_6, gImage_num_7, 1);
-			HAL_Delay(300);//////////////ЈЁx,yЈ©   ----Y----
-			EPD_partial_display(start_x, end_x, start_y, end_y, gImage_num_7, gImage_num_8, 1);
-			EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
-			HAL_Delay(300);
-			start_y+=24;
-			end_y+=24;
+	EPD_init(); //EPD init
+	EPD_full_display(gImage_logo_v1, gImage_logo_v1, 0);//Load logo
+	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+	HAL_Delay(2000);
+
+ 	EPD_init(); //EPD init
+  	EPD_full_display_Clear();//EPD Clear
+  	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+  	HAL_Delay(100); //2s
+
+	EPD_init(); //EPD init
+	EPD_full_display(gImage_main_display, gImage_main_display, 0);//EPD_picture1
+	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+
+	uint8_t x = 24, y = 16;
+
+	uint8_t x_start, x_end;
+	uint8_t y_start, y_end;
+
+	uint8_t x0_start = 64, x0_end = x + x0_start;
+	uint8_t y0_start = 72, y0_end = y + y0_start;
+
+	uint8_t x1_start = 64,  x1_end = x + x1_start;
+	uint8_t y1_start = 96, y1_end = y + y1_start;
+
+	uint8_t x2_start = 64, x2_end = x + x2_start;
+	uint8_t y2_start = 120, y2_end = y + y2_start;
+
+	display_number(x0_start, x0_end, y0_start, y0_end, 0, 0, 0);
+	display_number(x1_start, x1_end, y1_start, y1_end, 0, 0, 0);
+	display_number(x2_start, x2_end, y2_start, y2_end, 0, 0, 0);
+
+	x_start = x0_start; x_end = x0_end;
+	y_start = y0_start; y_end = y0_end;
+
+	for(uint8_t j = 1; j < 10; j++){
+		x_start = x0_start; x_end = x0_end;
+		y_start = y0_start; y_end = y0_end;
+		for(uint8_t i = 1; i <= 10; i++){
+			display_number(x_start, x_end, y_start, y_end, i, i-1, 1);
+			HAL_Delay(100);
 		}
-     }
+		display_number(x_start, x_end, y_start, y_end, 0, 9, 1);
+		x_start = x1_start; x_end = x1_end;
+		y_start = y1_start; y_end = y1_end;
+		display_number(x_start, x_end, y_start, y_end, j, j-1, 1);
+
+	}
+	/*
+	for(uint8_t i = 1; i < 10; i++){
+		display_number(x0_start, x0_end, y0_start, y0_end, i, i-1, 1);
+		HAL_Delay(10-0);
+	}
+	*/
+	HAL_Delay(2000);
+
   uint8_t j = 0;
   for(uint8_t i = 1; i < 127; i ++){
 	  stateDevise = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 5);
