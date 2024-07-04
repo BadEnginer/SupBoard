@@ -1,4 +1,4 @@
-#include <tasks/AdcControl.h>
+/*#include <tasks/AdcControl.h>
 
 //перенести данную задачу через таймеры в sensor control
 
@@ -92,3 +92,4 @@ void initADC(ADS1115_Config_t* configReg){
 void initChanelADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel){
 	configReg->channel = chanel;
 }
+*/

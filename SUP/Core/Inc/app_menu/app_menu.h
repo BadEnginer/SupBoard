@@ -1,10 +1,3 @@
-/*
- * app_menu.h
- *
- *  Created on: Apr 7, 2023
- *      Author: BadEnginer
- */
-
 #ifndef INC_APP_MENU_H_
 #define INC_APP_MENU_H_
 
@@ -56,22 +49,7 @@ void drawSettinMenu();
 void drawButtonMenu();
 void drawCurrentMenu(uint8_t menu_num_current, uint8_t menu_num_next, uint8_t menu_prev_num, int8_t offset);
 void udpateDisplay();
-uint8_t buttonUp();
-void buttonUpSet();
-void buttonUpReset();
-uint8_t buttonEn();
-void buttonEnSet();
-void buttonEnReset();
-uint8_t buttonCounter();
-void buttonCounterSet();
-void buttonCounterReset();
-uint8_t buttonLong();
-void buttonLongSet();
-void buttonLongReset();
-int8_t encoderData();
-void encoderSetUp();
-void encoderSetDown();
-void encoderReset();
+
 void setMaxSpeed(int8_t znak);
 void OutputBattaryParam();
 

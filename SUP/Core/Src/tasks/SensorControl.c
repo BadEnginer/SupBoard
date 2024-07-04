@@ -1,9 +1,12 @@
 #include <tasks/SensControl.h>
+#include <ADC_out/AdcControl.h>
 
-// описание делителя для точного расчета напряжения
-#define RES_TOP 9.84f
-#define RES_BOT 1.002f
-#define BATTERY_DEVIDER (1.0 + (RES_TOP/RES_BOT))
+
+extern sSystemState SystemState; // Глобальная структура где хранятся состояния всей системы
+extern osMutexId_t BlockI2CHandle; //Блокировка чтения i2c
+osStatus_t statusMutexI2C;
+
+
 
 /* Definitions for TestTimer */
 osTimerId_t TimerReadButtonHandle;
@@ -11,17 +14,21 @@ const osTimerAttr_t ReadButtonTimer_attributes = {
   .name = "TimerReadButton"
 };
 
-osTimerId_t TimerReadDataHandle;
-const osTimerAttr_t ReadDataTimer_attributes = {
-  .name = "TimerReadButton"
+osTimerId_t TimerReadADCHandle;
+const osTimerAttr_t ReadADCTimer_attributes = {
+  .name = "TimerReadADC"
 };
 
-volatile uint16_t temp_counter_plus = 0;
-volatile uint16_t temp_counter_min = 0;
-uint16_t old_raw_angle = 0;
-uint16_t angle = 0;
-int16_t old_encoder_data = 0;
-int16_t delta_encoder = 0;
+osTimerId_t TimerReadEncoderHandle;
+const osTimerAttr_t ReadEncoderTimer_attributes = {
+  .name = "TimerReadEncoder"
+};
+
+// Дескриптор таймера
+TimerHandle_t xButtonTimer;
+TimerHandle_t xADCTimer;
+TimerHandle_t xEncoderTimer;
+
 uint8_t command_CMD[10] = {0};
 uint8_t test_data = 0;
 int16_t arr_delta_angle[MAX_DELTA];
@@ -31,56 +38,39 @@ uint8_t countEB = 0;
 uint8_t countEP = 0;
 uint8_t countEM = 0;
 
-extern sSystemState SystemState;
+// Текущий канал ADC
+uint8_t currentChanel = 0;
+
+// Текущий указатель на буфер ADC
+uint8_t currentAdcBlock = 0;
+
+//функция для работы usb для отладки
 extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
-extern uint16_t current_angle;
-extern uint16_t arr_angle[MAX_COUNTER_ANGLE];
 char* tr_data;
 char symData[8] = {'L','a','s','t','-'};
+
 uint8_t time;
 extern uint8_t calibr;
-#define WAIT_ERROR_ADC_DAC 50
-
-void error_processing(){
-	// проверить все ли устройства на месте
-	// Сравнить заданную скорость и какое напряжение на выходе (если рассоглосание то ошибка)
-	// Если скорость 0 а ток не 0 ошибка + реакция
-	//SystemState.ErrorState.
-	// Проверка Достоврености работы АЦП
-	static uint8_t iterErrorADC_DAC = 0;
-	int16_t battary_voltage = SystemState.BattaryData.voltage;
-	int16_t max_bat_voltage = SystemState.BattaryData.MaxCellVoltage * SystemState.BattaryData.numCell;
-	int16_t min_bat_voltage = SystemState.BattaryData.MinCellVoltage * SystemState.BattaryData.numCell;
-	int16_t difADC_DAC = SystemState.AdcData.chanel_1_voltage - (SystemState.MotorData.control_voltage * 1000);
-
-	if(abs(SystemState.AdcData.chanel_0_voltage > 10))
-		SystemState.ErrorState.ErrorMigrationZero = ZERO_MIGRATE;
-	else
-		SystemState.ErrorState.ErrorMigrationZero = ZERO_OK;
-
-	if(abs(difADC_DAC) > 100)
-		iterErrorADC_DAC++;
-	else
-		iterErrorADC_DAC = 0;
-	if(iterErrorADC_DAC > WAIT_ERROR_ADC_DAC){
-		SystemState.ErrorState.error_DAC = DEVISE_ERROR;
-		iterErrorADC_DAC = 0;
-	}
-
-	if(battary_voltage >= max_bat_voltage)
-			SystemState.ErrorState.ErrorBattary = VOLTAGE_IS_HIGH;
-	else if(battary_voltage < min_bat_voltage)
-			SystemState.ErrorState.ErrorBattary = VOLTAGE_IS_LOW;
-	else
-		SystemState.ErrorState.ErrorBattary  = BATTARY_OK;
-
-}
 
 int16_t dif_current;
 int16_t calibrate;
-// Задача для опросо кнопок, энкодера и система команд от usb и обработка ошибок
+
+
+
+
+// Задача для опросо кнопок, энкодера, ацп и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
+
+	initAllChanelADC();
+	pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel[currentChanel]);
+	ADS1115_updateConfig(pADS, configChanel[currentChanel]);
+	ADS1115_startContinousMode(pADS);
+
 	osDelay(3000);
+
+	uint8_t error_timers = create_timers();
+	if(error_timers > 0){while(1);}
+
 	SystemState.BattaryData.calibraty = 1;
 	SystemState.BattaryData.zeroCurrentReal = SystemState.AdcData.chanel_3_voltage;
 	SystemState.BattaryData.zeroCurrentImg = 3300 / 2;
@@ -102,15 +92,9 @@ void StartSensOutTask(void *argument){
 		    symData[7] = '\r';
 			CDC_Transmit_FS(symData, sizeof(symData));
 		}
-		longButton();
 		calcDeltaAngle(arr_angle);
-		trueButtonLB();
-		trueButtonEB();
-		trueButtonEP();
-		trueButtonEM();
 
-#define CUR_PARAM_1 37174,7
-#define CUR_PARAM_2 (1,7317 * CUR_PARAM_1)
+
 		dif_current = (SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg);
 		if(SystemState.BattaryData.calibraty == 1){
 			SystemState.BattaryData.calibraty = 0;
@@ -126,25 +110,6 @@ void StartSensOutTask(void *argument){
 		osDelay(100);
 	}
 }
-
-int16_t expFiltrIcurrnt(float newVal, float k) {
-	  static float filVal = 0;
-	  filVal += (newVal - filVal) * k;
-	  return (int16_t)filVal;
-}
-
-int16_t expFiltrVbat(float newVal, float k) {
-	  static float filVal = 0;
-	  filVal += (newVal - filVal) * k;
-	  return (int16_t)filVal;
-}
-int16_t expFiltrCharge(float newVal, float k) {
-	  static float filVal = 0;
-	  filVal += (newVal - filVal) * k;
-	  return (int16_t)filVal;
-}
-
-
 
 uint16_t charge_proc_LIPO[] = {3000, 3300, 3600, 3700, 3750, 3790, 3830, 3870, 3920, 3970, 4100, 4200};
 uint16_t charge_proc_FE[]   = {3183, 3191, 3218, 3257, 3272, 3277, 3282, 3302, 3318, 3322, 3324, 3558};
@@ -183,116 +148,94 @@ uint8_t  battaryCharge(){
 		}
 	}
 }
-void trueButtonLB(){
-	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
-		if(pinState == GPIO_PIN_SET){
-			countLB++;
-		}
-		else{
-			countLB = 0;
-		}
-		if(countLB > MAX_COUNT){
-			buttonLongSet();
-			countLB = 0;
-		}
+
+
+void readButtonState(){
+	longButton();
+	trueButtonLB();
+	trueButtonEB();
+	trueButtonEP();
+	trueButtonEM();
 }
 
-void trueButtonEB(){
-	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4);
-		if(pinState == GPIO_PIN_SET){
-			countEB++;
-		}
-		else{
-			countEB = 0;
-		}
-		if(countEB > MAX_COUNT){
-			buttonEnSet();
-			countEB = 0;
-		}
+void readEncoderState(){ // читаем таймером значение если порт свободен
+	if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
+		arr_angle[counterAngle] = getEncoderData();
+		counterAngle++;
+		if(counterAngle >= MAX_COUNTER_ANGLE)
+			counterAngle = 0;
+		osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 }
 
-void trueButtonEP(){
-	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
-	static uint8_t counterLong = OFF;
-		if(pinState == GPIO_PIN_SET){
-			countEP++;
-		}
-		else{
-			countEP = 0;
-			counterLong = OFF;
-		}
-		if((countEP > MAX_COUNT) && (counterLong == OFF)){
-			//counterLong = ON;
-			encoderSetUp();
-			countEP = 0;
-		}
-		if((countEP > LONG_COUNT) && (counterLong == ON)){
-			setMaxSpeed(1);// Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать увеличивать
-			countEP = 0;
-			counterLong = OFF;
-		}
-}
+void readADCState(){
+	uint8_t data_ready = 0;
+	// Попытка захвата мьютекса
+	if(osMutexAcquire(BlockI2CHandle, MUTEX_TIMEOUT) == osOK){
+			data_ch[currentChanel][currentAdcBlock] = ADS1115_getData(pADS);
+			currentAdcBlock++;
+			if(currentAdcBlock >= SIZE_ADC_BUFF){
+				currentAdcBlock = 0;
+				currentChanel++;
+				if(currentChanel >= NUM_ADC_CH){
+					currentChanel = 0;
+					data_ready = YES;
+				}
+				ADS1115_updateConfig(pADS, configChanel[currentChanel]);
+			}
+			osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 
-void trueButtonEM(){
-	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15);
-
-	static uint8_t counterLong = OFF;
-		if(pinState == GPIO_PIN_SET){
-			countEM++;
-		}
-		else{
-			countEM = 0;
-			counterLong = OFF;
-		}
-		if((countEM > MAX_COUNT) && (counterLong == OFF)){
-			encoderSetDown();
-			countEM = 0;
-		}
-		if((countEM > LONG_COUNT) && (counterLong == ON)){
-			setMaxSpeed(-1); // Добавил логигу работы для удержания кнопки если она продолжает удерживаться то продолжать уменьшать
-			countEM = 0;
-			counterLong = OFF;
-		}
-}
-
-void calcDeltaAngle(uint16_t* data){
-	static int32_t currentAngle = 0;
-	int32_t temp = currentAngle - data[28];
-	if(temp > 1000 || temp < -1000){
-		currentAngle = data[28];
-		return;
-	}
-	if(currentAngle)
-	if(temp > 500 ){
-		currentAngle = data[28];
-		encoderSetUp();
-		temp_counter_plus++;
-	}
-	if(temp < -500){
-		currentAngle = data[28];
-		encoderSetDown();
-		temp_counter_min++;
+			if(data_ready == YES){
+				SystemState.AdcData.chanel_0_voltage = (getAverADC(data_ch[0])* ADC_TO_V);
+				SystemState.AdcData.chanel_1_voltage = (getAverADC(data_ch[1])* ADC_TO_V) - SystemState.AdcData.chanel_0_voltage ;					SystemState.AdcData.chanel_2_voltage = (getAverADC(data_ch[2])* ADC_TO_V) - SystemState.AdcData.chanel_0_voltage;
+				SystemState.AdcData.chanel_3_voltage = (getAverADC(data_ch[3])* ADC_TO_V) - SystemState.AdcData.chanel_0_voltage;
+				data_ready = NO;
+			}
 	}
 }
 
-void longButton(){
-	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14);
-	if(pinState == GPIO_PIN_RESET){
-		buttonCounterSet();
-	}
-	else{
-		buttonCounterReset();
-	}
+uint8_t create_timers(void){
+uint8_t error = 0;
+	// Создание таймера для кнопок
+	xButtonTimer 	= xTimerCreate(	"Button Timer",                         // Название таймера
+	                             	pdMS_TO_TICKS(BUTTON_TIMER_PERIOD_MS),  // Период таймера в тиках
+									pdTRUE,                                 // Повторяющийся таймер
+									(void*)0,                               // Идентификатор таймера
+									vButtonTimerCallback);                  // Функция обратного вызова таймера
 
-	if(buttonCounter() > 6){
-		buttonLongSet();
-		buttonCounterReset();
-	}
+	// Создание таймера АЦП
+	xADCTimer 		= xTimerCreate("ADC Timer",                          	// Название таймера
+									pdMS_TO_TICKS(ADC_TIMER_PERIOD_MS),  	// Период таймера в тиках
+									pdTRUE,                              	// Повторяющийся таймер
+									(void*)0,                            	// Идентификатор таймера
+									vADCTimerCallback);                  	// Функция обратного вызова таймера
+
+	// Создание таймера Энкодера
+	xEncoderTimer 	= xTimerCreate("Encoder Timer",                      	// Название таймера
+									pdMS_TO_TICKS(ENCODER_TIMER_PERIOD_MS), // Период таймера в тиках
+									pdTRUE,                                 // Повторяющийся таймер
+									(void*)0,                               // Идентификатор таймера
+									vEncoderTimerCallback);                 // Функция обратного вызова таймера
+
+	// Ошибка создания таймера
+	if (xADCTimer == NULL) 		error++;
+	if(xButtonTimer == NULL) 	error++;
+	if (xEncoderTimer == NULL)  error++;
+
+	if (xTimerStart(xADCTimer, 		0) != pdPASS) 	error++;
+	if (xTimerStart(xButtonTimer, 	0) != pdPASS) 	error++;
+	if (xTimerStart(xEncoderTimer, 	0) != pdPASS) 	error++;
 }
 
+void vEncoderTimerCallback(){
+	readEncoderState();
+}
+void vADCTimerCallback(){
 
+}
 
+void vButtonTimerCallback(){
 
+}
 
 
 

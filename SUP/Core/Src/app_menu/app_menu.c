@@ -4,11 +4,7 @@ osStatus_t statusMutex;
 
 extern sSystemState SystemState;
 int currentMenuItem = 0;
-static uint8_t buttonUpper = 0;  	// Кнопка вверх нажата 1
-static uint8_t buttonEnable = 0; 	// Кнопка ввода нажата 1
-static uint8_t button_counter = 0;  // Количество отсчётом сколько кнопка удерживалась
-static uint8_t button_long = 0;		// Кнопка ввода удержана 1
-static int8_t  encoderAS56 = 0;		// Положение энкодера 1 крутят в плюс -1 крутят в минус
+
 uint8_t calibr = 1;
 // Названия пунктов меню
 const char* menuItems[MENU_ITEMS_COUNT+1] = {
@@ -489,12 +485,15 @@ void drawADCMenu(){
 		osDelay(50);
 	}
 }
+
 void drawEncodMenu(){
 	uint8_t exit = 0;
 }
+
 void drawDACMenu(){
 	uint8_t exit = 0;
 }
+
 void drawSettinMenu(){
 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = ERROR_CONFIG;
@@ -581,9 +580,7 @@ void drawSettinMenu(){
 	}
 }
 
-
 void OutputBattaryParam(){
-
 	SystemState.DisplayState.prevState = SystemState.DisplayState.state;
 	SystemState.DisplayState.state = BATTARY_CONFIG;
 	char* battTypeLip = {"Batt.T:LiPo"};
@@ -703,79 +700,3 @@ void OutputBattaryParam(){
 			SystemState.BattaryData.MinCellVoltage = 3182;
 		}
 }
-
-
-uint8_t buttonUp(){
-	return buttonUpper;
-}
-void buttonUpSet(){
-	buttonUpper = 1;
-}
-void buttonUpReset(){
-	buttonUpper = 0;
-}
-
-uint8_t buttonEn(){
-	return buttonEnable;
-}
-void buttonEnSet(){
-	SystemState.ButtonsData.ButtonEN= BUTTON_ON;
-	SystemState.ButtonsData.ButtonENCounter++;
-	buttonEnable = 1;
-}
-void buttonEnReset(){
-	SystemState.ButtonsData.ButtonEN= BUTTON_OFF;
-	buttonEnable = 0;
-}
-
-uint8_t buttonCounter(){
-	return button_counter;
-}
-void buttonCounterSet(){
-	button_counter++;
-}
-
-void buttonCounterReset(){
-	button_counter = 0;
-}
-
-uint8_t buttonLong(){
-	return button_long;
-}
-void buttonLongSet(){
-	SystemState.ButtonsData.ButtonBACK = BUTTON_ON;
-	SystemState.ButtonsData.ButtonBACKCounter++;
-	button_long = 1;
-}
-void buttonLongReset(){
-	SystemState.ButtonsData.ButtonBACK = BUTTON_OFF;
-	button_long = 0;
-}
-
-int8_t encoderData(){
-	return encoderAS56;
-}
-
-void encoderSetUp(){
-	SystemState.ButtonsData.EncoderPLUS = BUTTON_ON;
-	SystemState.ButtonsData.EncoderPLUSCounter++;
-	encoderAS56 = 1;
-}
-void setMaxSpeed(int8_t znak){
-	SystemState.ButtonsData.SetMaxSpeed = BUTTON_ON;
-	SystemState.ButtonsData.setMaxSpeed = znak;
-}
-
-void encoderSetDown(){
-	SystemState.ButtonsData.EncoderMINUS = BUTTON_ON;
-	SystemState.ButtonsData.EncoderMINUSCounter++;
-	encoderAS56 = -1;
-}
-
-void encoderReset(){
-	SystemState.ButtonsData.EncoderMINUS = BUTTON_OFF;
-	SystemState.ButtonsData.EncoderPLUS = BUTTON_OFF;
-	encoderAS56 = 0;
-}
-
-
