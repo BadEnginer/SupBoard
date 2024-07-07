@@ -8,6 +8,9 @@ uint16_t raznica1 = 0;
 uint16_t raznica2 = 0;
 uint8_t decides = 0;
 
+#define BATTARY_NO_INIT 0
+#define BATTARY_TYPE_LIFE 1
+
 uint8_t  battaryCharge(){
 	uint16_t* arr = charge_proc_LIPO + 2 ;
 	uint8_t num_cell = (uint8_t) SystemState.BattaryData.numCell;

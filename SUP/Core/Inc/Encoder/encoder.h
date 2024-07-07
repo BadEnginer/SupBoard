@@ -4,7 +4,9 @@
 #include <main.h>
 #include "stm32f4xx_hal.h"
 
-extern sSystemState SystemState; // Глобальная структура где хранятся состояния всей системы
+#define TRUE  (1==1)
+#define FALSE (1==0)
+#define MIN_ANGLE_CHANGE 10
 
 typedef struct {
 	uint8_t dum:3;
@@ -15,16 +17,21 @@ typedef struct {
 }s_magnit;
 
 typedef union{
-	s_magnit state_magnit;
+	s_magnit magnit;
 	uint8_t data;
-}u_magnituda;
+}u_magnit;
 
-uint16_t getEncoderData();
-void calcDeltaAngle(uint16_t*);
+typedef struct {
+    uint16_t currentPosition;     // Текущее положение энкодера
+    uint16_t previousPosition;    // Предыдущее положение энкодера
+    int16_t stepCount;           // Счетчик шагов энкодера
+    uint8_t turnLeft;               // Флаг поворота влево
+    uint8_t turnRight;              // Флаг поворота вправо
+    uint8_t buttonPressed;          // Состояние кнопки энкодера (если есть)
+    u_magnit magnituda;			// Состояние магнитного энкодера
+} sEncoder;
 
-int8_t encoderData();
-void encoderSetUp();
-void encoderSetDown();
-void encoderReset();
+void initMagEncoder(sEncoder *encoder);
+void updateMagEncoder(sEncoder *encoder);
 
 #endif /* INC_ENCODER_ENCODER_H_ */

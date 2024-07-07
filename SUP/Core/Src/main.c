@@ -152,11 +152,12 @@ int main(void)
 
   /*After the partial refresh, you need to use OTP to clean the screen, otherwise the screen of the electronic paper may not be removed.*/
   	/******Clear screen after Partial refresh*****/
+  /*
  	EPD_init(); //EPD init
   	EPD_full_display_Clear();//EPD Clear
   	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
   	HAL_Delay(100); //2s
-
+   */
   	/*After the display is completed, wait for about 10 seconds before turning off the power,
   	  otherwise the electronic paper may display abnormally */
 
@@ -166,11 +167,12 @@ int main(void)
      //Paint_SelectImage(BlackImage);//Set the virtual canvas data storage location
 
       /***********String***************************/
-	EPD_init(); //EPD init
+	/*EPD_init(); //EPD init
 	EPD_full_display(gImage_logo_v1, gImage_logo_v1, 0);//Load logo
 	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
 	HAL_Delay(2000);
-
+	*/
+/*
  	EPD_init(); //EPD init
   	EPD_full_display_Clear();//EPD Clear
   	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
@@ -200,7 +202,8 @@ int main(void)
 
 	x_start = x0_start; x_end = x0_end;
 	y_start = y0_start; y_end = y0_end;
-
+	*/
+    /*
 	for(uint8_t j = 1; j < 10; j++){
 		x_start = x0_start; x_end = x0_end;
 		y_start = y0_start; y_end = y0_end;
@@ -214,13 +217,14 @@ int main(void)
 		display_number(x_start, x_end, y_start, y_end, j, j-1, 1);
 
 	}
+	*/
 	/*
 	for(uint8_t i = 1; i < 10; i++){
 		display_number(x0_start, x0_end, y0_start, y0_end, i, i-1, 1);
 		HAL_Delay(10-0);
 	}
 	*/
-	HAL_Delay(2000);
+	HAL_Delay(1000);
 
   uint8_t j = 0;
   for(uint8_t i = 1; i < 127; i ++){
@@ -590,13 +594,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin == EXT_button_on_Pin){
-			buttonEnSet();
-	}
-}
-
-
 
 void test_i2c_dev(){
 	HAL_StatusTypeDef stateI2cADC;

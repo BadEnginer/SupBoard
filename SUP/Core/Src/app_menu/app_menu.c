@@ -1,4 +1,4 @@
-#include "app_menu/app_menu.h"
+/*#include "app_menu/app_menu.h"
 
 osStatus_t statusMutex;
 
@@ -700,3 +700,4 @@ void OutputBattaryParam(){
 			SystemState.BattaryData.MinCellVoltage = 3182;
 		}
 }
+*/

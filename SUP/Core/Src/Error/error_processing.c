@@ -1,4 +1,4 @@
-#include "Error/error_processing.h"
+/*#include "Error/error_processing.h"
 
 void error_processing(){
 	// проверить все ли устройства на месте
@@ -34,3 +34,4 @@ void error_processing(){
 		SystemState.ErrorState.ErrorBattary  = BATTARY_OK;
 
 }
+*/

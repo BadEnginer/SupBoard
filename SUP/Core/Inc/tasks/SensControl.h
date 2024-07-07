@@ -4,7 +4,9 @@
 
 #include <main.h>
 #include <stdlib.h>
-
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
 
 #define MAX_ANGLE 600
 #define MIN_ANGLE 1
@@ -20,9 +22,9 @@
 #define CUR_PARAM_2 (1,7317 * CUR_PARAM_1)
 
 // определение для софт таймеров
-#define BUTTON_TIMER_PERIOD_MS  100
-#define ADC_TIMER_PERIOD_MS 	100
-#define ENCODER_TIMER_PERIOD_MS 100
+#define BUTTON_TIMER_PERIOD_MS  300
+#define ADC_TIMER_PERIOD_MS 	10
+#define ENCODER_TIMER_PERIOD_MS 300
 
 void trueButtonLB();
 void trueButtonEB();
@@ -36,8 +38,8 @@ uint8_t  battaryCharge();
 int16_t expFiltrCharge(float newVal, float k);
 int16_t expFiltrVbat(float newVal, float k);
 int16_t expFiltrIcurrnt(float newVal, float k);
-void error_processing();
-void longButton();
+//void error_processing();
+
 void StartSensOutTask(void *argument);
 
 
@@ -47,9 +49,5 @@ void vButtonTimerCallback (TimerHandle_t xTimer);
 void vADCTimerCallback	  (TimerHandle_t xTimer);
 void vEncoderTimerCallback(TimerHandle_t xTimer);
 
-// Декларация функции для чтения состояния кнопок
-void readButtonState(void);
-void readADCState(void);
-void readEncoderState(void);
 
 #endif /* INC_TASKS_SENSCONTROL_H_ */
