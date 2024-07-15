@@ -3,8 +3,9 @@
 
 #include <tasks/SensControl.h>
 #include "cmsis_os.h"
-#include "tasks/OledMenu.h"
-#include "tasks/LedControl.h"
+//#include "tasks/OledMenu.h"
+//#include "tasks/LedControl.h"
+#include "tasks/ElinkDisplay.h"
 #include "tasks/MotorControl.h"
 
 /**

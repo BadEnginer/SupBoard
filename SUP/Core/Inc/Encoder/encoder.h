@@ -3,6 +3,7 @@
 
 #include <main.h>
 #include "stm32f4xx_hal.h"
+#include "System/commonStruct.h"
 
 #define TRUE  (1==1)
 #define FALSE (1==0)
@@ -17,18 +18,22 @@ typedef struct {
 }s_magnit;
 
 typedef union{
-	s_magnit magnit;
-	uint8_t data;
+	s_magnit state;
+	uint8_t raw;
 }u_magnit;
 
 typedef struct {
-    uint16_t currentPosition;     // Текущее положение энкодера
-    uint16_t previousPosition;    // Предыдущее положение энкодера
-    int16_t stepCount;           // Счетчик шагов энкодера
-    uint8_t turnLeft;               // Флаг поворота влево
-    uint8_t turnRight;              // Флаг поворота вправо
-    uint8_t buttonPressed;          // Состояние кнопки энкодера (если есть)
-    u_magnit magnituda;			// Состояние магнитного энкодера
+	DeviceCommon common;
+	u_magnit magnit;	// Состояние магнитного энкодера
+
+    int16_t  stepCount;	// Счетчик шагов энкодера
+    uint8_t  turnLeft; 	// Флаг поворота влево
+    uint8_t  turnRight;	// Флаг поворота вправо
+
+    uint16_t currentPosition;	// Текущее положение энкодера
+    uint16_t previousPosition;	// Предыдущее положение энкодера
+
+    uint8_t  buttonPressed;	// Состояние кнопки энкодера (если есть)
 } sEncoder;
 
 void initMagEncoder(sEncoder *encoder);

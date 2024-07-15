@@ -11,10 +11,10 @@ void initMagEncoder(sEncoder *encoder){
 
 
 void updateMagEncoder(sEncoder *encoder){
-	encoder->magnituda.data = AS5600_GetStatus(); // Если все флаги верные то сделать расчеты
-	if( encoder->magnituda.magnit.MD == TRUE  &&
-		encoder->magnituda.magnit.MH == FALSE &&
-		encoder->magnituda.magnit.ML == FALSE){
+	encoder->magnit.raw = AS5600_GetStatus(); // Если все флаги верные то сделать расчеты
+	if( encoder->magnit.state.MD == TRUE  &&
+			encoder->magnit.state.MH == FALSE &&
+			encoder->magnit.state.ML == FALSE){
 			encoder->previousPosition = encoder->currentPosition;
 			encoder->currentPosition = AS5600_GetRawAngle();
 			encoder->stepCount = encoder->currentPosition - encoder->previousPosition;

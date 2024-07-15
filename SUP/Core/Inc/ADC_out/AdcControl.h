@@ -10,7 +10,7 @@ typedef struct {
     float filVal;
 } ExpFilterState_t;
 
-extern sSystemState SystemState;
+
 extern I2C_HandleTypeDef hi2c1;
 // Настройка параметров резистора для делителя
 // todo надо добавить расчеты для всех плечь
@@ -23,10 +23,10 @@ extern I2C_HandleTypeDef hi2c1;
 #define ADC_CURRENT 2
 #define ADC_BATT 3
 
-#define ADC_CHANEL_1 0 //
-#define ADC_CHANEL_2 1 //
-#define ADC_CHANEL_3 2 //
-#define ADC_CHANEL_4 3 // Voltage
+#define ADC_CHANEL_0 0 //
+#define ADC_CHANEL_1 1 //
+#define ADC_CHANEL_2 2 //
+#define ADC_CHANEL_3 3 // Voltage
 
 #define SIZE_ADC_BUFF 10
 #define NUM_ADC_CH 4
@@ -43,15 +43,30 @@ extern I2C_HandleTypeDef hi2c1;
 #define FULL_RANGE_CURRENT 2200.0 // 2500 ( половина от 5 Вольт - 0.3
 #define mV_TO_A (MAX_CURRENT/FULL_RANGE_CURRENT) // 33mV на 1 А ( из даташиита)
 
-#define MAX_COUNTER_ANGLE 10
+typedef struct{
+	int16_t voltage;
+	int16_t adc_data;
+	float coef_to_V;
+} sData;
 
-void initAllChanelADC();
-void readAllChanelADC();
+typedef struct {
+	ADS1115_Config_t config[NUM_ADC_CH];
+	ADS1115_Handle_t* handle;
+	sData data[NUM_ADC_CH];
+	uint8_t currentChanel;
+} sADC;
+
+
+void initAllChanelADC(sADC* myADC);
+void updapteConfig(sADC* myADC);
 void initADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel);
-void initChanelADC(ADS1115_Config_t*, MultiplexerConfig_t );
 int16_t getAverADC(int16_t* data);
-void adc_to_voltage();
+float expFilter(float newVal, float k, ExpFilterState_t *filterState);
+
+void readAllChanelADC(sADC* myADC);
 int32_t calculateCurrent(int16_t voltageDifference);
 uint16_t calculateVoltageSupply(int16_t voltageADC, float divede);
+void updateData(sADC* myADC,uint8_t chanel);
+void updateAllData(sADC* myADC);
 
 #endif /* INC_TASKS_ADCCONTROL_H_ */

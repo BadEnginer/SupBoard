@@ -1,24 +1,36 @@
 #include "ADC_out/AdcControl.h"
 
 // Структуры для работы АЦП
+/*
 ADS1115_Config_t configChanel[4];
 ADS1115_Handle_t *pADS;
-int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF] = {0};
+*/
+int16_t data_ch[NUM_ADC_CH][SIZE_ADC_BUFF] = {0}; // Фильтрующий буфер
 // Текущий канал ADC
-uint8_t currentChanel = 0;
 uint8_t currentAdcBlock = 0;
 
 
 
-void initAllChanelADC(){
-	initADC(&configChanel[ADC_CHANEL_1], CHANNEL_AIN0_GND);
-	initADC(&configChanel[ADC_CHANEL_2], CHANNEL_AIN1_GND);
-	initADC(&configChanel[ADC_CHANEL_3], CHANNEL_AIN2_GND);
-	initADC(&configChanel[ADC_CHANEL_4], CHANNEL_AIN3_GND);
+void initAllChanelADC(sADC* myADC){
+	initADC(&myADC->config[ADC_CHANEL_0], CHANNEL_AIN0_GND);
+	initADC(&myADC->config[ADC_CHANEL_2], CHANNEL_AIN2_GND);
+	initADC(&myADC->config[ADC_CHANEL_3], CHANNEL_AIN3_GND);
+	initADC(&myADC->config[ADC_CHANEL_1], CHANNEL_AIN1_GND);
 
-	pADS = ADS1115_init(&hi2c1, ADS1115_ADR, configChanel[currentChanel]);
-	ADS1115_updateConfig(pADS, configChanel[0]);
-	ADS1115_startContinousMode(pADS);
+	myADC->currentChanel = ADC_CHANEL_0;
+
+	myADC->data[ADC_CHANEL_0].coef_to_V = ADC_TO_V;
+	myADC->data[ADC_CHANEL_1].coef_to_V = ADC_TO_V;
+	myADC->data[ADC_CHANEL_2].coef_to_V = ADC_TO_V;
+	myADC->data[ADC_CHANEL_3].coef_to_V = ADC_TO_V;
+
+	myADC->handle = ADS1115_init(&hi2c1, ADS1115_ADR, myADC->config[myADC->currentChanel]);
+	updapteConfig(myADC);
+	ADS1115_startContinousMode(myADC->handle);
+}
+
+void updapteConfig(sADC* myADC){
+	ADS1115_updateConfig(myADC->handle, myADC->config[myADC->currentChanel]);
 }
 
 void initADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel){
@@ -32,10 +44,6 @@ void initADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel){
 	configReg->channel = chanel;
 }
 
-void initChanelADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel){
-	configReg->channel = chanel;
-}
-
 int16_t getAverADC(int16_t* data){
 	int32_t temp = 0;
 	for(uint8_t i = 0; i < SIZE_ADC_BUFF; i++)
@@ -45,22 +53,22 @@ int16_t getAverADC(int16_t* data){
 }
 
 // Универсальная фильтрующая функция
-int16_t expFilter(float newVal, float k, ExpFilterState_t *filterState) {
+float expFilter(float newVal, float k, ExpFilterState_t *filterState) {
     filterState->filVal += (newVal - filterState->filVal) * k;
-    return (int16_t)(filterState->filVal);
+    return (filterState->filVal);
 }
 
-void readAllChanelADC(){ // Чтение всех каналов ацп и преобразоавние их в напряжение
-	data_ch[currentChanel][currentAdcBlock] = ADS1115_getData(pADS);
+void readAllChanelADC(sADC* myADC){ // Чтение всех каналов ацп и преобразоавние их в напряжение
+	data_ch[myADC->currentChanel][currentAdcBlock] = ADS1115_getData(myADC->handle);
 	currentAdcBlock++;
 	if(currentAdcBlock >= (SIZE_ADC_BUFF)){ // Если заполнил первый массив
 		currentAdcBlock = 0;
-		currentChanel++;
-		if(currentChanel >= NUM_ADC_CH){ // Если весь ацп массив обновился сделать расчеты
-			currentChanel = 0;
-			adc_to_voltage();
+		myADC->currentChanel++;
+		if(myADC->currentChanel >= NUM_ADC_CH){ // Если весь ацп массив обновился сделать расчеты
+			myADC->currentChanel = 0;
+			updateAllData(myADC);
 		}
-		ADS1115_updateConfig(pADS, configChanel[currentChanel]);
+		updapteConfig(myADC);
 	}
 }
 
@@ -75,9 +83,15 @@ uint16_t calculateVoltageSupply(int16_t voltageADC, float divede){
 	return (((float)(voltageADC) * (float)divede));
 }
 
-void adc_to_voltage(){
-	SystemState.AdcData.chanel_0_voltage = (getAverADC(data_ch[0])* ADC_TO_V);
-	SystemState.AdcData.chanel_1_voltage = (getAverADC(data_ch[1])* ADC_TO_V);
-	SystemState.AdcData.chanel_2_voltage = (getAverADC(data_ch[2])* ADC_TO_V);
-	SystemState.AdcData.chanel_3_voltage = (getAverADC(data_ch[3])* ADC_TO_V);
+void updateData(sADC* myADC,uint8_t chanel){
+	myADC->data[chanel].adc_data =   getAverADC(data_ch[chanel]);
+	myADC->data[chanel].voltage =    myADC->data[chanel].adc_data * myADC->data[chanel].coef_to_V;
+
+}
+
+void updateAllData(sADC* myADC){
+	updateData(myADC, ADC_CHANEL_0);
+	updateData(myADC, ADC_CHANEL_1);
+	updateData(myADC, ADC_CHANEL_2);
+	updateData(myADC, ADC_CHANEL_3);
 }

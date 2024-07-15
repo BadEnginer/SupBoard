@@ -1,8 +1,9 @@
 #include "Button/Button.h"
 
-void init_button(sButton* button, GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, uint8_t invert){
+void init_button(sButton* button, GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, uint8_t invert, ButtonID id){
 	button->GPIO = GPIOx;
 	button->Pin  = GPIO_Pin;
+	button->id = id;
 	button->invertState = invert;
 	button->currentState  = 0;
 	button->previousState = 0;
@@ -35,7 +36,6 @@ void updateButtonState(sButton* button){
 		button->holdCounter = 0;
 		button->longPress = ON_BUTTON;
 	}
-
 }
 
 void resetLongButton(sButton* button){
@@ -54,3 +54,9 @@ uint8_t ShortButtonState(sButton* button){
 	return button->shortPress;
 }
 
+void initAllButton(sButton* button){
+	init_button(&button[A], GPIOA, GPIO_PIN_15, NO_INVERT, A);
+	init_button(&button[B], GPIOB, GPIO_PIN_3,  NO_INVERT, B);
+	init_button(&button[C], GPIOB, GPIO_PIN_4,  NO_INVERT, C);
+	init_button(&button[D], GPIOB, GPIO_PIN_5,  NO_INVERT, D);
+}

@@ -30,7 +30,7 @@ void display_number(unsigned int x_start, unsigned int x_end, unsigned int y_sta
 
 void delay_xms(unsigned int xms)
 {
-	HAL_Delay(xms);
+	osDelay(xms);
 	/*
 	unsigned int i;
 	while(xms--)

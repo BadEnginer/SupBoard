@@ -35,10 +35,16 @@ extern "C" {
 #include "Display/ws2812/ARGB.h"
 #include "Display/ssd1306/ssd1306.h"
 #include "ADC_out/ADS1115.h"
-#include "DAC_out/MCP4725.h"
 #include "Encoder/as5600.h"
 #include "tasks/UserTasks.h"
 #include "Display/LCM2004A/lcd_hd44780_i2c.h"
+#include "System/commonStruct.h"
+#include "Battery/battery.h"
+#include "ADC_out/AdcControl.h"
+#include "Button/Button.h"
+#include "Encoder/encoder.h"
+#include "ADC_out/AdcControl.h"
+#include "DAC_out/DAC.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -138,11 +144,6 @@ typedef struct{
 	int16_t chanel_3_voltage;
 } sAdcData;
 
-typedef enum eTypeBattary{
-	BATTARY_NO_INIT,
-	BATTARY_TYPE_LIFE,
-	BATTARY_TYPE_LIPO
-} TypeBattary;
 
 typedef enum eNumCell{
 	NUM_CELL_NO_INIT,
@@ -159,7 +160,7 @@ typedef struct{
 	uint8_t percentCharge;
 	uint16_t MaxCellVoltage;
 	uint16_t MinCellVoltage;
-	TypeBattary BatteryType;
+	//TypeBattary BatteryType;
 	NumCell numCell;
 	uint16_t voltage;
 	int32_t current; // mA
@@ -242,6 +243,11 @@ typedef struct{
 	int8_t current_speed;
 	uint8_t max_speed;
 } sMotorData;
+
+typedef struct{
+
+} sDevises;
+
 
 typedef struct{
 	sBattaryData BattaryData;

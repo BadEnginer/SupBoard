@@ -8,21 +8,17 @@ uint16_t raznica1 = 0;
 uint16_t raznica2 = 0;
 uint8_t decides = 0;
 
-#define BATTARY_NO_INIT 0
 #define BATTARY_TYPE_LIFE 1
 
 uint8_t  battaryCharge(){
 	uint16_t* arr = charge_proc_LIPO + 2 ;
-	uint8_t num_cell = (uint8_t) SystemState.BattaryData.numCell;
+	uint8_t num_cell = 2;//(uint8_t) SystemState.BattaryData.numCell;
 	int16_t rez_mid;
-	uint16_t battary_voltage = SystemState.BattaryData.voltage;
+	uint16_t battary_voltage = 1;//SystemState.BattaryData.voltage;
 	if(num_cell == 0)
 		return 0;
-	if(SystemState.BattaryData.BatteryType == BATTARY_NO_INIT)
-		return 0;
 	//uint16_t battery_1C = battary_voltage/num_cell;
-	if(SystemState.BattaryData.BatteryType == BATTARY_TYPE_LIFE)
-		arr = charge_proc_FE + 2;
+
 	if(battary_voltage < (arr[0]*num_cell)) // Минимальное значение и меньше будет 0
 		return 0;
 	if(battary_voltage >= (arr[9]*num_cell)) // Максимальное значение и выше будет 1

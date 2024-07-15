@@ -1,18 +1,14 @@
 #include <tasks/SensControl.h>
-#include <ADC_out/AdcControl.h>
-#include <Encoder/encoder.h>
-#include <Button/Button.h>
+#include "System/SystemState.h"
 
-
-extern sSystemState SystemState; // Глобальная структура где хранятся состояния всей системы
+sSystem mySystem; // Глобальная структура где хранятся состояния всей системы
 extern osMutexId_t BlockI2CHandle; //Блокировка чтения i2c
 osStatus_t statusMutexI2C;
 
-sButton  buttonA;
-sButton  buttonB;
-sButton  buttonC;
-sButton  buttonD;
-sEncoder MagEnc;
+#define myADC &mySystem.adc
+#define MagEnc &mySystem.magEnc
+#define myButton mySystem.button
+#define myDAC &mySystem.dac
 
 /* Definitions for TestTimer */
 osTimerId_t TimerReadButtonHandle;
@@ -44,7 +40,6 @@ char symData[8] = {'L','a','s','t','-'};
 
 uint8_t time;
 extern uint8_t calibr;
-
 int16_t dif_current;
 int16_t calibrate;
 uint8_t test_data;
@@ -52,20 +47,15 @@ int32_t current_new = 0;
 int16_t supply_voltage_new = 0;
 // Задача для опросо кнопок, энкодера, ацп и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
-	initAllChanelADC();
-	init_button(&buttonA, GPIOA, GPIO_PIN_15, NO_INVERT);
-	init_button(&buttonB, GPIOB, GPIO_PIN_3,  NO_INVERT);
-	init_button(&buttonC, GPIOB, GPIO_PIN_4,  NO_INVERT);
-	init_button(&buttonD, GPIOB, GPIO_PIN_5,  NO_INVERT);
-	initMagEncoder(&MagEnc);
+	initAllChanelADC(myADC);
+	initAllButton(myButton);
+	initMagEncoder(MagEnc);
+	initDAC(myDAC, REF_VOLTAGE_DAC);
 	osDelay(300);
 	uint8_t error_timers = create_timers();
 	if(error_timers > 0){while(1);}
 	osDelay(3000);
-	int16_t zeroCurrent = SystemState.AdcData.chanel_1_voltage;
-	SystemState.BattaryData.calibraty = 1;
-	SystemState.BattaryData.zeroCurrentReal = SystemState.AdcData.chanel_3_voltage;
-	SystemState.BattaryData.zeroCurrentImg = 3300 / 2;
+	int16_t zeroCurrent = 1;
 	for(;;){
 		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
 			switch(command_CMD[0] - 48){ // преобразуем символ в число
@@ -73,7 +63,7 @@ void StartSensOutTask(void *argument){
 				//case 2: buttonLongSet();  break;
 				//case 3: encoderSetUp();   break;
 				//case 4: encoderSetDown(); break;
-				case 5: SystemState.BattaryData.calibraty = 1;	  break;
+				//case 5: SystemState.BattaryData.calibraty = 1;	  break;
 				//case 6: setMaxSpeed(1);	  break;
 				//case 7: setMaxSpeed(-1);  break;
 
@@ -84,21 +74,7 @@ void StartSensOutTask(void *argument){
 		    symData[7] = '\r';
 			CDC_Transmit_FS(symData, sizeof(symData));
 		}
-		dif_current = (SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg);
-		if(SystemState.BattaryData.calibraty == 1){
-			SystemState.BattaryData.calibraty = 0;
-			calibrate = dif_current;
-		}
-		//SystemState.BattaryData.current =expFiltrIcurrnt(((dif_current-calibrate) *42.553), 0.5);
-		//SystemState.BattaryData.current = (float)((SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg)/0.0235);
-		//SystemState.BattaryData.voltage = expFiltrVbat(((1.0 * SystemState.AdcData.chanel_2_voltage * 1.0 * BATTERY_DEVIDER)), 0.2);
-		//SystemState.BattaryData.percentCharge = expFiltrCharge(battaryCharge(SystemState.BattaryData.BatteryType, SystemState.BattaryData.numCell, SystemState.BattaryData.voltage), 0.2);
-		if(SystemState.ErrorState.ErrorBattary == VOLTAGE_IS_HIGH)
-			SystemState.BattaryData.percentCharge = 100;
-		//error_processing();
-		osDelay(100);
-		current_new = calculateCurrent(SystemState.AdcData.chanel_1_voltage - zeroCurrent);
-		supply_voltage_new = calculateVoltageSupply(SystemState.AdcData.chanel_3_voltage, BATTERY_DEVIDER);
+		dif_current = 1;//(SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg);
 	}
 }
 
@@ -127,7 +103,7 @@ uint8_t create_timers(void){
 
 	// Ошибка создания таймера
 	if (xADCTimer == NULL) 		error++;
-	if(xButtonTimer == NULL) 	error++;
+	if (xButtonTimer == NULL) 	error++;
 	if (xEncoderTimer == NULL)  error++;
 
 	if (xTimerStart(xADCTimer, 		0) != pdPASS) 	error++;
@@ -138,7 +114,7 @@ uint8_t create_timers(void){
 
 void vEncoderTimerCallback(TimerHandle_t xTimer){
 	if(osMutexAcquire(BlockI2CHandle, MUTEX_TIMEOUT) == osOK){
-		updateMagEncoder(&MagEnc);
+		updateMagEncoder(MagEnc);
 		osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 	}
 
@@ -146,16 +122,15 @@ void vEncoderTimerCallback(TimerHandle_t xTimer){
 
 void vADCTimerCallback(TimerHandle_t xTimer){
 	if(osMutexAcquire(BlockI2CHandle, MUTEX_TIMEOUT) == osOK){// Попытка захвата мьютекса
-		readAllChanelADC();
+		readAllChanelADC(myADC);
 		osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 	}
 }
 
 void vButtonTimerCallback(TimerHandle_t xTimer){
-	updateButtonState(&buttonA);
-	updateButtonState(&buttonB);
-	updateButtonState(&buttonC);
-	updateButtonState(&buttonD);
+	for(uint8_t i = 0; i < NUM_BUTTONS; i++){
+		updateButtonState(&myButton[i]);
+	}
 }
 
 

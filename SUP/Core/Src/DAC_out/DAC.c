@@ -1,28 +1,33 @@
 #include "DAC_out/DAC.h"
 
+extern osMutexId_t BlockI2CHandle;
+extern I2C_HandleTypeDef hi2c1;
 
 uint16_t speed_arr_plus[] =  {0,250,300,330,380,460,550,650,770,900}; // step mV for lean speed
 uint16_t speed_arr_minus[] = {0,180,250,310,380,460,550,650,770,900}; // step mV for lean speed
-/*
-void initDAC(MCP4725* myMCP4725);
-void SetSpeed(MCP4725* myMCP4725, int16_t speed);
-void SlowStop();
-void FastStop();
-*/
-void initDAC(MCP4725* myMCP4725){
-	*myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, 3.20);
+
+void initDAC(sDAC* myDAC, float refVoltage){
+	myDAC->refVoltage = refVoltage;
+	myDAC->myMCP4725 = MCP4725_init(&hi2c1, MCP4725A0_ADDR_A00, refVoltage);
+	turnOnDAC(myDAC, DEV_ON);
 }
 
-/*
-void SetSpeed(MCP4725* myMCP4725, int16_t setSpeed){
-	//MCP4725_setVoltage(myMCP4725, setSpeed, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
+uint8_t setDACVoltage(float voltage, sDAC* myDAC){
+	myDAC->voltage = (uint16_t)(voltage*1000);
+	return MCP4725_setVoltage(&(myDAC->myMCP4725), voltage, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
 }
 
-
-float expFiltrDAC(float newVal, float k) {
-	  static float filVal = STOP_ENGINE;
-	  filVal += (newVal - filVal) * k;
-	  return filVal;
+uint16_t getDACVoltage(sDAC* myDAC){
+	return myDAC->voltage;
 }
 
-*/
+uint8_t turnOnDAC(sDAC* myDAC,ePowerState turn){
+	if(turn == DEV_OFF){
+		myDAC->common.status = STATE_DEVICE_WAIT;
+		return MCP4725_setVoltage(&(myDAC->myMCP4725), ZERO_SPEED_VOLTAGE, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_100KOHM);
+	}
+	else
+		myDAC->common.status = STATE_DEVICE_READY;
+	return MCP4725_setVoltage(&(myDAC->myMCP4725), ZERO_SPEED_VOLTAGE, MCP4725_FAST_MODE, MCP4725_POWER_DOWN_OFF);
+}
+

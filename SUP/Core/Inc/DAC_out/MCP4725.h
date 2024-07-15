@@ -29,7 +29,7 @@
 #ifndef MCP4725_h
 #define MCP4725_h
 
-#include "main.h"
+#include "stm32f4xx.h"
 #include <math.h>
 
 #define MCP4725_DISABLE_SANITY_CHECK     //disable some sanity checks to increase speed, use with caution
@@ -76,6 +76,15 @@ typedef enum
 }
 MCP4725_READ_TYPE;
 
+typedef struct
+{
+	// Privates:
+	I2C_HandleTypeDef* hi2c;
+	MCP4725Ax_ADDRESS _i2cAddress;
+  float             _refVoltage;
+  uint16_t          _bitsPerVolt;
+} MCP4725;
+
 /* Some arithmatic functions */
 #define lowByte(x)		((uint8_t)(x%256))
 #define highByte(x)		((uint8_t)(x/256))
@@ -93,15 +102,6 @@ MCP4725_READ_TYPE;
 #define MCP4725_REFERENCE_VOLTAGE    3.30                         //supply-reference votltage
 #define MCP4725_MAX_VALUE            4095 //((MCP4725_STEPS) - 1)
 #define MCP4725_ERROR                0xFFFF                       //returns 65535, if communication error is occurred
-
-typedef struct MCP
-{
-	// Privates:
-	I2C_HandleTypeDef* hi2c;
-	MCP4725Ax_ADDRESS _i2cAddress;
-  float             _refVoltage;
-  uint16_t          _bitsPerVolt;
-} MCP4725;
 
 
 // Publics:
