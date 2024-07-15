@@ -57,24 +57,11 @@ void StartSensOutTask(void *argument){
 	osDelay(3000);
 	int16_t zeroCurrent = 1;
 	for(;;){
-		if(command_CMD[0] != 0){ // Самоя простая система команда из палок и прочего
-			switch(command_CMD[0] - 48){ // преобразуем символ в число
-				//case 1: buttonEnSet();    break;
-				//case 2: buttonLongSet();  break;
-				//case 3: encoderSetUp();   break;
-				//case 4: encoderSetDown(); break;
-				//case 5: SystemState.BattaryData.calibraty = 1;	  break;
-				//case 6: setMaxSpeed(1);	  break;
-				//case 7: setMaxSpeed(-1);  break;
-
-			}//todo добавить больше данных
-			test_data = command_CMD[0];
-			command_CMD[0] = 0;
-		    itoa((test_data-48),symData+5,10);
-		    symData[7] = '\r';
-			CDC_Transmit_FS(symData, sizeof(symData));
+		osDelay(10);
+		if(osMutexAcquire(BlockI2CHandle, MUTEX_TIMEOUT) == osOK){// Попытка захвата мьютекса
+			readAllChanelADC(myADC);
+			osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 		}
-		dif_current = 1;//(SystemState.AdcData.chanel_3_voltage - SystemState.BattaryData.zeroCurrentImg);
 	}
 }
 
@@ -122,7 +109,7 @@ void vEncoderTimerCallback(TimerHandle_t xTimer){
 
 void vADCTimerCallback(TimerHandle_t xTimer){
 	if(osMutexAcquire(BlockI2CHandle, MUTEX_TIMEOUT) == osOK){// Попытка захвата мьютекса
-		readAllChanelADC(myADC);
+		//readAllChanelADC(myADC);
 		osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 	}
 }

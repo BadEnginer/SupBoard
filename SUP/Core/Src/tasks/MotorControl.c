@@ -10,7 +10,7 @@ void StartMotorControlTask(void *argument){
 	SetSpeed(&mySystem);
 	int16_t offset = 0;
 	for(;;){
-
+		osDelay(1000);
 	}
 
 }

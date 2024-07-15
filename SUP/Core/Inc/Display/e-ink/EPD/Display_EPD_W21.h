@@ -1,6 +1,6 @@
 #ifndef _DISPLAY_EPD_W21_H_
 #define _DISPLAY_EPD_W21_H_
-
+#include <stdint.h>
 
 #define EPD_WIDTH   200
 #define EPD_HEIGHT  200
@@ -18,8 +18,9 @@ void EPD_full_display_Clear(void);
 //Display canvas function
 void EPD_Display(unsigned char *Image); 
 
-void display_number(unsigned int x_start, unsigned int x_end,  unsigned int y_start,
-					unsigned int y_end,   uint8_t current_num, uint8_t previous_num,
+void num_to_arr(int16_t num, uint8_t* num_digital, uint8_t* sign, uint8_t* data);
+void display_number(uint16_t x_start,    uint16_t y_start,
+                    int16_t current_num, int16_t previous_num,
 					uint8_t mode);
 
 extern const unsigned char gImage_16x24_num_0[];

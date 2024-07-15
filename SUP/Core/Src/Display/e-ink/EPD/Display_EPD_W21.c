@@ -1,7 +1,7 @@
 #include "Display/e-ink/EPD/Display_EPD_W21_spi.h"
 #include "Display/e-ink/EPD/Display_EPD_W21.h"
-
 #include "Display/e-ink/pic/num_16x24.h"
+
 const unsigned char* images[] = {
         gImage_16x24_num_0,
         gImage_16x24_num_1,
@@ -12,19 +12,69 @@ const unsigned char* images[] = {
         gImage_16x24_num_6,
         gImage_16x24_num_7,
         gImage_16x24_num_8,
-        gImage_16x24_num_9
+        gImage_16x24_num_9,
+		gImage_16x24_num_min,
+		gImage_16x24_num_emp
 };
 
-void display_number(unsigned int x_start, unsigned int x_end, unsigned int y_start, unsigned int y_end,
-                    uint8_t current_num, uint8_t previous_num, uint8_t mode) {
-    // Проверка на допустимые значения current_num и previous_num
-    if (current_num > 9 || previous_num > 9) {
-        // Вывести сообщение об ошибке, если значения выходят за пределы допустимых
-        return;
-    }
+#define EMPTY_DIS 11
+#define MINUS_DIS 10
+#define NUM_X_SIZE 16
+#define NUM_Y_SIZE 24
+
+void num_to_arr(int16_t num, uint8_t* num_digital, uint8_t* sign, uint8_t* data){
+	(*sign) = (num < 0) ? 1 : 0;
+	if((*sign)){
+		num = -num;
+	}
+	if(num == 0){ //Исключение если пришел 0
+		data[0] = 0;
+		(*num_digital) = 1;
+		return;
+	}
+	int16_t temp = num;
+	while (temp != 0) {
+	        temp /= 10;
+	        (*num_digital)++;
+	}
+	for (uint8_t i = 0; i <= ((*num_digital)-1); i++) {
+		data[i] = num % 10;
+		num /= 10;
+	}
+}
+
+void display_number(uint16_t x_start, uint16_t y_start,
+                    int16_t current_num, int16_t previous_num, uint8_t mode) {
+	uint8_t current_data[5]  = {0};
+	uint8_t previous_data[5] = {0};
+	uint8_t previous_num_digital = 0;
+	uint8_t previous_sign = 0;
+	uint8_t current_num_digital = 0;
+	uint8_t current_sign = 0;
+	num_to_arr(current_num,  &current_num_digital,  &current_sign,  current_data);
+	num_to_arr(previous_num, &previous_num_digital, &previous_sign, previous_data);
 	EPD_init(); //EPD init
     // Вызов функции EPD_partial_display с соответствующими аргументами
-    EPD_partial_display(x_start, x_end, y_start, y_end, images[previous_num], images[current_num], mode);
+	if(current_sign){ // Если есть знак то обновить место для него
+		EPD_partial_display(y_start, y_start + NUM_Y_SIZE ,
+								    x_start, x_start + NUM_X_SIZE,
+									images[EMPTY_DIS],
+									images[EMPTY_DIS], 0);
+
+		EPD_partial_display(y_start, y_start + NUM_Y_SIZE ,
+						    x_start, x_start + NUM_X_SIZE,
+							images[EMPTY_DIS],
+							images[MINUS_DIS], 1);
+		x_start-=16;
+	}
+	for(uint8_t i = current_num_digital; i > 0; i--){
+		EPD_partial_display(y_start, y_start + NUM_Y_SIZE,
+					  	    x_start, x_start + NUM_X_SIZE,
+							images[previous_data[i-1]],
+							images[current_data[i-1]], mode);
+		x_start -= 16;
+	}
+
     EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
 }
 
