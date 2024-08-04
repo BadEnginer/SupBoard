@@ -3,7 +3,6 @@
 typedef struct sDAC dacc;
 #include "main.h"
 #include "System/commonStruct.h"
-#include "DAC_out/DAC.h"
 #include "ADC_out/AdcControl.h"
 #include "DAC_out/MCP4725.h"
 
@@ -35,6 +34,7 @@ typedef struct {
 } sDAC;
 
 
+uint8_t DAC_i2cReady();
 void initDAC(sDAC* myDAC, float refVoltage);
 uint8_t turnOnDAC(sDAC* myDAC,ePowerState);
 uint8_t setDACVoltage(float voltage, sDAC* myDAC);

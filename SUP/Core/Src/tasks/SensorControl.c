@@ -45,12 +45,21 @@ int16_t calibrate;
 uint8_t test_data;
 int32_t current_new = 0;
 int16_t supply_voltage_new = 0;
+void check_error(){
+	if(*myDAC.common.status == STATE_DEVICE_NO_INIT)
+		mySystem.err.Critical++;
+	if(*myADC.common.status == STATE_DEVICE_NO_INIT)
+		mySystem.err.Critical++;
+	if(*MagEnc.common.status == STATE_DEVICE_NO_INIT)
+		mySystem.err.Critical++;
+}
 // Задача для опросо кнопок, энкодера, ацп и система команд от usb и обработка ошибок
 void StartSensOutTask(void *argument){
 	initAllChanelADC(myADC);
 	initAllButton(myButton);
-	initMagEncoder(MagEnc);
+	initMagEncoder(MagEnc, I2C_ADDRESS_ENCODER);
 	initDAC(myDAC, REF_VOLTAGE_DAC);
+	check_error();
 	osDelay(300);
 	uint8_t error_timers = create_timers();
 	if(error_timers > 0){while(1);}
@@ -101,7 +110,13 @@ uint8_t create_timers(void){
 
 void vEncoderTimerCallback(TimerHandle_t xTimer){
 	if(osMutexAcquire(BlockI2CHandle, MUTEX_TIMEOUT) == osOK){
-		updateMagEncoder(MagEnc);
+		if(*MagEnc.common.status == STATE_DEVICE_NO_INIT){
+			initMagEncoder(MagEnc, I2C_ADDRESS_ENCODER);
+		}
+		else{
+			updateMagEncoder(MagEnc);
+		}
+
 		osMutexRelease(BlockI2CHandle);// Освобождение мьютекса
 	}
 

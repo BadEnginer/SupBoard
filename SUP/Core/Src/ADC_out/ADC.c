@@ -12,6 +12,15 @@ uint8_t currentAdcBlock = 0;
 
 
 void initAllChanelADC(sADC* myADC){
+	myADC->common.addressI2C = ADS1115_ADR;
+	if(ADC_i2cReady()){
+		myADC->common.error = NO_ERROR;
+		myADC->common.status = STATE_DEVICE_READY;
+	}
+	else{
+		myADC->common.error = YES_ERROR;
+		myADC->common.status = STATE_DEVICE_NO_INIT;
+	}
 	initADC(&myADC->config[ADC_CHANEL_0], CHANNEL_AIN0_GND);
 	initADC(&myADC->config[ADC_CHANEL_2], CHANNEL_AIN2_GND);
 	initADC(&myADC->config[ADC_CHANEL_3], CHANNEL_AIN3_GND);
@@ -29,6 +38,13 @@ void initAllChanelADC(sADC* myADC){
 	ADS1115_startContinousMode(myADC->handle);
 }
 
+uint8_t ADC_i2cReady(){
+	HAL_StatusTypeDef state = HAL_I2C_IsDeviceReady(&hi2c1, (ADS1115_ADR << 1), 2, 5);
+	if(state == HAL_OK)
+		return 1;
+	else
+		return 0;
+}
 void updapteConfig(sADC* myADC){
 	ADS1115_updateConfig(myADC->handle, myADC->config[myADC->currentChanel]);
 }

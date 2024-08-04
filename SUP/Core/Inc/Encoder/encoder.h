@@ -5,6 +5,7 @@
 #include "stm32f4xx_hal.h"
 #include "System/commonStruct.h"
 
+#define I2C_ADDRESS_ENCODER 54
 #define TRUE  (1==1)
 #define FALSE (1==0)
 #define MIN_ANGLE_CHANGE 10
@@ -36,7 +37,7 @@ typedef struct {
     uint8_t  buttonPressed;	// Состояние кнопки энкодера (если есть)
 } sEncoder;
 
-void initMagEncoder(sEncoder *encoder);
+void initMagEncoder(sEncoder *encoder, uint8_t adr);
 void updateMagEncoder(sEncoder *encoder);
 
 #endif /* INC_ENCODER_ENCODER_H_ */

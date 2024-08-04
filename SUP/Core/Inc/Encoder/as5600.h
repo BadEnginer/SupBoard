@@ -69,6 +69,7 @@ uint8_t  AS5600_ReadReg(uint8_t Reg);
 uint16_t AS5600_GetAngle(void);
 uint16_t AS5600_GetRawAngle(void);
 uint8_t  AS5600_GetStatus(void);
+uint8_t  AS5600_i2cReady();
 
 void AS5600_SetHystheresis (uint8_t Hyst);
 void AS5600_SetOutputStage (uint8_t OutStage);

@@ -31,6 +31,13 @@ uint16_t AS5600_GetRawAngle()
 	return AngleVal;	
 }
 
+uint8_t AS5600_i2cReady(){
+	HAL_StatusTypeDef state = HAL_I2C_IsDeviceReady(&hi2c1, (AS5600_ADDR << 1), 2, 5);
+	if(state == HAL_OK)
+		return 1;
+	else
+		return 0;
+}
 uint8_t AS5600_GetStatus()
 {
 	return AS5600_ReadReg(STATUS) & 0x38;	

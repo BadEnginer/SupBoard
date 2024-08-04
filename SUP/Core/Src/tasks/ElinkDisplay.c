@@ -19,21 +19,40 @@ void StartElinkDisplay(void *argument){
 	osDelay(1000);
 	uint8_t est = 0;
 	EPD_init(); //EPD init
-	EPD_full_display(gImage_main_display, gImage_main_display, 0);//EPD_picture1
+		EPD_full_display(gImage_main_display, gImage_main_display, 0);//EPD_picture1
 	EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
 
 	// центр32 x - 104 y
 	uint16_t test = 0;
 	uint16_t prev_test = 0;
-
+	uint8_t refresh_iter = 1;
+	uint8_t mode = 0;
 	prev_test = test;
 	test = mySystem.magEnc.currentPosition;
-	display_number(48, 104, test, prev_test,0);
+	//display_number(48, 104, test, prev_test,0);
+	//display_number(72, 80,  0, 0, 0);
 	for(;;){
 		prev_test = test;
 		test = mySystem.magEnc.currentPosition;
-		display_number(48, 104, test, prev_test,1);
-		osDelay(100);
+		if(mySystem.err.Critical > 0){
+			display_number(0, 0, 666, 111, 3);
+			while(mySystem.err.Critical > 0){
+				osDelay(300);
+			};
+		}
+		display_number(48, 104, test, prev_test, mode);
+		display_number(72, 80,  refresh_iter, refresh_iter-1, mode);
+		mode = 1;
+		osDelay(300);
+		refresh_iter++;
+		if(refresh_iter >= 10){
+			mode = 0;
+			refresh_iter = 1;
+			EPD_init(); //EPD init
+				EPD_full_display_Clear();
+				EPD_full_display(gImage_main_display, gImage_main_display, 0);//EPD_picture1
+			EPD_sleep();//EPD_sleep,Sleep instruction is necessary, please do not delete!!!
+		}
 
 	}
 }

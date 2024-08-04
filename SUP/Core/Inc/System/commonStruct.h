@@ -13,7 +13,8 @@ typedef enum {
 
 typedef enum {
     NO_ERROR,
-    YES_ERROR
+    YES_ERROR,
+	OLD_DATA
 } DeviceError;
 
 typedef struct {

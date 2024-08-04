@@ -18,10 +18,11 @@ extern I2C_HandleTypeDef hi2c1;
 #define RES_BOT 9.946f
 #define BATTERY_DEVIDER (1+(RES_TOP/RES_BOT))
 
-#define ADS1115_ADR 72
 #define ADC_DAC 1
 #define ADC_CURRENT 2
 #define ADC_BATT 3
+
+#define ADS1115_ADR 72
 
 #define ADC_CHANEL_0 0 //
 #define ADC_CHANEL_1 1 //
@@ -50,6 +51,7 @@ typedef struct{
 } sData;
 
 typedef struct {
+	DeviceCommon common;
 	ADS1115_Config_t config[NUM_ADC_CH];
 	ADS1115_Handle_t* handle;
 	sData data[NUM_ADC_CH];
@@ -63,6 +65,7 @@ void initADC(ADS1115_Config_t* configReg, MultiplexerConfig_t chanel);
 int16_t getAverADC(int16_t* data);
 float expFilter(float newVal, float k, ExpFilterState_t *filterState);
 
+uint8_t ADC_i2cReady();
 void readAllChanelADC(sADC* myADC);
 int32_t calculateCurrent(int16_t voltageDifference);
 uint16_t calculateVoltageSupply(int16_t voltageADC, float divede);

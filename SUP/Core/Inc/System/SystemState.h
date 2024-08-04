@@ -17,6 +17,11 @@ typedef struct {
 } sThruster;
 
 typedef struct {
+	 uint8_t Critical;
+}sSystemError;
+
+typedef struct {
+	sSystemError err;
 	sBattery battery;
 	sEncoder magEnc;
     sADC adc;

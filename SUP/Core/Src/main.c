@@ -130,6 +130,16 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(500);
+  HAL_StatusTypeDef state;
+  uint8_t adr_i2c[8] = {0};
+  uint8_t j = 0;
+  for(uint8_t i = 1; i < 128; i++){
+	  state = HAL_I2C_IsDeviceReady(&hi2c1, (i << 1), 2, 5);
+	  if(state == HAL_OK){
+		  adr_i2c[j] = i;
+		  j++;
+	  }
+  }
   BlockI2CHandle = osMutexNew(&BlockI2C_attributes);
     /* USER CODE END 2 */
 
@@ -459,58 +469,6 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-#define ADR_I2C_ENCODER 54
-
-Sys;
-checkDevisesState;
-void test_i2c_dev(){
-	HAL_StatusTypeDef i2cState;
-	uint8_t i2cAddresses[] = {54, 60, 72, 96};
-	/*
-	  // Подсчёт устройств в сети I2C 60-display, 72-ацп, 54-encoder, 96 -dac/
-    if(osMutexAcquire(BlockI2CHandle, 1000) == osOK){
-    	stateI2cENC = HAL_I2C_IsDeviceReady(&hi2c1, (54 << 1), 2, 5);
-		stateI2cDIS = HAL_I2C_IsDeviceReady(&hi2c1, (60 << 1), 2, 5);
-		stateI2cADC = HAL_I2C_IsDeviceReady(&hi2c1, (72 << 1), 2, 5);
-		stateI2cDAC = HAL_I2C_IsDeviceReady(&hi2c1, (96 << 1), 2, 5);
-		osMutexRelease(BlockI2CHandle);
-		if(stateI2cENC == HAL_OK){
-			SystemState.MagnitEncoderData.readyENCODER = DEVICE_READY;
-			SystemState.ErrorState.error_encoder = DEVISE_WORK;
-		}
-		else {
-			SystemState.MagnitEncoderData.readyENCODER = DEVICE_NO_ANSWER;
-			SystemState.ErrorState.error_encoder = DEVISE_NO_ANSWER;
-		}
-		if(stateI2cADC == HAL_OK){
-			SystemState.AdcData.readyADC = DEVICE_READY;
-			SystemState.ErrorState.error_ADC = DEVISE_OK;
-		}
-		else {
-			SystemState.AdcData.readyADC = DEVICE_NO_ANSWER;
-			SystemState.ErrorState.error_ADC = DEVISE_ERROR;
-		}
-
-		if(stateI2cDAC == HAL_OK){
-			SystemState.DacData.readyDAC = DEVICE_READY;
-			SystemState.ErrorState.error_DAC = DEVISE_OK;
-		}
-		else {
-			SystemState.DacData.readyDAC = DEVICE_NO_ANSWER;
-			SystemState.ErrorState.error_DAC = DEVISE_ERROR;
-		}
-
-		if(stateI2cDIS == HAL_OK){
-			SystemState.DisplayState.readyDISPLAY = DEVICE_READY;
-			SystemState.ErrorState.error_DISPLAY = DEVISE_OK;
-		}
-		else {
-			SystemState.DisplayState.readyDISPLAY = DEVICE_NO_ANSWER;
-			SystemState.ErrorState.error_DISPLAY = DEVISE_ERROR;
-		}
-    }
-    */
-}
 
 /* USER CODE END 4 */
 
@@ -529,7 +487,6 @@ void StartInitTask(void *argument)
   /* Infinite loop */
 	  for(;;)
 	  {
-		test_i2c_dev();
 	    osDelay(1000);
 	  }
   /* USER CODE END 5 */

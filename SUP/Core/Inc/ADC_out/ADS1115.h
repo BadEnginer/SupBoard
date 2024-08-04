@@ -8,6 +8,7 @@
 #ifndef INC_ADS1115_H_
 #define INC_ADS1115_H_
 
+
 #include "stdint.h"
 #include "stdlib.h"
 

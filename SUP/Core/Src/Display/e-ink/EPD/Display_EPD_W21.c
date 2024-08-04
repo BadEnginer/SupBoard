@@ -14,10 +14,12 @@ const unsigned char* images[] = {
         gImage_16x24_num_8,
         gImage_16x24_num_9,
 		gImage_16x24_num_min,
-		gImage_16x24_num_emp
+		gImage_16x24_num_emp,
+		gImage_16x24_num_full
 };
 
 #define EMPTY_DIS 11
+#define FULL_DIS 12
 #define MINUS_DIS 10
 #define NUM_X_SIZE 16
 #define NUM_Y_SIZE 24
@@ -51,9 +53,20 @@ void display_number(uint16_t x_start, uint16_t y_start,
 	uint8_t previous_sign = 0;
 	uint8_t current_num_digital = 0;
 	uint8_t current_sign = 0;
+	uint8_t temp = x_start;
 	num_to_arr(current_num,  &current_num_digital,  &current_sign,  current_data);
 	num_to_arr(previous_num, &previous_num_digital, &previous_sign, previous_data);
 	EPD_init(); //EPD init
+	if(mode == 3){
+		for(uint8_t l = current_num_digital; l > 0; l--){
+			EPD_partial_display(y_start, y_start + NUM_Y_SIZE ,
+								temp, temp + NUM_X_SIZE,
+								images[FULL_DIS],
+								images[EMPTY_DIS], 1);
+			temp +=16;
+		}
+		mode = 0;
+	}
     // Вызов функции EPD_partial_display с соответствующими аргументами
 	if(current_sign){ // Если есть знак то обновить место для него
 		EPD_partial_display(y_start, y_start + NUM_Y_SIZE ,

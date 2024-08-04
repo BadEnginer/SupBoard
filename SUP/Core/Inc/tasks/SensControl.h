@@ -15,7 +15,7 @@
 #define MAX_COUNT 2
 #define LONG_COUNT 15
 #define WAIT_ERROR_ADC_DAC 50
-#define MUTEX_TIMEOUT 1000
+#define MUTEX_TIMEOUT 10000
 
 //to do понять для чего это место )
 #define CUR_PARAM_1 37174,7
